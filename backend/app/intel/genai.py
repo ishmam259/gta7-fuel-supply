@@ -11,16 +11,22 @@ import logging
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from datetime import datetime, timedelta
 from typing import Any
 
 log = logging.getLogger("gta7.intel.genai")
 
-TIMEOUT_S = 8.0
+LLM_BUDGET_S = 3.0         # hard cap for the whole provider chain; after that the template answers instantly
+TIMEOUT_S = 3.0            # per-call HTTP timeout (OpenAI / Groq)
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
+SLOW_COOLDOWN_S = 15.0     # after it was merely too slow
 CACHE_MAX = 256
 MAX_CHARS = 900
+MAX_OUT_TOKENS = 300       # explanations need ~90 tokens, briefings ~200
+# fastest first (measured: gpt-4.1-nano ~1.1 s steady, gpt-4o-mini ~1.4 s with spikes); OPENAI_MODEL may be a list
+OPENAI_DEFAULT_MODELS = "gpt-4.1-nano,gpt-4o-mini"
 # used when GROQ_MODEL_PRIMARY/FALLBACK are not set; all verified available on Groq (Llama left the free tier: 404)
 GROQ_DEFAULT_MODELS = ("qwen/qwen3.8-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b")  # 20b: free-tier safety net            # explanation length shown in the dashboard
 SYSTEM = (
@@ -110,34 +116,51 @@ def _clean(text: str, limit: int = MAX_CHARS) -> str:
 
 
 # ---------------- providers ----------------
+_clients: dict[tuple, Any] = {}   # one client per provider/key: reuses the HTTPS connection (saves ~0.5-1.5 s per call)
+_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="llm")
+
+
+def _client(kind: str, key: str, insecure: bool = False):
+    ck = (kind, key, insecure)
+    if ck not in _clients:
+        if kind == "openai":
+            from openai import OpenAI
+            _clients[ck] = OpenAI(api_key=key, timeout=TIMEOUT_S, max_retries=0)
+        elif kind == "gemini":
+            from google import genai
+            from google.genai import types
+            _clients[ck] = genai.Client(api_key=key, http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_MS))
+        else:
+            from groq import Groq
+            kw = {}
+            if insecure:
+                import httpx
+                log.warning("GROQ_TLS_INSECURE set: TLS certificate verification disabled for Groq")
+                kw["http_client"] = httpx.Client(verify=False, timeout=TIMEOUT_S)
+            _clients[ck] = Groq(api_key=key, timeout=TIMEOUT_S, max_retries=0, **kw)
+    return _clients[ck]
+
+
 def _openai(cfg, model, system, user, want_json):
-    from openai import OpenAI
-    client = OpenAI(api_key=cfg["openai_api_key"], timeout=TIMEOUT_S, max_retries=0)
+    client = _client("openai", cfg["openai_api_key"])
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
-    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=500,
+    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=MAX_OUT_TOKENS,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
 
 def _gemini(cfg, model, system, user, want_json):
-    from google import genai
     from google.genai import types
-    client = genai.Client(api_key=cfg["gemini_api_key"], http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_MS))
-    conf = types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=500,
+    client = _client("gemini", cfg["gemini_api_key"])
+    conf = types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUT_TOKENS,
                                        response_mime_type="application/json" if want_json else None)
     return client.models.generate_content(model=model, contents=user, config=conf).text
 
 
 def _groq(cfg, model, system, user, want_json):
-    from groq import Groq
-    kw_client = {}
-    if cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"):
-        import httpx
-        log.warning("GROQ_TLS_INSECURE set: TLS certificate verification disabled for Groq")
-        kw_client["http_client"] = httpx.Client(verify=False, timeout=TIMEOUT_S)
-    client = Groq(api_key=cfg["groq_api_key"], timeout=TIMEOUT_S, max_retries=0, **kw_client)
+    client = _client("groq", cfg["groq_api_key"], cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"))
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
-    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=500,
+    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=MAX_OUT_TOKENS,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -146,7 +169,7 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     """(provider:model, call) in priority order; providers without a key are left out."""
     steps = []
     if cfg.get("openai_api_key"):
-        steps += [(f"openai:{m}", _openai) for m in _models(cfg.get("openai_model") or "gpt-4o-mini")]
+        steps += [(f"openai:{m}", _openai) for m in _models(cfg.get("openai_model") or OPENAI_DEFAULT_MODELS)]
     if cfg.get("gemini_api_key"):
         steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
     if cfg.get("groq_api_key"):
@@ -162,11 +185,18 @@ def _llm(user: str, want_json: bool = False) -> str | None:
         stats["cache_hits"] += 1
         return _cache[key]
     cfg = _cfg()
+    deadline = time.monotonic() + LLM_BUDGET_S
     for name, fn in _chain(cfg):
         if _down_until.get(name, 0) > time.monotonic():
             continue
+        remaining = deadline - time.monotonic()
+        if remaining <= 0.05:
+            stats["budget_exceeded"] = stats.get("budget_exceeded", 0) + 1
+            break
         try:
-            text = (fn(cfg, name.split(":", 1)[1], SYSTEM, user, want_json) or "").strip()
+            # run under the remaining budget; a slow call is abandoned (it finishes in the background, result ignored)
+            fut = _pool.submit(fn, cfg, name.split(":", 1)[1], SYSTEM, user, want_json)
+            text = (fut.result(timeout=remaining) or "").strip()
             text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()  # reasoning models
             if want_json:
                 text = _json_block(text)
@@ -178,6 +208,11 @@ def _llm(user: str, want_json: bool = False) -> str | None:
                 last_provider["name"] = name
                 stats["llm_ok"] += 1
                 return text
+        except FutureTimeout:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
+            log.warning("llm %s exceeded the %.1f s budget", name, LLM_BUDGET_S)
+            stats["failures"] += 1
+            stats["last_error"] = f"{name}: slower than {LLM_BUDGET_S:.0f} s"
+            _down_until[name] = time.monotonic() + SLOW_COOLDOWN_S
         except Exception as exc:
             log.warning("llm %s failed: %s", name, str(exc)[:200])
             stats["failures"] += 1
@@ -185,6 +220,24 @@ def _llm(user: str, want_json: bool = False) -> str | None:
             _down_until[name] = time.monotonic() + COOLDOWN_S
     stats["template"] += 1
     return None
+
+
+def warm_up() -> None:
+    """Open the first provider's connection in the background at startup, so the first operator click is fast.
+    Costs one 1-token call. Never raises."""
+    def _go():
+        try:
+            chain = _chain(_cfg())
+            if chain:
+                name, fn = chain[0]
+                cfg = _cfg()
+                if name.startswith(("openai", "groq")):
+                    kind = name.split(":")[0]
+                    c = _client(kind, cfg[f"{kind}_api_key"], cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"))
+                    c.chat.completions.create(model=name.split(":", 1)[1], max_tokens=1, messages=[{"role": "user", "content": "ok"}])
+        except Exception as exc:
+            log.info("llm warm-up skipped: %r", exc)
+    _pool.submit(_go)
 
 
 def llm_status() -> dict:
@@ -414,3 +467,7 @@ def answer(question: str, s: Any, alerts: list, recs: list) -> dict:
         except Exception:
             pass
     return template
+
+
+if not os.getenv("PYTEST_CURRENT_TEST") and "pytest" not in os.sys.modules:
+    warm_up()  # background; the import returns immediately

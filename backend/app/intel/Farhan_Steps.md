@@ -268,6 +268,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 | Tests started making real LLM calls once keys were added. | Tests read `.env`. | Tests disable keys; no network in tests. |
 | LLM output showed raw decimals ("0.9934 to 0.0") and IDs. | It got raw JSON. | Readable facts (names, %, clock times) are prepared in code. |
 | **Incident explanation invented a cause**: "route disrupted, likely due to the demand spike", although a `route_disruption` event named that exact route. | Asking the LLM to pick the cause from a list of events wasn't enough; it still guessed. | Code matches events to the entity (`_known_cause`), and the LLM must state that cause exactly. Live re-check: "disrupted due to a route disruption event (ticks 22-34)". |
+| **LLM too slow for the demo** (team: "judges won't accept a slow AI"). | Measured: a new HTTPS connection per call (+0.5–1.5 s), `gpt-4o-mini` ~1.4 s with spikes, first call ~3 s, and an 8 s timeout per provider (a stuck provider could hold a request for 8+ s). Gemini won't accept timeouts under 10 s. | **Hard 3 s budget for the whole chain** (each call runs under the remaining time; a slow call is abandoned and the template answers instantly). Connections reused per provider. Default OpenAI order `gpt-4.1-nano` (~1.1 s steady) → `gpt-4o-mini`. Output cap 300 tokens. Background warm-up at startup. Live: explanations 1.0–1.5 s, briefing 2.6 s, answer 1.4 s, repeats 0.02 s (cache), first call 3.0 → 1.6 s. Test: a provider that hangs for 3 s is cut off by the budget. |
 | Slow field access. | `_g()` converted the whole snapshot (2,000 history rows) to a dict for every single field read. | Read fields directly from the model. |
 
 ---
@@ -275,7 +276,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 ### Step 7: Tests (`backend/tests/intel/`)
 
 **What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
-the exact path production uses. **90 intel tests** (113 with Ishmam's backend tests), all passing, no network needed.
+the exact path production uses. **91 intel tests** (114 with Ishmam's backend tests), all passing, no network needed.
 
 | File | Tests | Covers |
 |---|---|---|
@@ -284,7 +285,7 @@ the exact path production uses. **90 intel tests** (113 with Ishmam's backend te
 | `test_risk.py` | 7 | Levels, probability goes down as stock goes up, outage, pending/in-transit trucks, DELAYED supply ETA. |
 | `test_detect.py` | 19 | No false alarms on real data (incl. supply arrivals and the snapshot race), leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
 | `test_planner.py` | 18 | Every simulator rule, the live before→after risk story, combined impact for two trucks, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
-| `test_genai.py` | 22 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
+| `test_genai.py` | 23 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
 | `test_pipeline.py` | 6 | **Through `intel_bridge`** with dict snapshots: healthy tick uses intel (not fallback); **combined crisis** (demand spike + route down + delayed supply + constrained depot + near-empty station) raises every alert type, gives a legal plan that uses the backup depot, and all 4 genai functions work; real snapshot pair with no false alarms; what-if including the fallback on a bad route; same input gives the same output; messy data handled by intel itself. |
 
 Other checks done outside pytest:
@@ -400,7 +401,7 @@ Retrain: `cd backend; python -m app.intel.rl 1500`
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
 Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
-Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (113 now).
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (114 now).
 
 **Correction for `round1_solution_approach.pdf` (the round-1 document):** it says "1-tick departure plus transit delay" and "lead time 3–5 ticks (45–75 min)". Tested on the simulator: a truck **departs on the tick it is ordered** and arrives after the transit time, so lead time is **2–4 ticks (30–60 min)**.
 
@@ -435,7 +436,7 @@ consequential actions.
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
 - **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
   simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
-- **90 intel tests** (113 with the backend's)
+- **91 intel tests** (114 with the backend's)
 - **RL option:** Q-learning picks the cover target; same service as LP with 15–20% fewer trucks., including full crisis runs through the backend bridge.
 - **Fast**: ~136 ms per tick for the whole pipeline.
 
