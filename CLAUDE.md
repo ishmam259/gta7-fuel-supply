@@ -12,8 +12,8 @@ Simulator reference: `docs/BUP_Fuel_Supply_Simulator_Integration_Guide_Final.pdf
 
 ## Run
 - Simulator: `docker compose up -d simulator-api` → http://localhost:8000/docs, admin console http://localhost:8000/admin
-- Backend: `cd backend && python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt && fastapi dev app/main.py --port 8080`
-- Web: `cd web && npm install && npm run dev` (http://localhost:3000, `NEXT_PUBLIC_API_URL=http://localhost:8080`)
+- Backend: `cd backend && python -m venv .venv && .venv\Scripts\activate && pip install -r requirements.txt && fastapi dev app/main.py --port 8090`
+- Web: `cd web && npm install && npm run dev` (http://localhost:3000, `NEXT_PUBLIC_API_URL=http://localhost:8090`)
 - Everything: `docker compose up --build`
 
 ## Rules

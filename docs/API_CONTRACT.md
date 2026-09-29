@@ -1,4 +1,4 @@
-# API Contract v1 — backend http://localhost:8080
+# API Contract v2 (backend port 8090) — backend http://localhost:8090
 Source of truth between dashboard ↔ backend. **Only Ishmam edits this file**; changes are announced as "contract vN" in the team chat.
 JSON everywhere. Errors: `{"detail": {"code": "UPPER_SNAKE", "message": "..."}}`.
 Sensitive routes (marked 🔒) need header `X-Operator-Key: <OPERATOR_KEY from .env>`.

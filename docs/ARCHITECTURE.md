@@ -6,7 +6,7 @@ flowchart LR
   subgraph SIM["BUP Fuel Supply Simulator :8000 (organizer image)"]
     V1["/v1 REST"]; SSE["/v1/stream SSE"]; ADM["/admin/*"]
   end
-  subgraph BE["backend :8080 (FastAPI, Python)"]
+  subgraph BE["backend :8090 (FastAPI, Python)"]
     CL["Sim client<br/>timeouts · retries · backoff · circuit breaker<br/>stale-data + schema validation"]
     SY["State sync<br/>SSE listener + REST resync, cached last-good state"]
     PR["Prediction service<br/>demand forecast · stockout probability · ETA"]
@@ -40,4 +40,4 @@ Required diagram chain (§19.6): **simulator → data/backend → intelligence �
 - Measurable: same seed + same crisis script ⇒ A/B compare service level **with vs without** our platform (world is deterministic).
 
 ## Ports
-simulator 8000 · backend 8080 · web 3000 · prometheus 9090 · grafana 3001
+simulator 8000 · backend 8090 · web 3000 · prometheus 9090 · grafana 3001
