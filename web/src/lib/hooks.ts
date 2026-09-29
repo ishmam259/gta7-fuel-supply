@@ -43,14 +43,18 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs = 3000, deps: unknow
 
   useEffect(() => {
     let cancelled = false;
+    // keep polling even in a background tab (an ops console often sits behind other windows); refresh at once on focus
     const tick = () => {
-      if (!cancelled && document.visibilityState !== "hidden") void refresh();
+      if (!cancelled) void refresh();
     };
-    tick();
+    const onVisible = () => document.visibilityState === "visible" && tick();
+    void refresh();
     const id = intervalMs > 0 ? setInterval(tick, intervalMs) : undefined;
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
       if (id) clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh, intervalMs, ...deps]);
