@@ -16,7 +16,7 @@ from sqlmodel import select
 
 from . import intel_bridge
 from .config import get_settings
-from .db import Alert, Decision, MetricPoint, Recommendation, session, utcnow
+from .db import Alert, Decision, MetricPoint, Recommendation, SharedState, session, utcnow
 from .logging_setup import log_event
 from .metrics import (ALERTS_RAISED, DECISIONS, DEGRADED, DEPOT_INVENTORY, MODEL_CONFIDENCE, OPEN_ALERTS,
                       PENDING_RECS, PIPELINE_SECONDS, PREDICTION_MAPE, RECOMMENDATIONS, RECOVERIES,
@@ -71,11 +71,60 @@ class Engine:
         self._last_full = 0.0
         self._consecutive_failures = 0
         self.paused_for_benchmark = False
+        self._last_shared = 0.0
         self._exec_lock = asyncio.Lock()  # approvals execute one at a time
 
     # ------------------------------------------------------------ lifecycle
     async def start(self) -> None:
+        if self.settings.role == "api":
+            self.load_shared(force=True)  # read replica: no tick loop, no writes
+            return
         self._tasks = [asyncio.create_task(self._poll_loop()), asyncio.create_task(self._sse_loop())]
+
+    # ------------------------------------------------------------ shared state (engine -> API replicas)
+    def save_shared(self) -> None:
+        """Engine publishes its latest view to the database so stateless API replicas can serve reads."""
+        if self.settings.role == "api" or time.monotonic() - self._last_shared < 0.5:
+            return
+        self._last_shared = time.monotonic()
+        data = {
+            "snap": self.snap, "risks": self.risks, "forecasts": self.forecasts, "last_tick": self.last_tick,
+            "last_sync_at": self.last_sync_at.isoformat() if self.last_sync_at else None,
+            "degraded": self.degraded, "sse_connected": self.sse_connected, "mode": self.mode,
+            "stale": self.sim.stale, "breaker": self.sim.breaker.state, "last_error": self.sim.last_error,
+            "started_at": self.started_at,
+            "intel": {"prediction": intel_bridge.STATUS.prediction, "decision": intel_bridge.STATUS.decision,
+                      "llm": intel_bridge.STATUS.llm},
+        }
+        try:
+            with session() as s:
+                row = s.get(SharedState, 1) or SharedState(id=1)
+                row.data, row.updated_at = json.loads(json.dumps(data, default=str)), utcnow()
+                s.add(row)
+                s.commit()
+        except Exception:
+            log.exception("could not publish shared state")
+
+    def load_shared(self, force: bool = False) -> None:
+        """API replica: refresh the engine's view from the database (cached for 1 s)."""
+        if not force and time.monotonic() - self._last_shared < 1.0:
+            return
+        self._last_shared = time.monotonic()
+        with session() as s:
+            row = s.get(SharedState, 1)
+        if row is None:
+            return
+        d = row.data
+        self.snap, self.risks, self.forecasts = d.get("snap"), d.get("risks") or {}, d.get("forecasts") or []
+        self.last_tick, self.degraded, self.sse_connected = d.get("last_tick"), d.get("degraded", False), d.get("sse_connected", False)
+        self.mode = d.get("mode") or self.mode
+        self.last_sync_at = datetime.fromisoformat(d["last_sync_at"]) if d.get("last_sync_at") else None
+        self.started_at = d.get("started_at", self.started_at)
+        self.sim.stale, self.sim.breaker.state, self.sim.last_error = d.get("stale", False), d.get("breaker", "closed"), d.get("last_error")
+        intel = d.get("intel") or {}
+        intel_bridge.STATUS.prediction = intel.get("prediction", intel_bridge.STATUS.prediction)
+        intel_bridge.STATUS.decision = intel.get("decision", intel_bridge.STATUS.decision)
+        intel_bridge.STATUS.llm = intel.get("llm", intel_bridge.STATUS.llm)
 
     async def stop(self) -> None:
         for t in self._tasks:
@@ -148,6 +197,12 @@ class Engine:
 
     # ------------------------------------------------------------ observe
     async def sync(self) -> None:
+        try:
+            await self._sync()
+        finally:
+            self.save_shared()
+
+    async def _sync(self) -> None:
         async with self._lock:
             try:
                 inst = await self.sim.get("/v1/instance")
@@ -537,4 +592,6 @@ engine: Engine | None = None
 
 def get_engine() -> Engine:
     assert engine is not None, "engine not started"
+    if engine.settings.role == "api":
+        engine.load_shared()
     return engine

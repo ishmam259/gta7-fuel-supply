@@ -54,6 +54,13 @@ class Alert(SQLModel, table=True):
     resolved_at: datetime | None = None
 
 
+class SharedState(SQLModel, table=True):
+    """Latest engine state, written by the engine every sync, read by API replicas."""
+    id: int = Field(default=1, primary_key=True)
+    data: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
 class MetricPoint(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     tick: int = Field(index=True)
@@ -74,7 +81,10 @@ def engine():
         if url.startswith("sqlite:///"):
             path = url.removeprefix("sqlite:///")
             os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-        _engine = create_engine(url, connect_args={"check_same_thread": False} if url.startswith("sqlite") else {})
+        if url.startswith("sqlite"):
+            _engine = create_engine(url, connect_args={"check_same_thread": False})
+        else:
+            _engine = create_engine(url, pool_size=10, max_overflow=10, pool_pre_ping=True)
     return _engine
 
 

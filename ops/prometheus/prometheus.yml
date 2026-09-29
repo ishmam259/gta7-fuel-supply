@@ -6,10 +6,20 @@ rule_files:
   - /etc/prometheus/alerts.yml
 
 scrape_configs:
+  # the engine (single writer): domain + intelligence + HTTP metrics
   - job_name: gta7-backend
     metrics_path: /metrics
     static_configs:
       - targets: ["backend:8090"]
+  # stateless API read replicas: discovered through Docker DNS, so `--scale api=N` shows up automatically
+  - job_name: gta7-api
+    metrics_path: /metrics
+    dns_sd_configs:
+      - names: ["api"]
+        type: A
+        port: 8090
+        refresh_interval: 10s
   - job_name: prometheus
+    metrics_path: /prometheus/metrics
     static_configs:
       - targets: ["localhost:9090"]

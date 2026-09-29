@@ -49,24 +49,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build images
-        run: docker compose build backend
-      - name: Deploy stack
-        run: docker compose up -d simulator-api backend prometheus
-      - name: Health check
+        run: docker compose build
+      - name: Deploy stack (engine + 2 API replicas + gateway + postgres + observability)
+        run: docker compose up -d
+      - name: Health check through the gateway
         run: |
-          for i in $(seq 1 40); do
-            if curl -fsS http://localhost:8090/api/health && curl -fsS http://localhost:8000/v1/health; then break; fi
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost/gateway/health && curl -fsS http://localhost/api/health; then break; fi
             sleep 3
           done
-          curl -fsS http://localhost:8090/api/system/status | tee status.json
+          curl -fsS http://localhost/api/system/status | tee status.json
           python3 -c "import json;s=json.load(open('status.json'));assert s['components']['simulator']=='healthy',s;print('overall:',s['overall'])"
-      - name: End-to-end smoke (step simulator, expect recommendations)
+      - name: End-to-end smoke (write via engine, read via replicas)
         run: |
-          curl -fsS -X POST -H "X-Operator-Key: change-me" -H "Content-Type: application/json" -d '{"n":30}' http://localhost:8090/api/sim/step
-          sleep 5
-          curl -fsS http://localhost:8090/api/state > /dev/null
-          curl -fsS "http://localhost:8090/api/recommendations?status=all" | python3 -c "import json,sys;r=json.load(sys.stdin);print(len(r),'recommendations');assert len(r)>0"
-          curl -fsS http://localhost:8090/metrics | grep -c gta7_
+          curl -fsS -X POST -H "X-Operator-Key: change-me" -H "Content-Type: application/json" -d '{"n":30}' http://localhost/api/sim/step
+          sleep 6
+          curl -fsS http://localhost/api/state > /dev/null
+          curl -fsS "http://localhost/api/recommendations?status=all" | python3 -c "import json,sys;r=json.load(sys.stdin);print(len(r),'recommendations');assert len(r)>0"
+      - name: Scale API replicas to 3 and verify
+        run: |
+          docker compose up -d --scale api=3 --no-recreate
+          sleep 15
+          test "$(docker compose ps -q api | wc -l)" -eq 3
+          for i in 1 2 3 4 5 6; do curl -fsS -o /dev/null -D - http://localhost/api/state | grep -i x-gta7-upstream; done
       - name: Logs on failure
         if: failure()
         run: docker compose logs --tail=200

@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=(".env", "../.env"), extra="ignore")
 
     simulator_url: str = "http://localhost:8000"
+    # all    = single process (dev): engine + API
+    # engine = the single writer: tick loop, approvals, mode, chaos, live stream
+    # api    = stateless read replica: serves reads from the engine's shared snapshot (scale this one)
+    role: str = "all"
     operator_key: str = "change-me"
     database_url: str = "sqlite:///./data/gta7.db"
     log_level: str = "INFO"

@@ -132,6 +132,11 @@
      "refId": "A",
      "expr": "sum(rate(http_requests_total[1m])) by (handler)",
      "legendFormat": "{{handler}}"
+    },
+    {
+     "refId": "B",
+     "expr": "sum(rate(http_requests_total[1m])) by (instance)",
+     "legendFormat": "total @ {{instance}}"
     }
    ],
    "gridPos": {
@@ -437,7 +442,7 @@
   {
    "id": 15,
    "type": "timeseries",
-   "title": "Backend CPU & memory",
+   "title": "CPU & memory per instance (engine + API replicas)",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -445,13 +450,13 @@
    "targets": [
     {
      "refId": "A",
-     "expr": "rate(process_cpu_seconds_total{job=\"gta7-backend\"}[1m])",
-     "legendFormat": "cpu cores"
+     "expr": "rate(process_cpu_seconds_total{job=~\"gta7-.*\"}[1m])",
+     "legendFormat": "cpu {{job}} {{instance}}"
     },
     {
      "refId": "B",
-     "expr": "process_resident_memory_bytes{job=\"gta7-backend\"}/1e6",
-     "legendFormat": "memory MB"
+     "expr": "process_resident_memory_bytes{job=~\"gta7-.*\"}/1e6",
+     "legendFormat": "MB {{job}} {{instance}}"
     }
    ],
    "gridPos": {
@@ -462,6 +467,62 @@
    },
    "fieldConfig": {
     "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 16,
+   "type": "stat",
+   "title": "API replicas up",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "count(up{job=\"gta7-api\"} == 1)",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 6,
+    "h": 5,
+    "x": 0,
+    "y": 33
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 17,
+   "type": "timeseries",
+   "title": "Requests served per replica (req/s)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(http_requests_total{job=\"gta7-api\"}[1m])) by (instance)",
+     "legendFormat": "{{instance}}"
+    }
+   ],
+   "gridPos": {
+    "w": 18,
+    "h": 7,
+    "x": 6,
+    "y": 33
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqps"
+    },
     "overrides": []
    },
    "options": {}

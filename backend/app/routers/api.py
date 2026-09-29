@@ -186,6 +186,8 @@ def get_mode():
 def set_mode(body: ModeBody):
     eng = get_engine()
     eng.mode = body.model_dump()
+    eng._last_shared = 0.0
+    eng.save_shared()
     return eng.mode
 
 

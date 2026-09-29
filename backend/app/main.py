@@ -18,9 +18,24 @@ settings = get_settings()
 setup_logging(settings.log_level)
 
 
+def _drop_engine_metrics() -> None:
+    """Read replicas only expose HTTP/process/simulator-call metrics; domain metrics belong to the engine."""
+    from prometheus_client import REGISTRY
+    from . import metrics as m
+    keep = {"SIM_REQUESTS", "SIM_LATENCY", "REQUEST_WINDOW", "LLM_CALLS"}
+    for name, obj in vars(m).items():
+        if name.isupper() and name not in keep and hasattr(obj, "_name"):
+            try:
+                REGISTRY.unregister(obj)
+            except KeyError:
+                pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    if settings.role == "api":
+        _drop_engine_metrics()
     engine_mod.engine = engine_mod.Engine()
     await engine_mod.engine.start()
     yield
