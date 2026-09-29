@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowRight, RefreshCw, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -34,16 +34,21 @@ export function BriefingCard() {
         </CardTitle>
         <div className="flex items-center gap-1.5">
           <SourceTag source={b.data?.source} />
-          <Button size="icon-sm" variant="ghost" onClick={() => void b.refresh()} aria-label="Refresh briefing">
-            <RefreshCw className={b.loading ? "animate-spin" : ""} />
+          <Button size="icon-sm" variant="ghost" onClick={() => void b.refresh()} disabled={b.fetching} aria-label="Refresh briefing">
+            <RefreshCw className={b.fetching ? "animate-spin" : ""} />
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <StaleNote error={b.error} updatedAt={b.updatedAt} />
-        {!b.data && !b.error && <Loading />}
+        {!b.data && !b.error && <Loading label="AI is writing the briefing…" />}
+        {b.data && b.fetching && (
+          <div className="flex items-center gap-2 rounded-md bg-muted px-2.5 py-1.5 text-xs text-muted-foreground" role="status">
+            <Loader2 className="size-3.5 animate-spin" /> Updating briefing for the latest tick…
+          </div>
+        )}
         {b.data && (
-          <>
+          <div className={b.fetching ? "space-y-3 opacity-60 transition-opacity" : "space-y-3 transition-opacity"}>
             <p className="leading-relaxed">{b.data.summary}</p>
             {b.data.top_risks.length > 0 && (
               <div>
@@ -74,7 +79,7 @@ export function BriefingCard() {
               </div>
             )}
             <div className="text-[11px] text-muted-foreground">Briefing at tick {b.data.tick} · AI explains, it does not decide quantities.</div>
-          </>
+          </div>
         )}
       </CardContent>
     </Card>

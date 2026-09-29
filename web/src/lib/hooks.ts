@@ -5,7 +5,8 @@ import { getOperatorKey } from "./api";
 export interface PollResult<T> {
   data: T | undefined;
   error: string | null; // last error (data may still hold the last good value → show as stale)
-  loading: boolean;
+  loading: boolean; // first load only
+  fetching: boolean; // any request in flight (first load, poll or manual refresh)
   updatedAt: number | null;
   refresh: () => Promise<void>;
 }
@@ -18,6 +19,7 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs = 3000, deps: unknow
   const [data, setData] = useState<T>();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
   const fnRef = useRef(fn);
   const inFlight = useRef(false);
@@ -28,6 +30,7 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs = 3000, deps: unknow
   const refresh = useCallback(async () => {
     if (inFlight.current) return;
     inFlight.current = true;
+    setFetching(true);
     try {
       const v = await fnRef.current();
       setData(v);
@@ -37,6 +40,7 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs = 3000, deps: unknow
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       inFlight.current = false;
+      setFetching(false);
       setLoading(false);
     }
   }, []);
@@ -59,7 +63,7 @@ export function usePoll<T>(fn: () => Promise<T>, intervalMs = 3000, deps: unknow
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh, intervalMs, ...deps]);
 
-  return { data, error, loading, updatedAt, refresh };
+  return { data, error, loading, fetching, updatedAt, refresh };
 }
 
 export function useOperatorKey(): string {
