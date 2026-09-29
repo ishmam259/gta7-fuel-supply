@@ -84,6 +84,13 @@ def test_supply_arrival_snapshot_race_no_alarm(supply):
     assert not kinds(run(ahead, supply["t12"] | {"tick": 11}), "inventory_anomaly")
 
 
+def test_supply_arrival_multi_tick_race_no_alarm(supply):
+    """After `step n=4` the contents can run 2+ ticks ahead of the label (board: 'ticks 80-82')."""
+    raced = copy.deepcopy(supply["t13"])
+    raced["tick"] = 11                              # label 2 ticks behind contents
+    assert not kinds(run(supply["t14"], raced), "inventory_anomaly")
+
+
 def test_leak_still_caught_during_supply_arrival(supply):
     now = copy.deepcopy(supply["t14"])
     next(d for d in now["depots"] if d["id"] == "depot-gazipur")["inventory"]["DIESEL"] -= 5000
