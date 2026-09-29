@@ -56,3 +56,24 @@ def test_rl_matches_lp_service_with_fewer_trucks():
     assert res["none"]["service_level"] < 0.5
     assert res["rl"]["service_level"] >= res["lp"]["service_level"] - 0.002
     assert res["rl"]["trucks_per_episode"] < res["lp"]["trucks_per_episode"]
+
+
+def test_summary_for_console_matches_saved_results():
+    s = rl.summary()
+    assert s["available"] and {"real_simulator", "offline", "policy", "how_it_works"} <= set(s)
+    real = {r["policy"]: r for r in s["real_simulator"]["results"]}
+    comp = json.loads(rl.COMPARISON_FILE.read_text())
+    for r in comp["results"]:
+        assert real[r["policy"]]["trucks_sent"] == r["trucks_sent"] and real[r["policy"]]["service_level"] == r["service_level"]
+        assert len(real[r["policy"]]["curve"]) == len(r["curve"])
+    assert s["offline"]["crisis"]["rl"]["trucks"] < s["offline"]["crisis"]["lp_24h"]["trucks"]
+    rows = s["policy"]["rows"]
+    assert len(rows) == s["policy"]["states_learned"] and all(r["chosen_cover_h"] in E.ACTIONS for r in rows)
+    assert rows == sorted(rows, key=lambda r: -r["visits"])
+
+
+def test_rl_summary_endpoint():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    r = TestClient(app).get("/api/rl/summary")
+    assert r.status_code == 200 and r.json()["available"] is True

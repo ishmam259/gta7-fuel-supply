@@ -2,7 +2,7 @@
 // Used only for endpoints listed in NEXT_PUBLIC_MOCK_ENDPOINTS (or all when NEXT_PUBLIC_MOCK=1).
 import type {
   Alert, AssistantAnswer, Briefing, Decision, Forecast, IncidentExplanation, MetricPoint, Mode,
-  NetworkState, Recommendation, SimulateResult, SystemStatus,
+  NetworkState, Recommendation, RlSummary, SimulateResult, SystemStatus,
 } from "./types";
 
 export const mockState: NetworkState = {
@@ -145,4 +145,31 @@ export const mockSystemStatus: SystemStatus = {
   overall: "healthy",
   components: { backend_api: "healthy", database: "healthy", simulator: "healthy", prediction_service: "healthy", decision_engine: "healthy", llm: "healthy" },
   circuit_breaker: "closed", sse: "connected", p95_latency_ms: 164, error_rate: 0.004, fallback_activations: 3, uptime_s: 5400,
+};
+
+const flat = (sl: number) => Array.from({ length: 48 }, (_, i) => ({ tick: i * 4, service_level: sl }));
+export const mockRlSummary: RlSummary = {
+  available: true,
+  real_simulator: {
+    ticks: 192,
+    crisis: [{ type: "demand_spike", offset: 8, duration_ticks: 48, parameters: { region_ids: ["region-dhaka"], multiplier: 1.6 } }],
+    results: [
+      { policy: "no_action", service_level: 0.4284, unmet_liters: 114613.6, served_liters: 85900, trucks_sent: 0, liters_shipped: 0, rejected: 0,
+        curve: flat(1).map((p, i) => ({ ...p, service_level: i < 12 ? 1 : 1 - (i - 12) * 0.016 })) },
+      { policy: "deterministic_lp", service_level: 1, unmet_liters: 0, served_liters: 200513.6, trucks_sent: 76, liters_shipped: 215600, rejected: 0, curve: flat(1) },
+      { policy: "rl", service_level: 1, unmet_liters: 0, served_liters: 200513.6, trucks_sent: 69, liters_shipped: 220750, rejected: 0, curve: flat(1) },
+    ],
+  },
+  offline: {
+    runs: 100, days_per_run: 4,
+    calm: { no_action: { service_level: 0.2158, worst_run: 0.1825, unmet_liters: 292101, trucks: 0 },
+            lp_24h: { service_level: 1, worst_run: 1, unmet_liters: 0, trucks: 87.6 },
+            rl: { service_level: 1, worst_run: 0.9979, unmet_liters: 8.2, trucks: 69.8 } },
+    crisis: { no_action: { service_level: 0.2103, worst_run: 0.1767, unmet_liters: 302008.8, trucks: 0 },
+              lp_24h: { service_level: 0.9998, worst_run: 0.985, unmet_liters: 87.8, trucks: 97.3 },
+              rl: { service_level: 0.9997, worst_run: 0.985, unmet_liters: 103.3, trucks: 82.8 } },
+  },
+  policy: { actions_h: [12, 18, 24, 30], states_learned: 2, episodes: 1500, train_seconds: 55,
+            rows: [{ cover_left: "12-16 h", depot_stock: "20-50%", spike: false, route_open: true, chosen_cover_h: 30, visits: 64315 },
+                   { cover_left: "8-12 h", depot_stock: "< 20%", spike: true, route_open: true, chosen_cover_h: 18, visits: 493 }] },
 };

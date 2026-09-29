@@ -4,7 +4,7 @@
 import * as mock from "./mock";
 import type {
   Alert, AssistantAnswer, Briefing, Decision, Forecast, IncidentExplanation, MetricPoint, Mode,
-  NetworkState, Recommendation, SimControlResult, SimulateBody, SimulateResult, SystemStatus,
+  NetworkState, Recommendation, RlSummary, SimControlResult, SimulateBody, SimulateResult, SystemStatus,
 } from "./types";
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8090").replace(/\/$/, "");
@@ -15,7 +15,7 @@ const TIMEOUT_MS = 8000;
 export type EndpointKey =
   | "state" | "forecast" | "metricsHistory" | "alerts" | "recommendations" | "recommendation" | "simulate"
   | "approve" | "reject" | "decisions" | "mode" | "setMode" | "briefing" | "assistant" | "incident"
-  | "systemStatus" | "sim" | "chaos";
+  | "systemStatus" | "sim" | "chaos" | "rl";
 
 export const isMocked = (k: EndpointKey) => MOCK_ALL || MOCK_KEYS.has(k);
 export const anyMocked = () => MOCK_ALL || MOCK_KEYS.size > 0;
@@ -153,6 +153,7 @@ export const api = {
   chaosFaultClear: () => (isMocked("chaos") ? delay({ ok: true }) : request<unknown>("/api/chaos/fault/clear", { ...post({}), operator: true })),
   chaosEvents: () => (isMocked("chaos") ? delay([]) : request<unknown>("/api/chaos/events")),
   chaosFaults: () => (isMocked("chaos") ? delay([]) : request<unknown>("/api/chaos/faults")),
+  rlSummary: () => (isMocked("rl") ? delay(mock.mockRlSummary) : request<RlSummary>("/api/rl/summary")),
 };
 
 export const streamUrl = () => `${API_URL}/api/stream`;

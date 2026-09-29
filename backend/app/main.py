@@ -13,6 +13,7 @@ from .logging_setup import setup_logging
 from .metrics import REQUEST_WINDOW
 from .routers.api import router as api_router
 from .routers.ops_api import router as ops_router
+from .routers.rl_api import router as rl_router
 
 settings = get_settings()
 setup_logging(settings.log_level)
@@ -62,4 +63,5 @@ async def timing(request: Request, call_next):
 
 app.include_router(api_router)
 app.include_router(ops_router)
+app.include_router(rl_router)
 Instrumentator(excluded_handlers=["/metrics", "/api/stream"]).instrument(app).expose(app, include_in_schema=False)

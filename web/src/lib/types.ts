@@ -253,3 +253,47 @@ export interface SimControlResult {
   tick: number;
   status: string;
 }
+
+// ---- RL vs deterministic comparison (GET /api/rl/summary; saved results) ----
+export type RlPolicyName = "no_action" | "deterministic_lp" | "rl";
+export interface RlRealResult {
+  policy: RlPolicyName;
+  service_level: number;
+  unmet_liters: number;
+  served_liters: number;
+  trucks_sent: number;
+  liters_shipped: number;
+  rejected: number;
+  curve: { tick: number; service_level: number }[];
+}
+export interface RlOfflineRow {
+  service_level: number;
+  worst_run: number;
+  unmet_liters: number;
+  trucks: number;
+}
+export interface RlPolicyRow {
+  cover_left: string;
+  depot_stock: string;
+  spike: boolean;
+  route_open: boolean;
+  chosen_cover_h: number;
+  visits: number;
+}
+export interface RlSummary {
+  available: boolean;
+  error?: string;
+  real_simulator?: {
+    ticks: number;
+    crisis: { type: string; offset: number; duration_ticks: number; parameters: Record<string, unknown> }[];
+    results: RlRealResult[];
+  };
+  offline?: {
+    runs: number;
+    days_per_run: number;
+    calm: Record<"no_action" | "lp_24h" | "rl", RlOfflineRow>;
+    crisis: Record<"no_action" | "lp_24h" | "rl", RlOfflineRow>;
+  };
+  policy?: { actions_h: number[]; states_learned: number; rows: RlPolicyRow[]; episodes?: number; train_seconds?: number };
+  how_it_works?: Record<"deterministic" | "rl" | "reward" | "training" | "verdict", string>;
+}

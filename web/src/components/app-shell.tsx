@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import {
-  Activity, AlertTriangle, Bell, Bot, ClipboardList, Fuel, Gauge, History, Inbox, Menu, Network, ShieldAlert, X,
+  Activity, AlertTriangle, Bell, Bot, BrainCircuit, ClipboardList, Fuel, Gauge, History, Inbox, Menu, Network, ShieldAlert, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { anyMocked } from "@/lib/api";
@@ -18,6 +18,7 @@ const NAV = [
   { href: "/recommendations", label: "Recommendations", icon: Inbox },
   { href: "/history", label: "History & Forecast", icon: History },
   { href: "/assistant", label: "AI Assistant", icon: Bot },
+  { href: "/rl", label: "RL vs Deterministic", icon: BrainCircuit },
   { href: "/system", label: "System Status", icon: Activity },
   { href: "/control", label: "Control & Chaos", icon: ShieldAlert },
 ];

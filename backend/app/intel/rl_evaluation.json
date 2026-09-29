@@ -1,0 +1,44 @@
+{
+ "runs": 100,
+ "days_per_run": 4,
+ "calm": {
+  "no_action": {
+   "service_level": 0.2158,
+   "worst_run": 0.1825,
+   "unmet_liters": 292101.0,
+   "trucks": 0.0
+  },
+  "lp_24h": {
+   "service_level": 1.0,
+   "worst_run": 1.0,
+   "unmet_liters": 0.0,
+   "trucks": 87.6
+  },
+  "rl": {
+   "service_level": 1.0,
+   "worst_run": 0.9979,
+   "unmet_liters": 8.2,
+   "trucks": 69.8
+  }
+ },
+ "crisis": {
+  "no_action": {
+   "service_level": 0.2103,
+   "worst_run": 0.1767,
+   "unmet_liters": 302008.8,
+   "trucks": 0.0
+  },
+  "lp_24h": {
+   "service_level": 0.9998,
+   "worst_run": 0.985,
+   "unmet_liters": 87.8,
+   "trucks": 97.3
+  },
+  "rl": {
+   "service_level": 0.9997,
+   "worst_run": 0.985,
+   "unmet_liters": 103.3,
+   "trucks": 82.8
+  }
+ }
+}

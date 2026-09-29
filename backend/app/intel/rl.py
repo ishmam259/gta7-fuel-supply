@@ -138,6 +138,79 @@ def rl_plan(s: Snapshot, fc: list[Forecast], risks: list[Risk]) -> list[Recommen
     return recs
 
 
+# ---------------- saved results for the console's "RL vs Deterministic" page ----------------
+EVAL_FILE = Path(__file__).with_name("rl_evaluation.json")
+COMPARISON_FILE = Path(__file__).with_name("policy_comparison.json")
+FIXTURE = Path(__file__).resolve().parents[2] / "tests/intel/fixtures/snapshot_tick24.json"
+_COVER_LABEL = ("0–4 h", "4–8 h", "8–12 h", "12–16 h")
+_DEPOT_LABEL = ("< 20%", "20–50%", "> 50%")
+
+
+def evaluate_calm_crisis(seeds: range = range(70000, 70100), ticks: int = 384) -> dict:
+    """Offline evaluation behind the reported numbers (100 held-out runs x 4 days, calm and crisis). Saves EVAL_FILE."""
+    snap = json.loads(FIXTURE.read_text())
+    qt = QTable.load()
+    pols = {"no_action": lambda st, r: None, "lp_24h": lambda st, r: DEFAULT_COVER, "rl": lambda st, r: qt.best(st)}
+    out = {"runs": len(seeds), "days_per_run": ticks // 96}
+    for label, events in (("calm", False), ("crisis", True)):
+        out[label] = {}
+        for name, pol in pols.items():
+            sl, lost, trucks = [], [], []
+            for sd in seeds:
+                w, _ = E.run_episode(snap, pol, sd, ticks=ticks, events=events)
+                sl.append(E.service_level(w)); lost.append(w.lost); trucks.append(w.trucks_sent)
+            out[label][name] = {"service_level": round(sum(sl) / len(sl), 4), "worst_run": round(min(sl), 4),
+                                "unmet_liters": round(sum(lost) / len(lost), 1), "trucks": round(sum(trucks) / len(trucks), 1)}
+    EVAL_FILE.write_text(json.dumps(out, indent=1))
+    return out
+
+
+def _read(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return None
+
+
+def summary() -> dict:
+    """Everything the RL page shows, from saved files only (no simulator calls, safe during judging)."""
+    comp, ev, pol = _read(COMPARISON_FILE), _read(EVAL_FILE), _read(POLICY_FILE)
+    out: dict = {"available": bool(comp or ev or pol)}
+    if comp:
+        out["real_simulator"] = {
+            "ticks": comp["results"][0]["ticks"],
+            "crisis": [{"type": e["type"], "offset": e["offset"], "duration_ticks": e["duration_ticks"],
+                        "parameters": e["parameters"]} for e in comp["crisis"]],
+            "results": [{k: r[k] for k in ("policy", "service_level", "unmet_liters", "served_liters", "trucks_sent",
+                                           "liters_shipped", "rejected")}
+                        | {"curve": [{"tick": p["tick"], "service_level": p["service_level"]} for p in r["curve"]]}
+                        for r in comp["results"]],
+        }
+    if ev:
+        out["offline"] = ev
+    if pol:
+        qt = QTable(pol["q"], pol.get("n"))
+        rows = []
+        for k in pol["q"]:
+            c, d, sp, ro = map(int, k.split(","))
+            rows.append({"cover_left": _COVER_LABEL[c], "depot_stock": _DEPOT_LABEL[d], "spike": bool(sp),
+                         "route_open": bool(ro), "chosen_cover_h": qt.best((c, d, sp, ro)), "visits": sum(pol["n"][k])})
+        rows.sort(key=lambda r: -r["visits"])
+        out["policy"] = {"actions_h": list(E.ACTIONS), "states_learned": len(rows), "rows": rows,
+                         "episodes": pol.get("meta", {}).get("episodes"),
+                         "train_seconds": pol.get("meta", {}).get("train_seconds")}
+    out["how_it_works"] = {
+        "deterministic": "LP optimizer with a fixed 24 h target cover per delivery; enforces every simulator rule.",
+        "rl": "Tabular Q-learning picks the target cover (12/18/24/30 h) per station x fuel from 4 signals: cover left, "
+              "depot stock, demand spike, normal route open. The same LP then picks the trucks and enforces every rule.",
+        "reward": "-(liters lost + truck cost) per hour until the station needs its next truck.",
+        "training": "Offline in a fast copy of the network (documented demand model, simulator rules, random crises).",
+        "verdict": "Same service level as the deterministic LP with 9-20% fewer trucks. LP stays the default; "
+                   "RL is an option (mode = rl).",
+    }
+    return out
+
+
 if __name__ == "__main__":  # python -m app.intel.rl  (from backend/): train, evaluate, save the policy
     import sys, time
     fixture = Path(__file__).resolve().parents[2] / "tests/intel/fixtures/snapshot_tick24.json"
