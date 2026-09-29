@@ -4,7 +4,7 @@ from .models import (
     AllocationPlan, Alternative, ExpectedImpact, Forecast, ProjectionPoint, RecommendationDraft,
     Risk, Situation, Snapshot, WhatIf,
 )
-from .risk import SHIPPABLE_DEPOT, assess_risk, dispatch_used, incoming, project, stockout_prob
+from .risk import SHIPPABLE_DEPOT, assess_risk, dispatch_used, incoming, long_forecasts, project, stockout_prob
 
 MIN_QTY = 500.0
 
@@ -33,6 +33,7 @@ def _candidates(s: Snapshot, station_id: str, fuel: str, depot_left: dict, depot
 
 def _plan(s: Snapshot, fc: list[Forecast], risks: list[Risk], mode: str) -> list[RecommendationDraft]:
     by_key = {(f.station_id, f.fuel_type): f for f in fc}
+    long_fc = long_forecasts(s)  # probabilities use the same 12 h window as assess_risk
     depot_left = {d["id"]: float(d.get("dispatch_capacity_per_tick", 0)) - dispatch_used(s, d) for d in s.depots}
     depot_inv = {(d["id"], f): float(q) for d in s.depots for f, q in d.get("inventory", {}).items()}
     recs = []
@@ -44,7 +45,7 @@ def _plan(s: Snapshot, fc: list[Forecast], risks: list[Risk], mode: str) -> list
         options = []
         for route, qty, cons in cands:
             eta = s.tick + int(route["transit_ticks"])
-            p_after = stockout_prob(s, f, r.current_inventory, {eta: qty})
+            p_after = stockout_prob(s, long_fc.get((r.station_id, r.fuel_type), f), r.current_inventory, {eta: qty})
             options.append((route, qty, cons, eta, p_after))
         route, qty, cons, eta, p_after = options[0]
         depot_left[route["source_depot_id"]] -= qty
@@ -83,8 +84,9 @@ def simulate(s: Snapshot, fc: list[Forecast], station_id: str, fuel_type: str,
     route = next(r for r in s.routes if r["id"] == route_id)
     inv = float(st["inventory"][fuel_type])
     extra = {s.tick + int(route["transit_ticks"]): quantity}
+    lf = long_forecasts(s).get((station_id, fuel_type), f)
     pts = lambda path: [ProjectionPoint(tick=t, inventory=round(i, 1)) for t, i in path]
     return WhatIf(
         projection_without=pts(project(s, f, inv)), projection_with=pts(project(s, f, inv, extra)),
-        stockout_prob_before=stockout_prob(s, f, inv), stockout_prob_after=stockout_prob(s, f, inv, extra),
+        stockout_prob_before=stockout_prob(s, lf, inv), stockout_prob_after=stockout_prob(s, lf, inv, extra),
     )
