@@ -29,7 +29,8 @@ LIST_ENDPOINTS = {
     "regions": "/v1/regions", "depots": "/v1/depots", "stations": "/v1/stations", "routes": "/v1/routes",
     "supply_arrivals": "/v1/supply-arrivals", "events": "/v1/events", "allocations": "/v1/allocations",
 }
-AUTO_RESOLVE_KINDS = {"shortage_risk", "disruption", "bottleneck", "integration_failure", "stale_data"}
+AUTO_RESOLVE_KINDS = {"shortage_risk", "disruption", "bottleneck", "integration_failure", "stale_data",
+                      "low_confidence", "anomalous_demand", "inventory_anomaly", "fallback", "recovery"}
 
 
 async def fetch_snapshot(sim: SimClient, inst: dict, history_limit: int = 2000) -> dict:
@@ -70,6 +71,7 @@ class Engine:
         self._last_full = 0.0
         self._consecutive_failures = 0
         self.paused_for_benchmark = False
+        self._exec_lock = asyncio.Lock()  # approvals execute one at a time
 
     # ------------------------------------------------------------ lifecycle
     async def start(self) -> None:
@@ -369,6 +371,41 @@ class Engine:
     # ------------------------------------------------------------ act (executor)
     async def execute(self, rec_id: int, actor: str = "operator", quantity: float | None = None,
                       note: str | None = None) -> Recommendation:
+        """Approvals are serialized so each one sees the effect of the previous one."""
+        async with self._exec_lock:
+            return await self._execute(rec_id, actor, quantity, note)
+
+    def availability_problem(self, station_id: str, fuel: str, alloc: dict) -> str | None:
+        """Re-check a shipment against the LATEST snapshot (availability may have changed since the card was made)."""
+        snap = self.snap
+        if snap is None:
+            return None
+        route = next((r for r in snap["routes"] if r["id"] == alloc.get("route_id")), None)
+        depot = next((d for d in snap["depots"] if d["id"] == alloc.get("source_depot_id")), None)
+        st = next((x for x in snap["stations"] if x["id"] == station_id), None)
+        qty = float(alloc.get("quantity", 0))
+        if route is None or depot is None or st is None:
+            return "unknown route, depot or station"
+        if route["status"] != "AVAILABLE":
+            return f"route {route['id']} is now {route['status']}"
+        if depot["status"] not in ("OPEN", "CONSTRAINED"):
+            return f"{depot['name']} is now {depot['status']}"
+        if st["status"] != "OPEN":
+            return f"{st['name']} is now {st['status']}"
+        if qty > route["max_shipment"]:
+            return f"quantity {qty:.0f} L exceeds route max {route['max_shipment']:.0f} L"
+        if depot["inventory"].get(fuel, 0) < qty:
+            return f"{depot['name']} now has only {depot['inventory'].get(fuel, 0):.0f} L {fuel.lower()}"
+        pending = sum(a["quantity"] for a in snap["allocations"]
+                      if a["status"] == "PENDING" and a["source_depot_id"] == depot["id"])
+        if pending + qty > depot["dispatch_capacity_per_tick"]:
+            return (f"{depot['name']} dispatch capacity left this tick is "
+                    f"{max(0, depot['dispatch_capacity_per_tick'] - pending):.0f} L")
+        if st["inventory"].get(fuel, 0) + qty > st["capacity"].get(fuel, 0):
+            return f"{st['name']} has room for only {st['capacity'][fuel] - st['inventory'][fuel]:.0f} L"
+        return None
+
+    async def _execute(self, rec_id: int, actor: str, quantity: float | None, note: str | None) -> Recommendation:
         with session() as s:
             rec = s.get(Recommendation, rec_id)
             if rec is None:
@@ -378,6 +415,21 @@ class Engine:
             alloc = dict(rec.body.get("allocation", {}))
             if quantity is not None:
                 alloc["quantity"] = float(quantity)
+            problem = self.availability_problem(rec.station_id, rec.fuel_type, alloc)
+            if problem:
+                rec.status = "failed"
+                rec.failure_reason = f"AVAILABILITY_CHANGED: {problem} (recommended at tick {rec.tick}, now tick {self.last_tick})"
+                rec.updated_at = utcnow()
+                s.add(rec)
+                s.add(Decision(tick=self.last_tick or 0, actor=actor, action="approve", recommendation_id=rec.id,
+                               result="AVAILABILITY_CHANGED", note=note))
+                s.commit()
+                s.refresh(rec)
+                DECISIONS.labels(actor, "approve", "AVAILABILITY_CHANGED").inc()
+                log_event(log, "approval blocked: availability changed", recommendation_id=rec.id, problem=problem)
+                self.publish("recommendation", self.rec_view(rec))
+                self._wake.set()  # re-plan from the latest state
+                return rec
             body = {"idempotency_key": f"gta7-rec{rec.id}-q{int(alloc['quantity'])}",
                     "source_depot_id": alloc["source_depot_id"], "destination_station_id": rec.station_id,
                     "route_id": alloc["route_id"], "fuel_type": rec.fuel_type, "quantity": alloc["quantity"]}
