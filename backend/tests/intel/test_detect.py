@@ -62,6 +62,35 @@ def test_depot_leak_detected(pair):
     assert a.entity.type == "depot" and a.entity.id == "depot-gazipur"
 
 
+@pytest.fixture
+def supply() -> dict:
+    return json.loads((FIX / "supply_arrival.json").read_text())  # real: supply-001 +18,000 L diesel at Gazipur, tick 12
+
+
+def test_supply_arrival_normal_timing_no_alarm(supply):
+    assert not kinds(run(supply["t13"], supply["t12"]), "inventory_anomaly")
+    assert not kinds(run(supply["t14"], supply["t12"]), "inventory_anomaly")
+
+
+def test_supply_arrival_snapshot_race_no_alarm(supply):
+    """Ishmam's false positive: the snapshot labelled tick 12 already contains the supply (a tick passed while the
+    backend fetched), so the next check counted +18,000 L twice and reported a drop."""
+    raced = copy.deepcopy(supply["t13"])
+    raced["tick"], raced["sim_time"] = supply["t12"]["tick"], supply["t12"]["sim_time"]
+    assert not kinds(run(supply["t14"], raced), "inventory_anomaly")
+    # the reverse race: current snapshot's tick label is behind its contents
+    ahead = copy.deepcopy(supply["t13"])
+    ahead["tick"], ahead["sim_time"] = supply["t12"]["tick"], supply["t12"]["sim_time"]
+    assert not kinds(run(ahead, supply["t12"] | {"tick": 11}), "inventory_anomaly")
+
+
+def test_leak_still_caught_during_supply_arrival(supply):
+    now = copy.deepcopy(supply["t14"])
+    next(d for d in now["depots"] if d["id"] == "depot-gazipur")["inventory"]["DIESEL"] -= 5000
+    [a] = kinds(run(now, supply["t12"]), "inventory_anomaly")
+    assert a.entity.id == "depot-gazipur" and "drop" in a.title
+
+
 def test_no_prev_no_inventory_check(pair):
     assert not kinds(run(pair["now"]), "inventory_anomaly")
 
