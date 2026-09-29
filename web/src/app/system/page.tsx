@@ -82,7 +82,7 @@ export default function SystemPage() {
             {COMPONENTS.map(({ key, label, icon: Icon, what }) => {
               const v = String(s.components?.[key] ?? "unknown");
               return (
-                <div key={key} className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4">
+                <div key={key} className="flex min-w-0 items-center justify-between gap-3 rounded-xl border bg-card p-4">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
                       <Icon className="size-4" />
