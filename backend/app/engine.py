@@ -167,6 +167,8 @@ class Engine:
             self._consecutive_failures = 0
             if self.degraded:
                 self._recover()
+            else:
+                self._resolve(kind="integration_failure")  # a successful sync clears any leftover outage alert
             if self.last_tick is not None and inst["tick"] < self.last_tick:
                 self._on_reset()
             self.prev, self.snap = self.snap, snap
