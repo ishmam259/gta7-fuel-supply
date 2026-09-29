@@ -275,7 +275,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 ### Step 7: Tests (`backend/tests/intel/`)
 
 **What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
-the exact path production uses. **83 intel tests** (106 with Ishmam's backend tests), all passing, no network needed.
+the exact path production uses. **90 intel tests** (113 with Ishmam's backend tests), all passing, no network needed.
 
 | File | Tests | Covers |
 |---|---|---|
@@ -301,6 +301,59 @@ Other checks done outside pytest:
 | Ishmam's backup `fallback_policy.py` also crashes on a `None` demand value. | His file doesn't check for `None`. | Not my file. Reported to Ishmam (see section 4). |
 
 Run: `cd backend; python -m pytest tests/intel -q`
+
+---
+
+### Step 8: Reinforcement learning (Plan v2, timeboxed to 13:20)
+
+**What it does, in plain English:** the LP planner always aims for **24 hours of cover** per delivery. RL learns
+**how much cover to aim for** in each situation (12 / 18 / 24 / 30 h) by practising thousands of times on a fast
+copy of the network. The LP still decides the actual trucks and still enforces every simulator rule; RL only
+picks the target. It's a hybrid: learning where it's safe, deterministic optimization where rules matter.
+
+| Piece | File | What |
+|---|---|---|
+| Training world | `rl_env.py` | Fast offline copy of the network built from a real snapshot + the documented demand model: trucks depart on the order tick and arrive after transit, dispatch limits, route max, tank capacity, depot stock, supply every 64 ticks (tight: 80% of daily demand, depots start 15–60% full), random demand spikes (×1.5–2.0), route disruptions and shipment delays. ~0.03 s per simulated 4 days. |
+| Agent | `rl.py` | **Tabular Q-learning.** State (4 small signals): cover left (0–4/4–8/8–12/12–16 h), depot stock (<20% / <50% / more), demand spike active, station's normal route open. Action: target cover 12/18/24/30 h. Reward: −(liters lost + truck cost) ÷ hours until that station needs its next truck, i.e. **cost per hour**. 1,500 training runs of 4 simulated days (~55 s). |
+| Policy | `rl_policy.json` | The learned table (37 situations), plus training metadata and evaluation. |
+| Runtime | `rl.rl_plan(s, fc, risks)` | Looks up the learned cover per station/fuel from the live snapshot, runs the normal LP with it, returns cards with `mode="rl"` and a signal like "RL chose 30 h target cover (state: …)". **No policy file → plain LP.** LP stays the default. |
+
+**What it learned (readable, not a black box):**
+- Plenty of time and depot stock → **30 h** (bigger deliveries, fewer trucks).
+- **Depot low + demand spike → 18 h** (don't drain the depot; other stations need it too).
+- Station's normal route down → mostly 24–30 h (the backup route is slower and smaller, so each trip should count).
+
+**Results (100 held-out runs per row, same seeds for every policy, 4 simulated days each):**
+
+| Scenario | Policy | Service level | Liters lost | Trucks |
+|---|---|---|---|---|
+| Calm | No action | 21.6% | 292,101 | 0 |
+| Calm | LP (24 h) | 100% | 0 | 87.6 |
+| Calm | **RL** | 100% | 8 | **69.8 (−20%)** |
+| Crisis | No action | 21.0% | 302,009 | 0 |
+| Crisis | LP (24 h) | 99.98% | 88 | 97.3 |
+| Crisis | **RL** | 99.97% | 103 | **82.8 (−15%)** |
+
+**Honest conclusion (for Q&A):** RL does **not** beat LP on service; both keep ~100% because the forecast is accurate
+(5% error) and the LP already respects every limit. RL's win is **efficiency: the same service with 15–20% fewer
+trucks**, by learning when bigger deliveries pay off and when to conserve depot stock. We keep the explainable LP
+as the default and offer RL as an option (`mode="rl"`), per brief §8 ("optional, must show why it helps").
+Limitation: trained in our own model of the network, not on the live simulator (too slow); live comparison
+needs Ishmam's benchmark `policy` switch.
+
+**Bugs found and fixed:**
+
+| Bug | Why | Fix |
+|---|---|---|
+| Nothing to learn: every fixed cover scored 100%. | Training world too generous (depot supply > demand). | Realistic scarcity: supply at 80% of daily demand, depots start 15–60% full, stronger spikes. Then choices matter (truck count 581 vs 85 per 4 days for 12 h vs 30 h). |
+| Training too slow (0.7 s per episode). | The demand model was recomputed every tick. | Cached per profile/fuel/hour: ~50× faster. |
+| Agent never saw a route disruption. | "Primary route open" looked at the fastest **available** route, which is always open. | Look at the station's normal (fastest) route regardless of status; 37 situations learned instead of 24. |
+
+**Tests (`test_rl.py`, 7):** policy file ships and every entry is a valid action; `rl_plan` gives legal plans marked
+`rl` with an explanation on 3 real snapshots; no policy → identical to LP; training world is deterministic; on
+held-out seeds RL matches LP service with fewer trucks, and no action collapses.
+
+Retrain: `cd backend; python -m app.intel.rl 1500`
 
 ---
 
@@ -334,7 +387,7 @@ Run: `cd backend; python -m pytest tests/intel -q`
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
 Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
-Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (106 now).
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (113 now).
 
 **Correction for `round1_solution_approach.pdf` (the round-1 document):** it says "1-tick departure plus transit delay" and "lead time 3–5 ticks (45–75 min)". Tested on the simulator: a truck **departs on the tick it is ordered** and arrives after the transit time, so lead time is **2–4 ticks (30–60 min)**.
 
@@ -369,7 +422,8 @@ consequential actions.
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
 - **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
   simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
-- **83 intel tests** (106 with the backend's), including full crisis runs through the backend bridge.
+- **90 intel tests** (113 with the backend's)
+- **RL option:** Q-learning picks the cover target; same service as LP with 15–20% fewer trucks., including full crisis runs through the backend bridge.
 - **Fast**: ~136 ms per tick for the whole pipeline.
 
 **Status: all 7 steps are complete** and pushed to `intel`. Ishmam has merged up to step 4. The team fixes,

@@ -14,7 +14,7 @@ AlertKind = Literal[
     "shortage_risk", "anomalous_demand", "inventory_anomaly", "bottleneck", "disruption",
     "integration_failure", "low_confidence", "fallback", "recovery",
 ]
-PlanMode = Literal["optimizer", "heuristic", "fallback"]
+PlanMode = Literal["optimizer", "heuristic", "fallback", "rl"]
 
 
 class Snapshot(BaseModel):
