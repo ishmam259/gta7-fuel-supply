@@ -5,7 +5,7 @@ Field names match docs/API_CONTRACT.md so the backend can store/return them unch
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 FuelType = Literal["DIESEL", "PETROL", "OCTANE"]
 RiskLevel = Literal["ok", "watch", "critical", "outage"]
@@ -29,6 +29,38 @@ class Snapshot(BaseModel):
     events: list[dict] = Field(default_factory=list)
     demand_history: list[dict] = Field(default_factory=list)
     regions: list[dict] = Field(default_factory=list)  # optional, /v1/regions
+    metrics: dict = Field(default_factory=dict)        # optional, /v1/metrics (service level for briefings)
+    dropped_rows: int = 0                              # malformed rows removed by the sanity check
+
+    @model_validator(mode="after")
+    def _sanitize(self):
+        """Drop rows a bad simulator response could contain, so one broken row never breaks the whole tick."""
+        before = sum(len(getattr(self, k)) for k in _REQUIRED)
+        for key, (fields, numeric) in _REQUIRED.items():
+            setattr(self, key, [r for r in getattr(self, key) if _ok(r, fields, numeric)])
+        self.allocations = [a for a in self.allocations if a.get("route_id") or a.get("destination_station_id")]
+        self.dropped_rows = before - sum(len(getattr(self, k)) for k in _REQUIRED)
+        return self
+
+
+def _num(x) -> bool:
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and x == x  # rejects None, strings, NaN
+
+
+def _ok(row, fields: tuple, numeric: tuple) -> bool:
+    return (isinstance(row, dict) and all(row.get(f) is not None for f in fields)
+            and all(_num(row.get(f)) for f in numeric))
+
+
+# per snapshot list: (required fields, fields that must be numbers)
+_REQUIRED = {
+    "stations": (("id", "status", "capacity", "inventory"), ()),
+    "depots": (("id", "status", "capacity", "inventory"), ("dispatch_capacity_per_tick",)),
+    "routes": (("id", "source_depot_id", "destination_station_id", "status"), ("transit_ticks", "max_shipment")),
+    "allocations": (("status", "fuel_type"), ("quantity",)),
+    "supply_arrivals": (("id", "depot_id", "fuel_type", "status"), ("quantity", "planned_tick")),
+    "demand_history": (("station_id", "fuel_type"), ("tick", "demand_liters")),
+}
 
 
 class Forecast(BaseModel):
