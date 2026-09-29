@@ -70,13 +70,34 @@ def test_violations_catches_illegal_batch(healthy):
 
 
 # ---- quality ----
-def test_healthy_network_one_targeted_rec(healthy):
+def test_healthy_network_targets_stations_under_16h(healthy):
+    s, recs = run(healthy)
+    risks = {(r.station_id, r.fuel_type): r for r in assess_risk(s, forecast(s))}
+    assert recs and all(risks[(r.station_id, r.fuel_type)].stockout_hours < 16 for r in recs)
+    tongi = next(r for r in recs if (r.station_id, r.fuel_type) == ("station-tongi", "DIESEL"))
+    assert tongi.expected_impact.stockout_prob_before > 0.9 and tongi.expected_impact.stockout_prob_after < 0.2
+    assert tongi.expected_impact.unmet_liters_avoided > 0
+    assert tongi.confidence >= 0.8 and not tongi.requires_human_review
+
+
+def test_risk_story_before_after_on_live_state():
+    """Ishmam's report: p was 0% for everything. Live tick-220 state: stations under 16 h show a real drop."""
+    s, recs = run(load("snapshot_live_now"))
+    risks = assess_risk(s, forecast(s))
+    assert sum(r.stockout_prob > 0.3 for r in risks) >= 8                     # graded, not all 0%
+    assert all(0.0 < r.stockout_prob < 1.0 for r in risks if 18 < r.stockout_hours < 30)
+    assert len(recs) >= 3
+    for r in recs:
+        assert r.expected_impact.stockout_prob_before >= 0.9
+        assert r.expected_impact.stockout_prob_after <= 0.35
+
+
+def test_two_trucks_share_one_combined_impact(healthy):
     _, recs = run(healthy)
-    [r] = recs
-    assert (r.station_id, r.fuel_type) == ("station-tongi", "DIESEL")
-    assert r.expected_impact.stockout_prob_before > 0.9 and r.expected_impact.stockout_prob_after < 0.05
-    assert r.expected_impact.unmet_liters_avoided > 0
-    assert r.confidence >= 0.8 and not r.requires_human_review
+    pair = [r for r in recs if (r.station_id, r.fuel_type) == ("station-karnaphuli", "PETROL")]
+    assert len(pair) == 2 and all(r.allocation.quantity >= 1500 for r in pair)
+    assert pair[0].expected_impact.stockout_prob_after == pair[1].expected_impact.stockout_prob_after < 0.2
+    assert all(any(sig.startswith("together with") for sig in r.signals) for r in pair)
 
 
 def test_scarcity_is_shared_fairly(scarce):

@@ -111,12 +111,14 @@ The answer to give: *"documented demand model, calibrated online from demand his
 
 **What it does:** for every station × fuel:
 - **Stockout hours:** hours until the tank hits zero. Computed with a 48-hour forecast so it follows day/night demand.
-- **Stockout probability:** chance of running dry **within the next 12 hours** (see Ishmam's fix below).
+- **Stockout probability:** chance of running dry **within the next 24 hours** if nothing new is ordered (see Ishmam's two reports below).
+  Uncertainty = forecast noise + recent forecast error + a 10% "demand shock" allowance for spikes and events the forecast cannot see,
+  so the probability rises smoothly as stock falls (e.g. 30 h of stock ≈ low, 24 h ≈ 50%, 13 h ≈ 100%).
   It uses the forecast band and the forecast's recent error, so "uncertain" demand means a higher probability.
 - **Level:**
   - `outage`: empty, or the station has status OUTAGE
   - `critical`: less than 4 h left
-  - `watch`: less than 12 h left or probability above 30%
+  - `watch`: less than 16 h left (time to plan a delivery)
   - `ok`: otherwise
 - **Supply ETA:**
   - When the next truck reaches the station, counting trucks already driving (IN_TRANSIT) and ones just ordered (PENDING).
@@ -129,7 +131,8 @@ The answer to give: *"documented demand model, calibrated online from demand his
 | Stockout hours were too pessimistic. | Beyond 4 hours it assumed the current (busy-hour) rate would continue all night. | Use a 48-hour forecast that follows the daily demand curve. |
 | PENDING trucks were ignored. | v1 only counted IN_TRANSIT. | Count PENDING too, using `destination_station_id` directly from the allocation. |
 | **Off-by-one tick** in arrival times (found in step 4 by probing the real simulator). | I assumed a truck ordered at tick T leaves at T+1. In reality it leaves **at T** and arrives at **T + transit**, and fuel arriving at tick t is usable for tick t's demand. | Fixed arrival tick = created tick + transit, and the forecast's first value = the current tick. |
-| **Probability showed 0.0 for stations with shortage alerts** (reported by Ishmam). | Probability looked only 4 hours ahead. A station 10 h from empty got p≈0 while raising a shortage alert. | Changed to "chance of stockout within **12 hours**", the window an allocation can still fix. Tongi diesel now shows **99%**. |
+| **Probability showed 0.0 for stations with shortage alerts** (Ishmam, report 1). | Probability looked only 4 hours ahead. A station 10 h from empty got p≈0 while raising a shortage alert. | Changed to a 12-hour window. Tongi diesel then showed 99%. |
+| **Probability still 0% for almost everything, e.g. Tongi petrol at 13.3 h** (Ishmam, report 2). | Two causes: (1) the 12 h window. Anything with more than ~13 h of stock was outside it. (2) The model trusted its 5%-accurate forecast so much that probability jumped from 100% to 0% within an hour or two (live tick 220: 10 h = 100%, 12.5 h = 34%, 19.5 h+ = 0%). | Window widened to **24 h** (matches the planner's 24 h cover target). Added a 10% demand-shock allowance so the probability is graded. Levels now depend on hours only (watch < 16 h), so badges don't all turn yellow. Live tick 220 now: 8 of 12 pairs show a real probability (53%–100%), and recommendation cards show e.g. **100% → 6%**, **100% → 9%**, **98% → 27%**. |
 
 ---
 
@@ -206,11 +209,13 @@ explains why.
 |---|---|---|
 | Stations at 0 L got **no** fuel. | Empty OPEN stations are level `outage`, and v1 only planned for watch/critical. | Include `outage` when the station is OPEN (it can still receive trucks). |
 | Planner refused CONSTRAINED depots. | v1 required status OPEN; the guide says CONSTRAINED can still ship. | Allowed OPEN + CONSTRAINED everywhere. |
-| `unmet_liters_avoided` was always 0. | v1 formula was wrong. | Compute lost sales with and without the truck over 12 h and subtract. |
+| `unmet_liters_avoided` was always 0. | v1 formula was wrong. | Compute lost sales with and without the truck over the risk window (now 24 h) and subtract. |
 | Quantities too small (Tongi 1,350 L, risk only 99% → 43%). | Target was only 12 h of cover. | Target 24 h of cover. |
 | "Risk after" stayed 100% for empty stations. | They run dry **before** any truck can arrive, and that gap was counted. | "Risk after" counts from the truck's arrival onward. A signal says "runs dry before the truck arrives; gap cannot be avoided". |
 | **Unfair split in a crisis:** Cox's Bazar got nothing. | A plain linear optimizer gives everything to the highest scores. | Two-tier value (first 6 h worth 3×): diminishing returns spread the fuel. |
-| Planner and risk used different probability windows, so before/after didn't match. | Planner used the 4 h forecast. | Both use the same 12 h window. |
+| Planner and risk used different probability windows, so before/after didn't match. | Planner used the 4 h forecast. | Both use the same window (now 24 h). |
+| "Risk after" stayed high after the switch to 24 h. | Deliveries covered exactly the forecast, and with a 10% shock allowance that leaves ~50% risk. | Order 20% above forecast demand (safety stock), capped by tank space. |
+| A station with two trucks (two routes) showed 100% → 100% on the second card. | Each card measured its own truck as if the other didn't exist. | Every card for the same station/fuel shows the **combined** effect of all its trucks, plus a signal "together with X L via route Y". A second truck must carry at least 1,500 L. |
 | What-if accepted a route that doesn't match the station/depot. | No check. | Raises `ROUTE_MISMATCH`. |
 
 ---
@@ -266,7 +271,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 ### Step 7: Tests (`backend/tests/intel/`)
 
 **What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
-the exact path production uses. **76 intel tests** (94 with Ishmam's backend tests), all passing, no network needed.
+the exact path production uses. **78 intel tests** (96 with Ishmam's backend tests), all passing, no network needed.
 
 | File | Tests | Covers |
 |---|---|---|
@@ -274,7 +279,7 @@ the exact path production uses. **76 intel tests** (94 with Ishmam's backend tes
 | `test_forecast.py` | 7 | Backtest error < 10%, band, day/night shape, spike start/end, fallbacks. |
 | `test_risk.py` | 7 | Levels, probability goes down as stock goes up, outage, pending/in-transit trucks, DELAYED supply ETA. |
 | `test_detect.py` | 15 | No false alarms on real data, leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
-| `test_planner.py` | 16 | Every simulator rule, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
+| `test_planner.py` | 18 | Every simulator rule, the live before→after risk story, combined impact for two trucks, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
 | `test_genai.py` | 21 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
 | `test_pipeline.py` | 6 | **Through `intel_bridge`** with dict snapshots: healthy tick uses intel (not fallback); **combined crisis** (demand spike + route down + delayed supply + constrained depot + near-empty station) raises every alert type, gives a legal plan that uses the backup depot, and all 4 genai functions work; real snapshot pair with no false alarms; what-if including the fallback on a bad route; same input gives the same output; messy data handled by intel itself. |
 
@@ -321,10 +326,11 @@ Run: `cd backend; python -m pytest tests/intel -q`
 |---|---|---|
 | genai must accept dicts | GenAI was step 6, "later". | Done immediately, together with the full provider chain. Step 6 finished early. |
 | `stockout_prob_before` = 0 | Probability over 4 h (step 3 was "done"). | Step 3 reopened: 12 h window; planner and what-if changed to match. |
+| **Report 2:** p still 0% for everything (e.g. Tongi petrol, 13.3 h) | 12 h window, very confident model. | Step 3 reopened again: 24 h window + demand-shock allowance; watch at < 16 h; planner adds 20% safety stock and shows combined impact per station. Verified on the live simulator (4/4 allocations accepted). |
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
 Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
-Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All 94 tests pass together.
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (96 now).
 
 **Things for Ishmam to fix in his files (found while testing):**
 1. His engine de-duplicates alerts by `kind + entity` only. Two different alerts on the same depot (e.g. dispatch
@@ -350,14 +356,14 @@ consequential actions.
 
 **My part, the intelligence layer:**
 - **Predicts** demand per station/fuel (5.1% average error vs 64.7% naive).
-- **Measures risk**: hours until empty, chance of running dry in 12 h, level, when help arrives (including delays).
+- **Measures risk**: hours until empty, chance of running dry in 24 h (graded, not 0/100), level, when help arrives (including delays).
 - **Detects problems**: shortages, abnormal demand, unexplained stock changes, bottlenecks, disruptions, with stable alert keys.
 - **Plans trucks** with an optimizer that shares fairly in a crisis, never breaks a simulator rule
   (the real simulator accepted 20/20), offers alternatives, and shows risk before → after (e.g. 99% → 0%).
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
 - **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
   simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
-- **76 intel tests** (94 with the backend's), including full crisis runs through the backend bridge.
+- **78 intel tests** (96 with the backend's), including full crisis runs through the backend bridge.
 - **Fast**: ~136 ms per tick for the whole pipeline.
 
 **Status: all 7 steps are complete** and pushed to `intel`. Ishmam has merged up to step 4. The team fixes,

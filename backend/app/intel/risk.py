@@ -1,6 +1,6 @@
 """Stockout risk per (station, fuel) from forecast + inventory + incoming shipments.
 
-stockout_prob = P(stockout within PROB_HORIZON_TICKS = 12 h, the window an allocation can still fix)
+stockout_prob = P(stockout within PROB_HORIZON_TICKS = 24 h without new orders; the planner's cover target)
               = max over k of P(cumulative demand by tick k > inventory + arrivals by k), normal approx.
 Per-tick sd comes from the forecast band; a systematic term (MAPE) covers model error that does not average out.
 """
@@ -12,7 +12,9 @@ Z80 = 1.28
 SHIPPABLE_DEPOT = {"OPEN", "CONSTRAINED"}
 MAX_HOURS = 168.0  # cap for "no stockout in sight"
 LONG_HORIZON_TICKS = 192  # 48 h at 15 min/tick
-PROB_HORIZON_TICKS = 48   # 12 h
+PROB_HORIZON_TICKS = 96   # 24 h
+WATCH_HOURS = 16.0        # under this, plan a delivery (well inside the 24 h window)
+DEMAND_SHOCK = 0.10       # extra relative uncertainty: demand spikes / events the forecast cannot see
 
 
 def _norm_cdf(z: float) -> float:
@@ -99,7 +101,7 @@ def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, 
     arrivals = incoming(s, fc.station_id, fc.fuel_type)
     for t, q in (extra or {}).items():
         arrivals[t] = arrivals.get(t, 0.0) + q
-    sys_err = min(fc.mape_recent if fc.mape_recent is not None else 0.1, 0.5)
+    sys_err = min(fc.mape_recent if fc.mape_recent is not None else 0.1, 0.5) + DEMAND_SHOCK
     cum_d = var = worst = 0.0
     n = PROB_HORIZON_TICKS
     for i, (mu, lo, hi) in enumerate(zip(fc.per_tick[:n], fc.lower[:n], fc.upper[:n]), start=1):
@@ -129,7 +131,7 @@ def level(inventory: float, station_open: bool, hours: float, prob: float) -> st
         return "outage"
     if hours < 4:
         return "critical"
-    if hours < 12 or prob > 0.3:
+    if hours < WATCH_HOURS:
         return "watch"
     return "ok"
 

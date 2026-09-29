@@ -1,7 +1,7 @@
 # GTA 7 platform: `docker compose up --build`
 #   simulator  http://localhost:8000   (organizer image)
 #   backend    http://localhost:8090   (API docs /docs, metrics /metrics)
-#   web        http://localhost:3000   (operator console; `--profile web` once web/Dockerfile exists)
+#   web        http://localhost:3000   (operator console)
 #   prometheus http://localhost:9090
 #   grafana    http://localhost:3001   (admin / admin)
 services:
@@ -33,10 +33,12 @@ services:
     restart: unless-stopped
 
   web:
-    profiles: ["web"]
-    build: ./web
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8090
+    build:
+      context: ./web
+      args:  # NEXT_PUBLIC_* are inlined at build time; the browser calls these URLs
+        NEXT_PUBLIC_API_URL: http://localhost:8090
+        NEXT_PUBLIC_GRAFANA_URL: http://localhost:3001
+        NEXT_PUBLIC_PROMETHEUS_URL: http://localhost:9090
     ports:
       - "3000:3000"
     depends_on:

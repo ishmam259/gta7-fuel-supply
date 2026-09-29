@@ -35,7 +35,7 @@ def _shortage(s: Snapshot, fc: list[Forecast], names: dict) -> list[AlertDraft]:
             continue
         sev = "warning" if r.level == "watch" else "critical"
         what = "out of stock" if r.level == "outage" else f"stockout in {r.stockout_hours} h"
-        detail = f"p(stockout, 12h)={r.stockout_prob:.2f}, inventory {r.current_inventory:.0f} L"
+        detail = f"p(stockout, 24h)={r.stockout_prob:.2f}, inventory {r.current_inventory:.0f} L"
         if r.next_supply_eta_tick is not None:
             detail += f", {r.incoming_liters:.0f} L arriving tick {r.next_supply_eta_tick}"
         if r.depot_supply_delayed:
