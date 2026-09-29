@@ -1,0 +1,5825 @@
+{
+ "t12": {
+  "tick": 12,
+  "sim_time": "2026-01-01T03:00:00",
+  "tick_minutes": 15,
+  "depots": [
+   {
+    "id": "depot-gazipur",
+    "name": "Gazipur Depot",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 12000.0,
+    "capacity": {
+     "DIESEL": 90000,
+     "PETROL": 70000,
+     "OCTANE": 45000
+    },
+    "inventory": {
+     "DIESEL": 60000,
+     "PETROL": 45000,
+     "OCTANE": 26000
+    }
+   },
+   {
+    "id": "depot-patiya",
+    "name": "Patiya Depot",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 11000.0,
+    "capacity": {
+     "DIESEL": 85000,
+     "PETROL": 65000,
+     "OCTANE": 40000
+    },
+    "inventory": {
+     "DIESEL": 55000,
+     "PETROL": 42000,
+     "OCTANE": 24000
+    }
+   }
+  ],
+  "stations": [
+   {
+    "id": "station-mirpur",
+    "name": "Mirpur Fuel Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "urban_high",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 15000,
+     "PETROL": 14000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 8267.99,
+     "PETROL": 8090.605,
+     "OCTANE": 4518.52
+    }
+   },
+   {
+    "id": "station-tongi",
+    "name": "Tongi Industrial Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "industrial",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 18000,
+     "PETROL": 9000,
+     "OCTANE": 6000
+    },
+    "inventory": {
+     "DIESEL": 10220.097,
+     "PETROL": 5750.013,
+     "OCTANE": 3375.535
+    }
+   },
+   {
+    "id": "station-karnaphuli",
+    "name": "Karnaphuli Highway Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "highway",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 14000,
+     "PETROL": 15000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 7468.225,
+     "PETROL": 8375.116,
+     "OCTANE": 4547.861
+    }
+   },
+   {
+    "id": "station-coxsbazar",
+    "name": "Cox's Bazar Regional Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "regional",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 12000,
+     "PETROL": 12000,
+     "OCTANE": 7000
+    },
+    "inventory": {
+     "DIESEL": 6879.179,
+     "PETROL": 6820.258,
+     "OCTANE": 3889.36
+    }
+   }
+  ],
+  "routes": [
+   {
+    "id": "route-gazipur-mirpur",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-tongi",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-tongi",
+    "transit_ticks": 2,
+    "max_shipment": 6500.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-karnaphuli",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-coxsbazar",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-coxsbazar",
+    "transit_ticks": 3,
+    "max_shipment": 6000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-karnaphuli",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-mirpur",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   }
+  ],
+  "allocations": [],
+  "supply_arrivals": [
+   {
+    "id": "supply-001",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 18000.0,
+    "planned_tick": 12,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-003",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 16000.0,
+    "planned_tick": 14,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-002",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 14000.0,
+    "planned_tick": 16,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-004",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 9000.0,
+    "planned_tick": 20,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-101",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 64,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-102",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 68,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-103",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 72,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-104",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 76,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-105",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 80,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-106",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 84,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-201",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 128,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-202",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 132,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-203",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 136,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-204",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 140,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-205",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 144,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-206",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 148,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-301",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 192,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-302",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 196,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-303",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 200,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-304",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 204,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-305",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 208,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-306",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 212,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   }
+  ],
+  "events": [],
+  "regions": [
+   {
+    "id": "region-dhaka",
+    "name": "Dhaka Division",
+    "demand_factor": 1.0
+   },
+   {
+    "id": "region-chattogram",
+    "name": "Chattogram Division",
+    "demand_factor": 1.08
+   }
+  ],
+  "demand_history": [
+   {
+    "id": 144,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 27.011,
+    "served_liters": 27.011,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 143,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 61.019,
+    "served_liters": 61.019,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 142,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 52.294,
+    "served_liters": 52.294,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 141,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 57.709,
+    "served_liters": 57.709,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 140,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 90.121,
+    "served_liters": 90.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 139,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 94.511,
+    "served_liters": 94.511,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 138,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 11.091,
+    "served_liters": 11.091,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 137,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 19.503,
+    "served_liters": 19.503,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 136,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.575,
+    "served_liters": 63.575,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 135,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 40.247,
+    "served_liters": 40.247,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 134,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 82.71,
+    "served_liters": 82.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 133,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.415,
+    "served_liters": 63.415,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 132,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 24.428,
+    "served_liters": 24.428,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 131,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 53.946,
+    "served_liters": 53.946,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 130,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 52.121,
+    "served_liters": 52.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 129,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 57.868,
+    "served_liters": 57.868,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 128,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 89.373,
+    "served_liters": 89.373,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 127,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 78.717,
+    "served_liters": 78.717,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 126,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 10.543,
+    "served_liters": 10.543,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 125,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 20.597,
+    "served_liters": 20.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 124,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 63.583,
+    "served_liters": 63.583,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 123,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 37.471,
+    "served_liters": 37.471,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 122,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 72.489,
+    "served_liters": 72.489,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 121,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 58.78,
+    "served_liters": 58.78,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 120,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 24.005,
+    "served_liters": 24.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 119,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 52.49,
+    "served_liters": 52.49,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 118,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 55.214,
+    "served_liters": 55.214,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 117,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 57.088,
+    "served_liters": 57.088,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 116,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 90.228,
+    "served_liters": 90.228,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 115,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 88.71,
+    "served_liters": 88.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 114,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 9.578,
+    "served_liters": 9.578,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 113,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 21.21,
+    "served_liters": 21.21,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 112,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 69.61,
+    "served_liters": 69.61,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 111,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 44.446,
+    "served_liters": 44.446,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 110,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 74.783,
+    "served_liters": 74.783,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 109,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 63.021,
+    "served_liters": 63.021,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 108,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 28.814,
+    "served_liters": 28.814,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 107,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 60.582,
+    "served_liters": 60.582,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 106,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 49.288,
+    "served_liters": 49.288,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 105,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 46.256,
+    "served_liters": 46.256,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 104,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 95.459,
+    "served_liters": 95.459,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 103,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 80.705,
+    "served_liters": 80.705,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 102,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 10.303,
+    "served_liters": 10.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 101,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 21.84,
+    "served_liters": 21.84,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 100,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 64.698,
+    "served_liters": 64.698,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 99,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 41.235,
+    "served_liters": 41.235,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 98,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 71.177,
+    "served_liters": 71.177,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 97,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 56.094,
+    "served_liters": 56.094,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 96,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 24.508,
+    "served_liters": 24.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 95,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 60.757,
+    "served_liters": 60.757,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 94,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 47.485,
+    "served_liters": 47.485,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 93,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 48.891,
+    "served_liters": 48.891,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 92,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 84.92,
+    "served_liters": 84.92,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 91,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 79.296,
+    "served_liters": 79.296,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 90,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 9.796,
+    "served_liters": 9.796,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 89,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 20.758,
+    "served_liters": 20.758,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 88,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 66.699,
+    "served_liters": 66.699,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 87,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 38.167,
+    "served_liters": 38.167,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 86,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 73.612,
+    "served_liters": 73.612,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 85,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 64.476,
+    "served_liters": 64.476,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 84,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 25.482,
+    "served_liters": 25.482,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 83,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 50.454,
+    "served_liters": 50.454,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 82,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.329,
+    "served_liters": 55.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 81,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 54.979,
+    "served_liters": 54.979,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 80,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 98.282,
+    "served_liters": 98.282,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 79,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 89.319,
+    "served_liters": 89.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 78,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 10.922,
+    "served_liters": 10.922,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 77,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 20.892,
+    "served_liters": 20.892,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 76,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 66.043,
+    "served_liters": 66.043,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 75,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 44.211,
+    "served_liters": 44.211,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 74,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 75.636,
+    "served_liters": 75.636,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 73,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.795,
+    "served_liters": 55.795,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 72,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 23.972,
+    "served_liters": 23.972,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 71,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 52.289,
+    "served_liters": 52.289,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 70,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 48.213,
+    "served_liters": 48.213,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 69,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 58.295,
+    "served_liters": 58.295,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 68,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 96.073,
+    "served_liters": 96.073,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 67,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 98.398,
+    "served_liters": 98.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 66,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 11.101,
+    "served_liters": 11.101,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 65,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 22.302,
+    "served_liters": 22.302,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 64,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 63.005,
+    "served_liters": 63.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 63,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 37.378,
+    "served_liters": 37.378,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 62,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 79.508,
+    "served_liters": 79.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 61,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 66.398,
+    "served_liters": 66.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 60,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 24.329,
+    "served_liters": 24.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 59,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 58.313,
+    "served_liters": 58.313,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 58,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 51.318,
+    "served_liters": 51.318,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 57,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 46.847,
+    "served_liters": 46.847,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 56,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 100.719,
+    "served_liters": 100.719,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 55,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 81.77,
+    "served_liters": 81.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 54,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 9.621,
+    "served_liters": 9.621,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 53,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 20.335,
+    "served_liters": 20.335,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 52,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 61.082,
+    "served_liters": 61.082,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 51,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 36.762,
+    "served_liters": 36.762,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 50,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 69.509,
+    "served_liters": 69.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 49,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 64.058,
+    "served_liters": 64.058,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 48,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 26.141,
+    "served_liters": 26.141,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 47,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.555,
+    "served_liters": 55.555,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 46,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.853,
+    "served_liters": 55.853,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 45,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 56.742,
+    "served_liters": 56.742,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 44,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 96.633,
+    "served_liters": 96.633,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 43,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 90.781,
+    "served_liters": 90.781,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 42,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 9.817,
+    "served_liters": 9.817,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 41,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 19.597,
+    "served_liters": 19.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 40,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 63.334,
+    "served_liters": 63.334,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 39,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 44.3,
+    "served_liters": 44.3,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 38,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 78.678,
+    "served_liters": 78.678,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 37,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 65.161,
+    "served_liters": 65.161,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 36,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 28.855,
+    "served_liters": 28.855,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 35,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 59.486,
+    "served_liters": 59.486,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 34,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 51.024,
+    "served_liters": 51.024,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 33,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 58.135,
+    "served_liters": 58.135,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 32,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 94.272,
+    "served_liters": 94.272,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 31,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 78.339,
+    "served_liters": 78.339,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 30,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 10.995,
+    "served_liters": 10.995,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 29,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 20.969,
+    "served_liters": 20.969,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 28,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 64.443,
+    "served_liters": 64.443,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 27,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 41.77,
+    "served_liters": 41.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 26,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 80.7,
+    "served_liters": 80.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 25,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 56.319,
+    "served_liters": 56.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 24,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 25.509,
+    "served_liters": 25.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 23,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 59.603,
+    "served_liters": 59.603,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 22,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 53.852,
+    "served_liters": 53.852,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 21,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 54.015,
+    "served_liters": 54.015,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 20,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 89.728,
+    "served_liters": 89.728,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 19,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 83.528,
+    "served_liters": 83.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 18,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 10.648,
+    "served_liters": 10.648,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 17,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 21.284,
+    "served_liters": 21.284,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 16,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 64.303,
+    "served_liters": 64.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 15,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 37.862,
+    "served_liters": 37.862,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 14,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 79.32,
+    "served_liters": 79.32,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 13,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 58.905,
+    "served_liters": 58.905,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 12,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 27.586,
+    "served_liters": 27.586,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 11,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.248,
+    "served_liters": 55.248,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 10,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 48.83,
+    "served_liters": 48.83,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 9,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.314,
+    "served_liters": 55.314,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 8,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 99.076,
+    "served_liters": 99.076,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 7,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 87.701,
+    "served_liters": 87.701,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 6,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 10.05,
+    "served_liters": 10.05,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 5,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 20.7,
+    "served_liters": 20.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 4,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 69.528,
+    "served_liters": 69.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 3,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 37.631,
+    "served_liters": 37.631,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 2,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 71.273,
+    "served_liters": 71.273,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 1,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 59.588,
+    "served_liters": 59.588,
+    "unmet_liters": 0.0
+   }
+  ]
+ },
+ "t13": {
+  "tick": 13,
+  "sim_time": "2026-01-01T03:15:00",
+  "tick_minutes": 15,
+  "depots": [
+   {
+    "id": "depot-gazipur",
+    "name": "Gazipur Depot",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 12000.0,
+    "capacity": {
+     "DIESEL": 90000,
+     "PETROL": 70000,
+     "OCTANE": 45000
+    },
+    "inventory": {
+     "DIESEL": 78000.0,
+     "PETROL": 45000,
+     "OCTANE": 26000
+    }
+   },
+   {
+    "id": "depot-patiya",
+    "name": "Patiya Depot",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 11000.0,
+    "capacity": {
+     "DIESEL": 85000,
+     "PETROL": 65000,
+     "OCTANE": 40000
+    },
+    "inventory": {
+     "DIESEL": 55000,
+     "PETROL": 42000,
+     "OCTANE": 24000
+    }
+   }
+  ],
+  "stations": [
+   {
+    "id": "station-mirpur",
+    "name": "Mirpur Fuel Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "urban_high",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 15000,
+     "PETROL": 14000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 8209.212,
+     "PETROL": 8006.598,
+     "OCTANE": 4476.771
+    }
+   },
+   {
+    "id": "station-tongi",
+    "name": "Tongi Industrial Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "industrial",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 18000,
+     "PETROL": 9000,
+     "OCTANE": 6000
+    },
+    "inventory": {
+     "DIESEL": 10151.314,
+     "PETROL": 5727.779,
+     "OCTANE": 3365.646
+    }
+   },
+   {
+    "id": "station-karnaphuli",
+    "name": "Karnaphuli Highway Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "highway",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 14000,
+     "PETROL": 15000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 7381.423,
+     "PETROL": 8276.516,
+     "OCTANE": 4500.624
+    }
+   },
+   {
+    "id": "station-coxsbazar",
+    "name": "Cox's Bazar Regional Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "regional",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 12000,
+     "PETROL": 12000,
+     "OCTANE": 7000
+    },
+    "inventory": {
+     "DIESEL": 6830.948,
+     "PETROL": 6768.842,
+     "OCTANE": 3862.793
+    }
+   }
+  ],
+  "routes": [
+   {
+    "id": "route-gazipur-mirpur",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-tongi",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-tongi",
+    "transit_ticks": 2,
+    "max_shipment": 6500.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-karnaphuli",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-coxsbazar",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-coxsbazar",
+    "transit_ticks": 3,
+    "max_shipment": 6000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-karnaphuli",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-mirpur",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   }
+  ],
+  "allocations": [],
+  "supply_arrivals": [
+   {
+    "id": "supply-001",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 18000.0,
+    "planned_tick": 12,
+    "actual_tick": 12,
+    "status": "ARRIVED"
+   },
+   {
+    "id": "supply-003",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 16000.0,
+    "planned_tick": 14,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-002",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 14000.0,
+    "planned_tick": 16,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-004",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 9000.0,
+    "planned_tick": 20,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-101",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 64,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-102",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 68,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-103",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 72,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-104",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 76,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-105",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 80,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-106",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 84,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-201",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 128,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-202",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 132,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-203",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 136,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-204",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 140,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-205",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 144,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-206",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 148,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-301",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 192,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-302",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 196,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-303",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 200,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-304",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 204,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-305",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 208,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-306",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 212,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   }
+  ],
+  "events": [],
+  "regions": [
+   {
+    "id": "region-dhaka",
+    "name": "Dhaka Division",
+    "demand_factor": 1.0
+   },
+   {
+    "id": "region-chattogram",
+    "name": "Chattogram Division",
+    "demand_factor": 1.08
+   }
+  ],
+  "demand_history": [
+   {
+    "id": 156,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 26.567,
+    "served_liters": 26.567,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 155,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 51.416,
+    "served_liters": 51.416,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 154,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 48.231,
+    "served_liters": 48.231,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 153,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 47.237,
+    "served_liters": 47.237,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 152,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 98.6,
+    "served_liters": 98.6,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 151,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 86.802,
+    "served_liters": 86.802,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 150,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 9.889,
+    "served_liters": 9.889,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 149,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 22.234,
+    "served_liters": 22.234,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 148,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 68.783,
+    "served_liters": 68.783,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 147,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 41.749,
+    "served_liters": 41.749,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 146,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 84.007,
+    "served_liters": 84.007,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 145,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 58.778,
+    "served_liters": 58.778,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 144,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 27.011,
+    "served_liters": 27.011,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 143,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 61.019,
+    "served_liters": 61.019,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 142,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 52.294,
+    "served_liters": 52.294,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 141,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 57.709,
+    "served_liters": 57.709,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 140,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 90.121,
+    "served_liters": 90.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 139,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 94.511,
+    "served_liters": 94.511,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 138,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 11.091,
+    "served_liters": 11.091,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 137,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 19.503,
+    "served_liters": 19.503,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 136,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.575,
+    "served_liters": 63.575,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 135,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 40.247,
+    "served_liters": 40.247,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 134,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 82.71,
+    "served_liters": 82.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 133,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.415,
+    "served_liters": 63.415,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 132,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 24.428,
+    "served_liters": 24.428,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 131,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 53.946,
+    "served_liters": 53.946,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 130,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 52.121,
+    "served_liters": 52.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 129,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 57.868,
+    "served_liters": 57.868,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 128,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 89.373,
+    "served_liters": 89.373,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 127,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 78.717,
+    "served_liters": 78.717,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 126,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 10.543,
+    "served_liters": 10.543,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 125,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 20.597,
+    "served_liters": 20.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 124,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 63.583,
+    "served_liters": 63.583,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 123,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 37.471,
+    "served_liters": 37.471,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 122,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 72.489,
+    "served_liters": 72.489,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 121,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 58.78,
+    "served_liters": 58.78,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 120,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 24.005,
+    "served_liters": 24.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 119,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 52.49,
+    "served_liters": 52.49,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 118,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 55.214,
+    "served_liters": 55.214,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 117,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 57.088,
+    "served_liters": 57.088,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 116,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 90.228,
+    "served_liters": 90.228,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 115,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 88.71,
+    "served_liters": 88.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 114,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 9.578,
+    "served_liters": 9.578,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 113,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 21.21,
+    "served_liters": 21.21,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 112,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 69.61,
+    "served_liters": 69.61,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 111,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 44.446,
+    "served_liters": 44.446,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 110,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 74.783,
+    "served_liters": 74.783,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 109,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 63.021,
+    "served_liters": 63.021,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 108,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 28.814,
+    "served_liters": 28.814,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 107,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 60.582,
+    "served_liters": 60.582,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 106,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 49.288,
+    "served_liters": 49.288,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 105,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 46.256,
+    "served_liters": 46.256,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 104,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 95.459,
+    "served_liters": 95.459,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 103,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 80.705,
+    "served_liters": 80.705,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 102,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 10.303,
+    "served_liters": 10.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 101,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 21.84,
+    "served_liters": 21.84,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 100,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 64.698,
+    "served_liters": 64.698,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 99,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 41.235,
+    "served_liters": 41.235,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 98,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 71.177,
+    "served_liters": 71.177,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 97,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 56.094,
+    "served_liters": 56.094,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 96,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 24.508,
+    "served_liters": 24.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 95,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 60.757,
+    "served_liters": 60.757,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 94,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 47.485,
+    "served_liters": 47.485,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 93,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 48.891,
+    "served_liters": 48.891,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 92,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 84.92,
+    "served_liters": 84.92,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 91,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 79.296,
+    "served_liters": 79.296,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 90,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 9.796,
+    "served_liters": 9.796,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 89,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 20.758,
+    "served_liters": 20.758,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 88,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 66.699,
+    "served_liters": 66.699,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 87,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 38.167,
+    "served_liters": 38.167,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 86,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 73.612,
+    "served_liters": 73.612,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 85,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 64.476,
+    "served_liters": 64.476,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 84,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 25.482,
+    "served_liters": 25.482,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 83,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 50.454,
+    "served_liters": 50.454,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 82,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.329,
+    "served_liters": 55.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 81,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 54.979,
+    "served_liters": 54.979,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 80,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 98.282,
+    "served_liters": 98.282,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 79,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 89.319,
+    "served_liters": 89.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 78,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 10.922,
+    "served_liters": 10.922,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 77,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 20.892,
+    "served_liters": 20.892,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 76,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 66.043,
+    "served_liters": 66.043,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 75,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 44.211,
+    "served_liters": 44.211,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 74,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 75.636,
+    "served_liters": 75.636,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 73,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.795,
+    "served_liters": 55.795,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 72,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 23.972,
+    "served_liters": 23.972,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 71,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 52.289,
+    "served_liters": 52.289,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 70,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 48.213,
+    "served_liters": 48.213,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 69,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 58.295,
+    "served_liters": 58.295,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 68,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 96.073,
+    "served_liters": 96.073,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 67,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 98.398,
+    "served_liters": 98.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 66,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 11.101,
+    "served_liters": 11.101,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 65,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 22.302,
+    "served_liters": 22.302,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 64,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 63.005,
+    "served_liters": 63.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 63,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 37.378,
+    "served_liters": 37.378,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 62,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 79.508,
+    "served_liters": 79.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 61,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 66.398,
+    "served_liters": 66.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 60,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 24.329,
+    "served_liters": 24.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 59,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 58.313,
+    "served_liters": 58.313,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 58,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 51.318,
+    "served_liters": 51.318,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 57,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 46.847,
+    "served_liters": 46.847,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 56,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 100.719,
+    "served_liters": 100.719,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 55,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 81.77,
+    "served_liters": 81.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 54,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 9.621,
+    "served_liters": 9.621,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 53,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 20.335,
+    "served_liters": 20.335,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 52,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 61.082,
+    "served_liters": 61.082,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 51,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 36.762,
+    "served_liters": 36.762,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 50,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 69.509,
+    "served_liters": 69.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 49,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 64.058,
+    "served_liters": 64.058,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 48,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 26.141,
+    "served_liters": 26.141,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 47,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.555,
+    "served_liters": 55.555,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 46,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.853,
+    "served_liters": 55.853,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 45,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 56.742,
+    "served_liters": 56.742,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 44,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 96.633,
+    "served_liters": 96.633,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 43,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 90.781,
+    "served_liters": 90.781,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 42,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 9.817,
+    "served_liters": 9.817,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 41,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 19.597,
+    "served_liters": 19.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 40,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 63.334,
+    "served_liters": 63.334,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 39,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 44.3,
+    "served_liters": 44.3,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 38,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 78.678,
+    "served_liters": 78.678,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 37,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 65.161,
+    "served_liters": 65.161,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 36,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 28.855,
+    "served_liters": 28.855,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 35,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 59.486,
+    "served_liters": 59.486,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 34,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 51.024,
+    "served_liters": 51.024,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 33,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 58.135,
+    "served_liters": 58.135,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 32,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 94.272,
+    "served_liters": 94.272,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 31,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 78.339,
+    "served_liters": 78.339,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 30,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 10.995,
+    "served_liters": 10.995,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 29,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 20.969,
+    "served_liters": 20.969,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 28,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 64.443,
+    "served_liters": 64.443,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 27,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 41.77,
+    "served_liters": 41.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 26,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 80.7,
+    "served_liters": 80.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 25,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 56.319,
+    "served_liters": 56.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 24,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 25.509,
+    "served_liters": 25.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 23,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 59.603,
+    "served_liters": 59.603,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 22,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 53.852,
+    "served_liters": 53.852,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 21,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 54.015,
+    "served_liters": 54.015,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 20,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 89.728,
+    "served_liters": 89.728,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 19,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 83.528,
+    "served_liters": 83.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 18,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 10.648,
+    "served_liters": 10.648,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 17,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 21.284,
+    "served_liters": 21.284,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 16,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 64.303,
+    "served_liters": 64.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 15,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 37.862,
+    "served_liters": 37.862,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 14,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 79.32,
+    "served_liters": 79.32,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 13,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 58.905,
+    "served_liters": 58.905,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 12,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 27.586,
+    "served_liters": 27.586,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 11,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.248,
+    "served_liters": 55.248,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 10,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 48.83,
+    "served_liters": 48.83,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 9,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.314,
+    "served_liters": 55.314,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 8,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 99.076,
+    "served_liters": 99.076,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 7,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 87.701,
+    "served_liters": 87.701,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 6,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 10.05,
+    "served_liters": 10.05,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 5,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 20.7,
+    "served_liters": 20.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 4,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 69.528,
+    "served_liters": 69.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 3,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 37.631,
+    "served_liters": 37.631,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 2,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 71.273,
+    "served_liters": 71.273,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 1,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 59.588,
+    "served_liters": 59.588,
+    "unmet_liters": 0.0
+   }
+  ]
+ },
+ "t14": {
+  "tick": 14,
+  "sim_time": "2026-01-01T03:30:00",
+  "tick_minutes": 15,
+  "depots": [
+   {
+    "id": "depot-gazipur",
+    "name": "Gazipur Depot",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 12000.0,
+    "capacity": {
+     "DIESEL": 90000,
+     "PETROL": 70000,
+     "OCTANE": 45000
+    },
+    "inventory": {
+     "DIESEL": 78000.0,
+     "PETROL": 45000,
+     "OCTANE": 26000
+    }
+   },
+   {
+    "id": "depot-patiya",
+    "name": "Patiya Depot",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "dispatch_capacity_per_tick": 11000.0,
+    "capacity": {
+     "DIESEL": 85000,
+     "PETROL": 65000,
+     "OCTANE": 40000
+    },
+    "inventory": {
+     "DIESEL": 55000,
+     "PETROL": 42000,
+     "OCTANE": 24000
+    }
+   }
+  ],
+  "stations": [
+   {
+    "id": "station-mirpur",
+    "name": "Mirpur Fuel Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "urban_high",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 15000,
+     "PETROL": 14000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 8143.575,
+     "PETROL": 7927.365,
+     "OCTANE": 4438.198
+    }
+   },
+   {
+    "id": "station-tongi",
+    "name": "Tongi Industrial Station",
+    "region_id": "region-dhaka",
+    "status": "OPEN",
+    "demand_profile": "industrial",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 18000,
+     "PETROL": 9000,
+     "OCTANE": 6000
+    },
+    "inventory": {
+     "DIESEL": 10084.845,
+     "PETROL": 5707.365,
+     "OCTANE": 3355.212
+    }
+   },
+   {
+    "id": "station-karnaphuli",
+    "name": "Karnaphuli Highway Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "highway",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 14000,
+     "PETROL": 15000,
+     "OCTANE": 9000
+    },
+    "inventory": {
+     "DIESEL": 7286.63,
+     "PETROL": 8179.556,
+     "OCTANE": 4444.446
+    }
+   },
+   {
+    "id": "station-coxsbazar",
+    "name": "Cox's Bazar Regional Station",
+    "region_id": "region-chattogram",
+    "status": "OPEN",
+    "demand_profile": "regional",
+    "demand_multiplier": 1.0,
+    "capacity": {
+     "DIESEL": 12000,
+     "PETROL": 12000,
+     "OCTANE": 7000
+    },
+    "inventory": {
+     "DIESEL": 6776.636,
+     "PETROL": 6712.375,
+     "OCTANE": 3838.599
+    }
+   }
+  ],
+  "routes": [
+   {
+    "id": "route-gazipur-mirpur",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-tongi",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-tongi",
+    "transit_ticks": 2,
+    "max_shipment": 6500.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-karnaphuli",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 2,
+    "max_shipment": 7000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-coxsbazar",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-coxsbazar",
+    "transit_ticks": 3,
+    "max_shipment": 6000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-gazipur-karnaphuli",
+    "source_depot_id": "depot-gazipur",
+    "destination_station_id": "station-karnaphuli",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   },
+   {
+    "id": "route-patiya-mirpur",
+    "source_depot_id": "depot-patiya",
+    "destination_station_id": "station-mirpur",
+    "transit_ticks": 4,
+    "max_shipment": 5000.0,
+    "status": "AVAILABLE"
+   }
+  ],
+  "allocations": [],
+  "supply_arrivals": [
+   {
+    "id": "supply-001",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 18000.0,
+    "planned_tick": 12,
+    "actual_tick": 12,
+    "status": "ARRIVED"
+   },
+   {
+    "id": "supply-003",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 16000.0,
+    "planned_tick": 14,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-002",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 14000.0,
+    "planned_tick": 16,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-004",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 9000.0,
+    "planned_tick": 20,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-101",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 64,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-102",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 68,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-103",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 72,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-104",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 76,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-105",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 80,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-106",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 84,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-201",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 128,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-202",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 132,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-203",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 136,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-204",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 140,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-205",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 144,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-206",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 148,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-301",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "DIESEL",
+    "quantity": 12000.0,
+    "planned_tick": 192,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-302",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "PETROL",
+    "quantity": 10000.0,
+    "planned_tick": 196,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-303",
+    "depot_id": "depot-gazipur",
+    "fuel_type": "OCTANE",
+    "quantity": 7000.0,
+    "planned_tick": 200,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-304",
+    "depot_id": "depot-patiya",
+    "fuel_type": "DIESEL",
+    "quantity": 10000.0,
+    "planned_tick": 204,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-305",
+    "depot_id": "depot-patiya",
+    "fuel_type": "PETROL",
+    "quantity": 8000.0,
+    "planned_tick": 208,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   },
+   {
+    "id": "supply-306",
+    "depot_id": "depot-patiya",
+    "fuel_type": "OCTANE",
+    "quantity": 6000.0,
+    "planned_tick": 212,
+    "actual_tick": null,
+    "status": "SCHEDULED"
+   }
+  ],
+  "events": [],
+  "regions": [
+   {
+    "id": "region-dhaka",
+    "name": "Dhaka Division",
+    "demand_factor": 1.0
+   },
+   {
+    "id": "region-chattogram",
+    "name": "Chattogram Division",
+    "demand_factor": 1.08
+   }
+  ],
+  "demand_history": [
+   {
+    "id": 168,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 24.194,
+    "served_liters": 24.194,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 167,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 56.467,
+    "served_liters": 56.467,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 166,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 54.312,
+    "served_liters": 54.312,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 165,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 56.178,
+    "served_liters": 56.178,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 164,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 96.96,
+    "served_liters": 96.96,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 163,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 94.793,
+    "served_liters": 94.793,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 162,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 10.434,
+    "served_liters": 10.434,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 161,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 20.414,
+    "served_liters": 20.414,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 160,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 66.469,
+    "served_liters": 66.469,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 159,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 38.573,
+    "served_liters": 38.573,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 158,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 79.233,
+    "served_liters": 79.233,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 157,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 13,
+    "sim_time": "2026-01-01T03:15:00",
+    "demand_liters": 65.637,
+    "served_liters": 65.637,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 156,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 26.567,
+    "served_liters": 26.567,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 155,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 51.416,
+    "served_liters": 51.416,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 154,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 48.231,
+    "served_liters": 48.231,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 153,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 47.237,
+    "served_liters": 47.237,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 152,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 98.6,
+    "served_liters": 98.6,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 151,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 86.802,
+    "served_liters": 86.802,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 150,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 9.889,
+    "served_liters": 9.889,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 149,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 22.234,
+    "served_liters": 22.234,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 148,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 68.783,
+    "served_liters": 68.783,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 147,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 41.749,
+    "served_liters": 41.749,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 146,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 84.007,
+    "served_liters": 84.007,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 145,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 12,
+    "sim_time": "2026-01-01T03:00:00",
+    "demand_liters": 58.778,
+    "served_liters": 58.778,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 144,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 27.011,
+    "served_liters": 27.011,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 143,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 61.019,
+    "served_liters": 61.019,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 142,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 52.294,
+    "served_liters": 52.294,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 141,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 57.709,
+    "served_liters": 57.709,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 140,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 90.121,
+    "served_liters": 90.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 139,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 94.511,
+    "served_liters": 94.511,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 138,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 11.091,
+    "served_liters": 11.091,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 137,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 19.503,
+    "served_liters": 19.503,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 136,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.575,
+    "served_liters": 63.575,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 135,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 40.247,
+    "served_liters": 40.247,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 134,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 82.71,
+    "served_liters": 82.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 133,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 11,
+    "sim_time": "2026-01-01T02:45:00",
+    "demand_liters": 63.415,
+    "served_liters": 63.415,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 132,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 24.428,
+    "served_liters": 24.428,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 131,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 53.946,
+    "served_liters": 53.946,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 130,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 52.121,
+    "served_liters": 52.121,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 129,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 57.868,
+    "served_liters": 57.868,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 128,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 89.373,
+    "served_liters": 89.373,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 127,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 78.717,
+    "served_liters": 78.717,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 126,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 10.543,
+    "served_liters": 10.543,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 125,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 20.597,
+    "served_liters": 20.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 124,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 63.583,
+    "served_liters": 63.583,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 123,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 37.471,
+    "served_liters": 37.471,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 122,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 72.489,
+    "served_liters": 72.489,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 121,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 10,
+    "sim_time": "2026-01-01T02:30:00",
+    "demand_liters": 58.78,
+    "served_liters": 58.78,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 120,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 24.005,
+    "served_liters": 24.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 119,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 52.49,
+    "served_liters": 52.49,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 118,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 55.214,
+    "served_liters": 55.214,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 117,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 57.088,
+    "served_liters": 57.088,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 116,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 90.228,
+    "served_liters": 90.228,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 115,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 88.71,
+    "served_liters": 88.71,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 114,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 9.578,
+    "served_liters": 9.578,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 113,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 21.21,
+    "served_liters": 21.21,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 112,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 69.61,
+    "served_liters": 69.61,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 111,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 44.446,
+    "served_liters": 44.446,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 110,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 74.783,
+    "served_liters": 74.783,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 109,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 9,
+    "sim_time": "2026-01-01T02:15:00",
+    "demand_liters": 63.021,
+    "served_liters": 63.021,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 108,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 28.814,
+    "served_liters": 28.814,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 107,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 60.582,
+    "served_liters": 60.582,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 106,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 49.288,
+    "served_liters": 49.288,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 105,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 46.256,
+    "served_liters": 46.256,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 104,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 95.459,
+    "served_liters": 95.459,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 103,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 80.705,
+    "served_liters": 80.705,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 102,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 10.303,
+    "served_liters": 10.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 101,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 21.84,
+    "served_liters": 21.84,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 100,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 64.698,
+    "served_liters": 64.698,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 99,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 41.235,
+    "served_liters": 41.235,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 98,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 71.177,
+    "served_liters": 71.177,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 97,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 8,
+    "sim_time": "2026-01-01T02:00:00",
+    "demand_liters": 56.094,
+    "served_liters": 56.094,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 96,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 24.508,
+    "served_liters": 24.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 95,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 60.757,
+    "served_liters": 60.757,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 94,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 47.485,
+    "served_liters": 47.485,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 93,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 48.891,
+    "served_liters": 48.891,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 92,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 84.92,
+    "served_liters": 84.92,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 91,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 79.296,
+    "served_liters": 79.296,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 90,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 9.796,
+    "served_liters": 9.796,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 89,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 20.758,
+    "served_liters": 20.758,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 88,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 66.699,
+    "served_liters": 66.699,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 87,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 38.167,
+    "served_liters": 38.167,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 86,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 73.612,
+    "served_liters": 73.612,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 85,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 7,
+    "sim_time": "2026-01-01T01:45:00",
+    "demand_liters": 64.476,
+    "served_liters": 64.476,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 84,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 25.482,
+    "served_liters": 25.482,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 83,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 50.454,
+    "served_liters": 50.454,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 82,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.329,
+    "served_liters": 55.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 81,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 54.979,
+    "served_liters": 54.979,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 80,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 98.282,
+    "served_liters": 98.282,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 79,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 89.319,
+    "served_liters": 89.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 78,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 10.922,
+    "served_liters": 10.922,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 77,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 20.892,
+    "served_liters": 20.892,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 76,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 66.043,
+    "served_liters": 66.043,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 75,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 44.211,
+    "served_liters": 44.211,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 74,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 75.636,
+    "served_liters": 75.636,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 73,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 6,
+    "sim_time": "2026-01-01T01:30:00",
+    "demand_liters": 55.795,
+    "served_liters": 55.795,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 72,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 23.972,
+    "served_liters": 23.972,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 71,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 52.289,
+    "served_liters": 52.289,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 70,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 48.213,
+    "served_liters": 48.213,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 69,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 58.295,
+    "served_liters": 58.295,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 68,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 96.073,
+    "served_liters": 96.073,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 67,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 98.398,
+    "served_liters": 98.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 66,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 11.101,
+    "served_liters": 11.101,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 65,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 22.302,
+    "served_liters": 22.302,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 64,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 63.005,
+    "served_liters": 63.005,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 63,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 37.378,
+    "served_liters": 37.378,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 62,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 79.508,
+    "served_liters": 79.508,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 61,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 5,
+    "sim_time": "2026-01-01T01:15:00",
+    "demand_liters": 66.398,
+    "served_liters": 66.398,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 60,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 24.329,
+    "served_liters": 24.329,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 59,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 58.313,
+    "served_liters": 58.313,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 58,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 51.318,
+    "served_liters": 51.318,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 57,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 46.847,
+    "served_liters": 46.847,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 56,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 100.719,
+    "served_liters": 100.719,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 55,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 81.77,
+    "served_liters": 81.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 54,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 9.621,
+    "served_liters": 9.621,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 53,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 20.335,
+    "served_liters": 20.335,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 52,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 61.082,
+    "served_liters": 61.082,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 51,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 36.762,
+    "served_liters": 36.762,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 50,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 69.509,
+    "served_liters": 69.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 49,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 4,
+    "sim_time": "2026-01-01T01:00:00",
+    "demand_liters": 64.058,
+    "served_liters": 64.058,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 48,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 26.141,
+    "served_liters": 26.141,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 47,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.555,
+    "served_liters": 55.555,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 46,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 55.853,
+    "served_liters": 55.853,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 45,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 56.742,
+    "served_liters": 56.742,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 44,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 96.633,
+    "served_liters": 96.633,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 43,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 90.781,
+    "served_liters": 90.781,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 42,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 9.817,
+    "served_liters": 9.817,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 41,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 19.597,
+    "served_liters": 19.597,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 40,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 63.334,
+    "served_liters": 63.334,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 39,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 44.3,
+    "served_liters": 44.3,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 38,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 78.678,
+    "served_liters": 78.678,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 37,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 3,
+    "sim_time": "2026-01-01T00:45:00",
+    "demand_liters": 65.161,
+    "served_liters": 65.161,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 36,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 28.855,
+    "served_liters": 28.855,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 35,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 59.486,
+    "served_liters": 59.486,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 34,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 51.024,
+    "served_liters": 51.024,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 33,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 58.135,
+    "served_liters": 58.135,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 32,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 94.272,
+    "served_liters": 94.272,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 31,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 78.339,
+    "served_liters": 78.339,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 30,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 10.995,
+    "served_liters": 10.995,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 29,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 20.969,
+    "served_liters": 20.969,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 28,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 64.443,
+    "served_liters": 64.443,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 27,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 41.77,
+    "served_liters": 41.77,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 26,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 80.7,
+    "served_liters": 80.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 25,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 2,
+    "sim_time": "2026-01-01T00:30:00",
+    "demand_liters": 56.319,
+    "served_liters": 56.319,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 24,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 25.509,
+    "served_liters": 25.509,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 23,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 59.603,
+    "served_liters": 59.603,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 22,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 53.852,
+    "served_liters": 53.852,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 21,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 54.015,
+    "served_liters": 54.015,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 20,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 89.728,
+    "served_liters": 89.728,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 19,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 83.528,
+    "served_liters": 83.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 18,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 10.648,
+    "served_liters": 10.648,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 17,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 21.284,
+    "served_liters": 21.284,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 16,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 64.303,
+    "served_liters": 64.303,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 15,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 37.862,
+    "served_liters": 37.862,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 14,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 79.32,
+    "served_liters": 79.32,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 13,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 1,
+    "sim_time": "2026-01-01T00:15:00",
+    "demand_liters": 58.905,
+    "served_liters": 58.905,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 12,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 27.586,
+    "served_liters": 27.586,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 11,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.248,
+    "served_liters": 55.248,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 10,
+    "station_id": "station-coxsbazar",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 48.83,
+    "served_liters": 48.83,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 9,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 55.314,
+    "served_liters": 55.314,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 8,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 99.076,
+    "served_liters": 99.076,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 7,
+    "station_id": "station-karnaphuli",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 87.701,
+    "served_liters": 87.701,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 6,
+    "station_id": "station-tongi",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 10.05,
+    "served_liters": 10.05,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 5,
+    "station_id": "station-tongi",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 20.7,
+    "served_liters": 20.7,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 4,
+    "station_id": "station-tongi",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 69.528,
+    "served_liters": 69.528,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 3,
+    "station_id": "station-mirpur",
+    "fuel_type": "OCTANE",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 37.631,
+    "served_liters": 37.631,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 2,
+    "station_id": "station-mirpur",
+    "fuel_type": "PETROL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 71.273,
+    "served_liters": 71.273,
+    "unmet_liters": 0.0
+   },
+   {
+    "id": 1,
+    "station_id": "station-mirpur",
+    "fuel_type": "DIESEL",
+    "tick": 0,
+    "sim_time": "2026-01-01T00:00:00",
+    "demand_liters": 59.588,
+    "served_liters": 59.588,
+    "unmet_liters": 0.0
+   }
+  ]
+ }
+}

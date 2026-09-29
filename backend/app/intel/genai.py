@@ -20,7 +20,9 @@ TIMEOUT_S = 8.0
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
 CACHE_MAX = 256
-MAX_CHARS = 900            # explanation length shown in the dashboard
+MAX_CHARS = 900
+# used when GROQ_MODEL_PRIMARY/FALLBACK are not set; all verified available on Groq (Llama left the free tier: 404)
+GROQ_DEFAULT_MODELS = ("qwen/qwen3.8-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b")  # 20b: free-tier safety net            # explanation length shown in the dashboard
 SYSTEM = (
     "You are the operations assistant of a fuel supply control room (simulated network in Bangladesh). "
     "Use ONLY the facts in the JSON you are given. Never invent numbers, stations, routes or events. "
@@ -148,7 +150,7 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     if cfg.get("gemini_api_key"):
         steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
     if cfg.get("groq_api_key"):
-        steps += [(f"groq:{m}", _groq) for m in _models(cfg.get("groq_model_primary"), cfg.get("groq_model_fallback")) or ["llama-3.1-8b-instant"]]
+        steps += [(f"groq:{m}", _groq) for m in _models(cfg.get("groq_model_primary"), cfg.get("groq_model_fallback")) or list(GROQ_DEFAULT_MODELS)]
     return steps
 
 

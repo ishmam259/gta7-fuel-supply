@@ -165,6 +165,7 @@ If one detector crashes, the others still run.
 | **False "unexplained inventory drop" at Patiya depot (−5,000 L).** | The depot was already **full** (85,000 L = capacity), so the simulator threw away the overflow when a supply truck arrived. My formula expected more fuel than possible. | Cap expected inventory at capacity. Real data now gives zero false alarms. |
 | Two different depot bottlenecks (dispatch saturated and constrained) had the same key, so one was hidden. | Key didn't include the sub-type. | Added a `code` field to the key (`dispatch`, `constrained`, `low_stock`, `multiplier`). |
 | Allocation POSTed at the same tick as the previous snapshot: is it already counted? | Depot stock drops the moment you POST, so it's ambiguous. | Accept either interpretation (whichever explains the change). Tested both. |
+| **False "unexplained petrol drop −8,000 L at Patiya"** (Ishmam, live run). Supply-105 had really arrived (+8,000 L at tick 80). | The backend reads the tick number first and the other lists in parallel. While the simulator runs, a tick can pass mid-fetch, so a snapshot **labelled** tick 80 already contained the tick-80 supply. The next check counted it again and expected 8,000 L too much. (Verified on the simulator: supply with `actual_tick` 12 shows in depot stock at tick 13, which the old code handled correctly; only the race broke it.) | Any arrival, sale or shipment at the edge of the window may count on either side; the check keeps the explanation that fits best. A real leak matches no arrival or sale, so it's still caught (tested: −5,000 L during a supply arrival is flagged). New real-data fixture `supply_arrival.json`; the race test fails on the old code and passes now. |
 
 ---
 
@@ -257,6 +258,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 | **`explain_*` crashed** (reported by Ishmam). | The backend passes dicts, and my functions expected Pydantic models. | All functions accept dicts **or** models. |
 | Gemini rejected every call. | My 8 s timeout was below Gemini's minimum of 10 s. | Gemini timeout set to 12 s. |
 | Groq said "model does not exist". | I hard-coded a model the key can't use. | Read model lists from `.env` (`GROQ_MODEL_PRIMARY`, `GROQ_MODEL_FALLBACK`, `GEMINI_MODEL_CHAIN`). |
+| **Groq still failed on Ishmam's machine** (reported again). | His `.env` has no `GROQ_MODEL_*` lines, so the built-in default `llama-3.1-8b-instant` was used, and that model doesn't exist on Groq (404). | Checked the Groq model list (Llama left Groq's free tier in August, confirmed by a live 404): defaults are now `qwen/qwen3.8-27b` → `openai/gpt-oss-120b` → `openai/gpt-oss-20b` (the free-tier safety net, as suggested by the team), all tested live for text and JSON. Ishmam should also add `GROQ_MODEL_PRIMARY` / `GROQ_MODEL_FALLBACK` to `.env.example`. |
 | Some models wrap JSON in ```` ```json ```` fences or `<think>` blocks. | Reasoning models. | Strip them before parsing. |
 | OpenAI key "missing". | The key had been pasted into `OPERATOR_KEY` in `.env`. | Moved it to `OPENAI_API_KEY`, and set `OPERATOR_KEY` back to `change-me`. |
 | OpenAI call crashed with `Decompressor.decompress() got an unexpected keyword argument 'output_buffer_limit'`. | Old `brotlicffi` 1.1 package in my Python. | `python -m pip install -U "brotlicffi>=1.2"`. |
@@ -271,16 +273,16 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 ### Step 7: Tests (`backend/tests/intel/`)
 
 **What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
-the exact path production uses. **78 intel tests** (96 with Ishmam's backend tests), all passing, no network needed.
+the exact path production uses. **82 intel tests** (105 with Ishmam's backend tests), all passing, no network needed.
 
 | File | Tests | Covers |
 |---|---|---|
 | `test_smoke.py` | 4 | Every function runs end to end. |
 | `test_forecast.py` | 7 | Backtest error < 10%, band, day/night shape, spike start/end, fallbacks. |
 | `test_risk.py` | 7 | Levels, probability goes down as stock goes up, outage, pending/in-transit trucks, DELAYED supply ETA. |
-| `test_detect.py` | 15 | No false alarms on real data, leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
+| `test_detect.py` | 18 | No false alarms on real data (incl. supply arrivals and the snapshot race), leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
 | `test_planner.py` | 18 | Every simulator rule, the live before→after risk story, combined impact for two trucks, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
-| `test_genai.py` | 21 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
+| `test_genai.py` | 22 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
 | `test_pipeline.py` | 6 | **Through `intel_bridge`** with dict snapshots: healthy tick uses intel (not fallback); **combined crisis** (demand spike + route down + delayed supply + constrained depot + near-empty station) raises every alert type, gives a legal plan that uses the backup depot, and all 4 genai functions work; real snapshot pair with no false alarms; what-if including the fallback on a bad route; same input gives the same output; messy data handled by intel itself. |
 
 Other checks done outside pytest:
@@ -330,7 +332,7 @@ Run: `cd backend; python -m pytest tests/intel -q`
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
 Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
-Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (96 now).
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (105 now).
 
 **Things for Ishmam to fix in his files (found while testing):**
 1. His engine de-duplicates alerts by `kind + entity` only. Two different alerts on the same depot (e.g. dispatch
@@ -363,7 +365,7 @@ consequential actions.
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
 - **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
   simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
-- **78 intel tests** (96 with the backend's), including full crisis runs through the backend bridge.
+- **82 intel tests** (105 with the backend's), including full crisis runs through the backend bridge.
 - **Fast**: ~136 ms per tick for the whole pipeline.
 
 **Status: all 7 steps are complete** and pushed to `intel`. Ishmam has merged up to step 4. The team fixes,
