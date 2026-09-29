@@ -213,3 +213,24 @@ def test_stale_pending_recommendation_is_retired(client):
     assert all(r["id"] != rid for r in c.get("/api/recommendations").json())
     old = next(r for r in c.get("/api/recommendations?status=superseded").json() if r["id"] == rid)
     assert "DISRUPTED" in old["failure_reason"]
+
+
+def test_depot_exhaustion_race_never_goes_negative(client):
+    """Q3: station A's order drains the depot, station B's order arrives right after -> B is stopped, stock >= 0."""
+    c, eng = client
+    snap = eng.snap
+    gaz = next(d for d in snap["depots"] if d["id"] == "depot-gazipur")
+    gaz["inventory"]["PETROL"], gaz["dispatch_capacity_per_tick"] = 3000, 50000
+    for a in snap["allocations"]:
+        a["status"] = "ARRIVED"
+    for st in snap["stations"]:
+        st["inventory"]["PETROL"] = 0
+    drafts = [{"station_id": st, "fuel_type": "PETROL", "mode": "heuristic", "confidence": 0.9,
+               "allocation": {"source_depot_id": "depot-gazipur", "route_id": rt, "quantity": 2000, "eta_tick": snap["tick"] + 2}}
+              for st, rt in (("station-mirpur", "route-gazipur-mirpur"), ("station-tongi", "route-gazipur-tongi"))]
+    eng._store_recommendations(snap, drafts)
+    ids = [r["id"] for r in c.get("/api/recommendations").json() if r["fuel_type"] == "PETROL"]
+    res = [c.post(f"/api/recommendations/{i}/approve", headers={"X-Operator-Key": "test-key"}).json() for i in ids]
+    assert sorted(r["status"] for r in res) == ["executed", "failed"]
+    assert "now has only 1000 L" in next(r for r in res if r["status"] == "failed")["failure_reason"]
+    assert gaz["inventory"]["PETROL"] == 1000 and len(eng.sim.posted) == 1
