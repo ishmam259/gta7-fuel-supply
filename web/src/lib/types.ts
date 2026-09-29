@@ -204,9 +204,11 @@ export interface Decision {
 }
 
 export interface Mode {
-  mode: "manual" | "assisted";
+  mode: "manual" | "assisted" | "auto";
   auto_confidence_threshold: number;
   auto_max_quantity: number;
+  /** auto mode: approve when stockout risk drops by at least this much (0.20 = 20 points) */
+  auto_min_risk_drop?: number;
 }
 
 export interface Briefing {
