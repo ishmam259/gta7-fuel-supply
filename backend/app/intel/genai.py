@@ -1,7 +1,7 @@
 """Operator-facing text: explanations, briefing, investigation assistant.
 
 The LLM only explains facts computed by deterministic code; it never decides quantities.
-Provider chain: OpenAI -> Gemini -> Groq -> template. Every function returns source "llm" or "template".
+Provider chain: OpenAI -> Groq -> Gemini -> template, all inside a 3 s budget. Every function returns source "llm" or "template".
 Inputs may be Pydantic models or plain dicts (the backend passes dicts).
 Prompts get pre-formatted, human-readable facts (names, percentages, clock times) so the text is operator-ready.
 """
@@ -11,7 +11,7 @@ import logging
 import os
 import re
 import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+import threading
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -117,7 +117,30 @@ def _clean(text: str, limit: int = MAX_CHARS) -> str:
 
 # ---------------- providers ----------------
 _clients: dict[tuple, Any] = {}   # one client per provider/key: reuses the HTTPS connection (saves ~0.5-1.5 s per call)
-_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="llm")
+
+
+class _Slow(Exception):
+    """A provider did not answer within the remaining budget."""
+
+
+def _within(seconds: float, fn, *args):
+    """Run fn in its own daemon thread and wait at most `seconds`. An abandoned call keeps running in the background
+    (bounded by the HTTP timeout) but never blocks a later call: no shared worker pool to exhaust."""
+    box: dict = {}
+
+    def run():
+        try:
+            box["value"] = fn(*args)
+        except BaseException as exc:  # noqa: BLE001 - re-raised in the caller
+            box["error"] = exc
+    th = threading.Thread(target=run, daemon=True, name="llm-call")
+    th.start()
+    th.join(timeout=seconds)
+    if th.is_alive():
+        raise _Slow()
+    if "error" in box:
+        raise box["error"]
+    return box.get("value")
 
 
 def _client(kind: str, key: str, insecure: bool = False):
@@ -170,10 +193,11 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     steps = []
     if cfg.get("openai_api_key"):
         steps += [(f"openai:{m}", _openai) for m in _models(cfg.get("openai_model") or OPENAI_DEFAULT_MODELS)]
-    if cfg.get("gemini_api_key"):
-        steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
+    # Groq before Gemini: measured ~0.3-1.2 s vs Gemini >= 2.3 s, and the whole chain has a 3 s budget
     if cfg.get("groq_api_key"):
         steps += [(f"groq:{m}", _groq) for m in _models(cfg.get("groq_model_primary"), cfg.get("groq_model_fallback")) or list(GROQ_DEFAULT_MODELS)]
+    if cfg.get("gemini_api_key"):
+        steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
     return steps
 
 
@@ -195,8 +219,7 @@ def _llm(user: str, want_json: bool = False) -> str | None:
             break
         try:
             # run under the remaining budget; a slow call is abandoned (it finishes in the background, result ignored)
-            fut = _pool.submit(fn, cfg, name.split(":", 1)[1], SYSTEM, user, want_json)
-            text = (fut.result(timeout=remaining) or "").strip()
+            text = (_within(remaining, fn, cfg, name.split(":", 1)[1], SYSTEM, user, want_json) or "").strip()
             text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()  # reasoning models
             if want_json:
                 text = _json_block(text)
@@ -208,7 +231,7 @@ def _llm(user: str, want_json: bool = False) -> str | None:
                 last_provider["name"] = name
                 stats["llm_ok"] += 1
                 return text
-        except FutureTimeout:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
+        except _Slow:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
             log.warning("llm %s exceeded the %.1f s budget", name, LLM_BUDGET_S)
             stats["failures"] += 1
             stats["last_error"] = f"{name}: slower than {LLM_BUDGET_S:.0f} s"
@@ -237,7 +260,7 @@ def warm_up() -> None:
                     c.chat.completions.create(model=name.split(":", 1)[1], max_tokens=1, messages=[{"role": "user", "content": "ok"}])
         except Exception as exc:
             log.info("llm warm-up skipped: %r", exc)
-    _pool.submit(_go)
+    threading.Thread(target=_go, daemon=True, name="llm-warmup").start()
 
 
 def llm_status() -> dict:

@@ -109,3 +109,6 @@ Badrul: load test and resilience docs (with Ishmam).
   instantly after that), reused connections, background warm-up. Live: explanations ~1.0–1.5 s, briefing ~2.6 s, answer ~1.4 s,
   cached repeats 0.02 s. **Everyone:** set `OPENAI_MODEL=gpt-4.1-nano,gpt-4o-mini` in your `.env` (nano is faster);
   Ishmam, please put that in `.env.example` too. Then restart the backend.
+- **13:55 · Farhan → All:** 3 s AI cap stress-tested (30 tests incl. live APIs): worst case anywhere **3.03 s**; full chain
+  median **1.1 s**, slowest 2.4 s, 24/24 real LLM answers; 16 parallel calls max 1.9 s. Fixed a starvation bug and moved Groq
+  before Gemini (Gemini never answers under 3 s). Restart the backend to pick it up.
