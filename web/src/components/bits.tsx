@@ -21,11 +21,12 @@ export function StatusPill({ value, className }: { value: string | undefined | n
   );
 }
 
-export function RiskBadge({ level, className }: { level: RiskLevel | undefined; className?: string }) {
+/** Risk level "outage" on a fuel = the tank is empty → shown as STOCKOUT (station OUTAGE is a separate status). */
+export function RiskBadge({ level, label, className }: { level: RiskLevel | undefined; label?: string; className?: string }) {
   const l = level ?? "ok";
   return (
     <span className={cn("inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide", riskClass[l], className)}>
-      {l}
+      {label ?? (l === "outage" ? "stockout" : l)}
     </span>
   );
 }
@@ -93,7 +94,8 @@ export function InvBar({ fuel, inv, cap, risk }: { fuel: string; inv: number | u
             stockout in <b className="text-foreground">{hours(risk.stockout_hours)}</b>
           </span>
           <span className="flex items-center gap-1">
-            p={pct(risk.stockout_prob)} <RiskBadge level={risk.level} />
+            <span title="Probability of running out within 24 h if no action is taken">24 h stockout risk if no action: {pct(risk.stockout_prob)}</span>
+            <RiskBadge level={risk.level} />
           </span>
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowRight, Check, FlaskConical, Info, ShieldCheck, TriangleAlert, X } from "lucide-react";
 import { useLive } from "@/components/live-provider";
@@ -21,10 +22,30 @@ const STATUSES: [string, string][] = [
 ];
 
 export default function RecommendationsPage() {
+  return (
+    <Suspense>
+      <Inbox />
+    </Suspense>
+  );
+}
+
+function Inbox() {
   const { state, bump } = useLive();
+  const params = useSearchParams();
+  const wanted = Number(params.get("id")) || null;
   const [status, setStatus] = useState("pending");
   const recs = usePoll(() => api.recommendations(status), 5000, [status, bump]);
-  const [selId, setSelId] = useState<number | null>(null);
+  const [selId, setSelId] = useState<number | null>(wanted);
+  // opened from a toast / briefing link: select that card; if it is no longer pending, look in "all"
+  const [seen, setSeen] = useState<number | null>(null);
+  if (wanted !== seen) {
+    setSeen(wanted);
+    if (wanted) setSelId(wanted);
+  }
+  const missing = wanted != null && selId === wanted && recs.data && !recs.data.some((r) => r.id === wanted) && status !== "all";
+  useEffect(() => {
+    if (missing) setTimeout(() => setStatus("all"), 0);
+  }, [missing]);
   const list = recs.data ?? [];
   const selected = list.find((r) => r.id === selId) ?? list[0];
 

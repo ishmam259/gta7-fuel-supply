@@ -2,6 +2,7 @@
 // App-wide live data: polls /api/state + /api/system/status every 3 s (contract: poll is the fallback)
 // and listens to /api/stream (SSE) to refresh immediately on ticks, alerts and new recommendations.
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, isMocked, streamUrl } from "@/lib/api";
 import { usePoll, type PollResult } from "@/lib/hooks";
@@ -26,11 +27,16 @@ export function LiveProvider({ children }: { children: React.ReactNode }) {
   const status = usePoll(api.systemStatus, 3000);
   const [stream, setStream] = useState<StreamState>("off");
   const [bump, setBump] = useState(0);
+  const router = useRouter();
+  const routerRef = useRef(router);
+  // the stream re-sends a recommendation every time it is refreshed → toast each id only once
+  const toasted = useRef(new Set<string>());
   const refreshState = useRef(state.refresh);
   const refreshStatus = useRef(status.refresh);
   useEffect(() => {
     refreshState.current = state.refresh;
     refreshStatus.current = status.refresh;
+    routerRef.current = router;
   });
 
   useEffect(() => {
@@ -53,8 +59,13 @@ export function LiveProvider({ children }: { children: React.ReactNode }) {
         setBump((b) => b + 1);
         try {
           const a = JSON.parse((ev as MessageEvent).data) as Alert;
-          if (a.severity === "critical") toast.error(a.title, { description: a.detail });
-          else if (a.severity === "warning") toast.warning(a.title, { description: a.detail });
+          const key = `alert-${a.id}`;
+          if (a.severity === "info" || a.status === "resolved" || toasted.current.has(key)) return;
+          toasted.current.add(key);
+          const open = () => routerRef.current.push(`/alerts?focus=${a.id}`);
+          const opts = { id: key, description: a.detail, action: { label: "View", onClick: open } };
+          if (a.severity === "critical") toast.error(a.title, opts);
+          else toast.warning(a.title, opts);
         } catch {
           /* ignore malformed event, polling still covers it */
         }
@@ -63,7 +74,15 @@ export function LiveProvider({ children }: { children: React.ReactNode }) {
         setBump((b) => b + 1);
         try {
           const r = JSON.parse((ev as MessageEvent).data) as Recommendation;
-          if (r.status === "pending") toast.info(`New recommendation #${r.id}`, { description: `${r.fuel_type} → ${r.station_id}` });
+          const key = `rec-${r.id}`;
+          if (r.status !== "pending" || toasted.current.has(key)) return;
+          toasted.current.add(key);
+          const open = () => routerRef.current.push(`/recommendations?id=${r.id}`);
+          toast.info(`New recommendation #${r.id}`, {
+            id: key,
+            description: `${r.allocation.quantity.toLocaleString("en-US")} L ${r.fuel_type} → ${r.station_id.replace("station-", "")} · click to inspect`,
+            action: { label: "Inspect", onClick: open },
+          });
         } catch {
           /* ignore */
         }

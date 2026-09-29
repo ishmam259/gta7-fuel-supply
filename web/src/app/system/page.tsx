@@ -121,8 +121,8 @@ export default function SystemPage() {
                 value={fresh ? (fresh.stale ? "stale" : fresh.degraded ? "degraded" : "healthy") : "unknown"}
                 desc={fresh ? `Last sync at tick ${fresh.last_sync_tick ?? "—"} (${timeAgo(fresh.last_sync_at)}). Stale = simulator sent X-Simulator-Stale.` : "No state yet"}
               />
-              <Mech label="ML unavailable" value={String(s.components?.prediction_service ?? "—")} desc="If forecasting fails the decision engine switches to the rule-based fallback policy (reorder at 35% capacity)." />
-              <Mech label="LLM unavailable" value={String(s.components?.llm ?? "—")} desc="Every explanation/briefing has a deterministic template fallback, labelled 'template fallback' in the UI." />
+              <Mech label="If prediction fails → fallback policy" value={String(s.components?.prediction_service ?? "—")} desc="Badge = current state of the prediction service. If forecasting fails, the decision engine switches to the rule-based fallback policy (reorder below 50% of capacity)." />
+              <Mech label="If LLM fails → template fallback" value={String(s.components?.llm ?? "—")} desc="Badge = current state of the LLM. Every explanation/briefing has a deterministic template fallback, labelled 'template fallback' in the UI." />
             </CardContent>
           </Card>
 

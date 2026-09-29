@@ -44,7 +44,7 @@ export default function NetworkPage() {
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <StatusPill value={st.status} />
-                    <RiskBadge level={worstRisk(st)} />
+                    <RiskBadge level={worstRisk(st)} label={st.status !== "OPEN" ? "outage" : undefined} />
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
