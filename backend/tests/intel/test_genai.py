@@ -124,6 +124,16 @@ def test_chain_order_and_models():
     assert genai._chain(cfg)[0][0] == "gemini:g1"
 
 
+def test_slow_llm_never_blocks_longer_than_budget(monkeypatch, rec, s):
+    import time
+    monkeypatch.setattr(genai, "LLM_BUDGET_S", 0.5)
+    use_providers(monkeypatch, lambda: time.sleep(3) or "too late", lambda: "never reached")
+    t = time.monotonic()
+    text, src = genai.explain_recommendation(rec, s)
+    assert src == "template" and time.monotonic() - t < 1.0     # budget, not the provider, decides the wait
+    assert "slower than" in genai.stats["last_error"]
+
+
 def test_groq_defaults_are_real_models():
     cfg = {k: "" for k in genai.FIELDS} | {"groq_api_key": "c"}
     assert [n for n, _ in genai._chain(cfg)] == ["groq:qwen/qwen3.8-27b", "groq:openai/gpt-oss-120b", "groq:openai/gpt-oss-20b"]

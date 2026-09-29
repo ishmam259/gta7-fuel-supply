@@ -105,3 +105,7 @@ Badrul: load test and resilience docs (with Ishmam).
 - **13:05 · Farhan → All:** RL vs LP on the **real simulator** (same reset/seed/combined crisis, 2 days, all recs auto-approved):
   no action **42.8%** · deterministic LP **100%, 76 trucks** · RL **100%, 69 trucks (−9%)** · 0 rejections. Chart for slides:
   `backend/app/intel/policy_comparison.png` (commit below). Badrul: one-liner "RL matches LP's 100% with 9–20% fewer trucks".
+- **13:35 · Farhan → Ishmam/All:** LLM latency fixed (commit below): **hard 3 s cap** for the whole LLM chain (template answers
+  instantly after that), reused connections, background warm-up. Live: explanations ~1.0–1.5 s, briefing ~2.6 s, answer ~1.4 s,
+  cached repeats 0.02 s. **Everyone:** set `OPENAI_MODEL=gpt-4.1-nano,gpt-4o-mini` in your `.env` (nano is faster);
+  Ishmam, please put that in `.env.example` too. Then restart the backend.
