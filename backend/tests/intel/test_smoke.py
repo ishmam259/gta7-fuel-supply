@@ -45,7 +45,9 @@ def test_plan_respects_limits_under_pressure(snap):
     assert all(q <= caps[d] for d, q in used.items())
 
 
-def test_fallback_and_simulate_and_genai(snap):
+def test_fallback_and_simulate_and_genai(snap, monkeypatch):
+    from app.intel import genai
+    monkeypatch.setattr(genai, "_cfg", lambda: {k: "" for k in genai.FIELDS})  # no network in tests
     assert isinstance(intel.fallback_plan(snap), list)
     fc = intel.forecast(snap)
     w = intel.simulate(snap, fc, "station-mirpur", "DIESEL", "depot-gazipur", "route-gazipur-mirpur", 5000)

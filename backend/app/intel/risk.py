@@ -1,6 +1,7 @@
 """Stockout risk per (station, fuel) from forecast + inventory + incoming shipments.
 
-stockout_prob = max over the horizon of P(cumulative demand by tick k > inventory + arrivals by k), normal approx.
+stockout_prob = P(stockout within PROB_HORIZON_TICKS = 12 h, the window an allocation can still fix)
+              = max over k of P(cumulative demand by tick k > inventory + arrivals by k), normal approx.
 Per-tick sd comes from the forecast band; a systematic term (MAPE) covers model error that does not average out.
 """
 import math
@@ -11,6 +12,7 @@ Z80 = 1.28
 SHIPPABLE_DEPOT = {"OPEN", "CONSTRAINED"}
 MAX_HOURS = 168.0  # cap for "no stockout in sight"
 LONG_HORIZON_TICKS = 192  # 48 h at 15 min/tick
+PROB_HORIZON_TICKS = 48   # 12 h
 
 
 def _norm_cdf(z: float) -> float:
@@ -82,7 +84,8 @@ def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, 
         arrivals[t] = arrivals.get(t, 0.0) + q
     sys_err = min(fc.mape_recent if fc.mape_recent is not None else 0.1, 0.5)
     cum_d = var = worst = 0.0
-    for i, (mu, lo, hi) in enumerate(zip(fc.per_tick, fc.lower, fc.upper), start=1):
+    n = PROB_HORIZON_TICKS
+    for i, (mu, lo, hi) in enumerate(zip(fc.per_tick[:n], fc.lower[:n], fc.upper[:n]), start=1):
         supply_k = inventory + sum(q for t, q in arrivals.items() if t <= s.tick + i - 1)
         cum_d += mu
         var += ((hi - lo) / (2 * Z80)) ** 2
@@ -106,14 +109,14 @@ def stockout_hours(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int,
 def level(inventory: float, station_open: bool, hours: float, prob: float) -> str:
     if inventory <= 0 or not station_open:
         return "outage"
-    if hours < 4 or prob > 0.5:
+    if hours < 4:
         return "critical"
-    if hours < 12 or prob > 0.2:
+    if hours < 12 or prob > 0.3:
         return "watch"
     return "ok"
 
 
-def _long_forecasts(s: Snapshot) -> dict[tuple[str, str], Forecast]:
+def long_forecasts(s: Snapshot) -> dict[tuple[str, str], Forecast]:
     """48 h forecast so stockout_hours follows the daily profile instead of extrapolating the current rate."""
     from .forecast import forecast
     try:
@@ -124,15 +127,15 @@ def _long_forecasts(s: Snapshot) -> dict[tuple[str, str], Forecast]:
 
 def assess_risk(s: Snapshot, fc: list[Forecast]) -> list[Risk]:
     stations = {st["id"]: st for st in s.stations}
-    long_fc = _long_forecasts(s)
+    long_fc = long_forecasts(s)
     out = []
     for f in fc:
         st = stations.get(f.station_id)
         if not st:
             continue
         inv = float(st.get("inventory", {}).get(f.fuel_type, 0.0))
-        hours = stockout_hours(s, long_fc.get((f.station_id, f.fuel_type), f), inv)
-        prob = stockout_prob(s, f, inv)
+        lf = long_fc.get((f.station_id, f.fuel_type), f)
+        hours, prob = stockout_hours(s, lf, inv), stockout_prob(s, lf, inv)
         arrivals = incoming(s, f.station_id, f.fuel_type)
         upstream = sorted((a for d in serving_depots(s, f.station_id) for a in depot_supply(s, d, f.fuel_type)),
                           key=lambda a: a["eta_tick"])
