@@ -78,7 +78,24 @@ def project(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, float]
     return path
 
 
-def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, float] | None = None) -> float:
+def expected_unmet(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, float] | None = None,
+                   horizon: int = PROB_HORIZON_TICKS) -> float:
+    """Liters of demand that would go unserved over the horizon (expected path)."""
+    arrivals = incoming(s, fc.station_id, fc.fuel_type)
+    for t, q in (extra or {}).items():
+        arrivals[t] = arrivals.get(t, 0.0) + q
+    inv, unmet = inventory, 0.0
+    for i, d in enumerate(fc.per_tick[:horizon]):
+        inv += arrivals.get(s.tick + i, 0.0)
+        served = min(inv, d)
+        unmet += d - served
+        inv -= served
+    return unmet
+
+
+def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, float] | None = None,
+                  from_tick: int | None = None) -> float:
+    """from_tick: only count stockouts at/after this tick (e.g. after a shipment lands)."""
     arrivals = incoming(s, fc.station_id, fc.fuel_type)
     for t, q in (extra or {}).items():
         arrivals[t] = arrivals.get(t, 0.0) + q
@@ -90,7 +107,8 @@ def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, 
         cum_d += mu
         var += ((hi - lo) / (2 * Z80)) ** 2
         sd = max(math.sqrt(var) + sys_err * cum_d, 1e-6)
-        worst = max(worst, 1 - _norm_cdf((supply_k - cum_d) / sd))
+        if from_tick is None or s.tick + i - 1 >= from_tick:
+            worst = max(worst, 1 - _norm_cdf((supply_k - cum_d) / sd))
     return round(worst, 4)
 
 
@@ -125,9 +143,9 @@ def long_forecasts(s: Snapshot) -> dict[tuple[str, str], Forecast]:
         return {}
 
 
-def assess_risk(s: Snapshot, fc: list[Forecast]) -> list[Risk]:
+def assess_risk(s: Snapshot, fc: list[Forecast], long_fc: dict | None = None) -> list[Risk]:
     stations = {st["id"]: st for st in s.stations}
-    long_fc = long_forecasts(s)
+    long_fc = long_forecasts(s) if long_fc is None else long_fc
     out = []
     for f in fc:
         st = stations.get(f.station_id)
