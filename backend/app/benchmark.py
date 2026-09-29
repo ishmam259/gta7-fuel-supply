@@ -120,13 +120,19 @@ async def run_benchmark(scenario: str | None = "combined_crisis", ticks: int = 9
 
 
 async def run_in_background(scenario: str | None, ticks: int) -> None:
+    from .engine import engine as live
     STATE.update(status="running", progress=0.0, error=None, started_at=time.time())
+    if live is not None:
+        live.paused_for_benchmark = True  # the benchmark owns the simulator while it runs
     try:
         STATE["result"] = await run_benchmark(scenario, ticks)
         STATE["status"] = "done"
     except Exception as exc:  # report, don't crash the API
         log.exception("benchmark failed")
         STATE.update(status="failed", error=repr(exc))
+    finally:
+        if live is not None:
+            live.paused_for_benchmark = False
 
 
 def latest() -> dict:

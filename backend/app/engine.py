@@ -69,6 +69,7 @@ class Engine:
         self._lock = asyncio.Lock()
         self._last_full = 0.0
         self._consecutive_failures = 0
+        self.paused_for_benchmark = False
 
     # ------------------------------------------------------------ lifecycle
     async def start(self) -> None:
@@ -103,6 +104,8 @@ class Engine:
             except asyncio.TimeoutError:
                 pass
             self._wake.clear()
+            if self.paused_for_benchmark:
+                continue
             try:
                 await self.sync()
             except Exception:  # never let the loop die
