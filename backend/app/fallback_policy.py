@@ -118,7 +118,7 @@ def plan(snap: dict, risks: dict) -> list[dict]:
         recs.append({
             "station_id": st["id"], "fuel_type": f, "mode": "fallback",
             "allocation": {"source_depot_id": d, "route_id": r["id"], "quantity": qty,
-                           "eta_tick": snap["tick"] + 1 + r["transit_ticks"]},
+                           "eta_tick": snap["tick"] + r["transit_ticks"]},
             "situation": {"current_inventory": st["inventory"][f],
                           "expected_demand_next_4h": round(rate * tph * 4, 1),
                           "projected_stockout_hours": risks[st["id"]][f]["stockout_hours"]},
@@ -129,10 +129,10 @@ def plan(snap: dict, risks: dict) -> list[dict]:
             "signals": [f"inventory + in-transit {level:.0f} L < 50% of capacity {st['capacity'][f]:.0f} L"],
             "constraints": [f"route max {r['max_shipment']:.0f} L", f"depot {d} dispatch left {dispatch_left[d] + qty:.0f} L"],
             "alternatives": [{"source_depot_id": o[0]["source_depot_id"], "route_id": o[0]["id"], "quantity": o[1],
-                              "eta_tick": snap["tick"] + 1 + o[0]["transit_ticks"]} for o in options[1:]],
+                              "eta_tick": snap["tick"] + o[0]["transit_ticks"]} for o in options[1:]],
             "explanation": (f"Fallback rule policy: {st['name']} {f.lower()} is below half capacity. "
                             f"Ship {qty:.0f} L from {depots[d]['name']} via {r['id']} (arrives ~tick "
-                            f"{snap['tick'] + 1 + r['transit_ticks']})."),
+                            f"{snap['tick'] + r['transit_ticks']})."),
         })
     return recs
 

@@ -122,7 +122,7 @@ def _fallback_whatif(snap: dict, body: dict) -> dict:
     route = next(r for r in snap["routes"] if r["id"] == body["route_id"])
     f = body["fuel_type"]
     rate = rates[(st["id"], f)]
-    arrive = snap["tick"] + 1 + route["transit_ticks"]
+    arrive = snap["tick"] + route["transit_ticks"]  # trucks depart on the tick they are ordered
     inv_a = inv_b = st["inventory"][f] + transit[(st["id"], f)]
     without, with_ = [], []
     for t in range(snap["tick"] + 1, snap["tick"] + 17):
