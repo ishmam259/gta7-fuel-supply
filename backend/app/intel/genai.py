@@ -219,7 +219,7 @@ def _rec_facts(rec: dict, s: Any, names: dict) -> dict:
         "station_stock_now": f"{sit.get('current_inventory', 0):.0f} L",
         "runs_dry_in": f"{sit.get('projected_stockout_hours', '?')} h",
         "demand_next_4h": f"{sit.get('expected_demand_next_4h', 0):.0f} L",
-        "stockout_risk_12h": f"{_pct(imp.get('stockout_prob_before'))} now, {_pct(imp.get('stockout_prob_after'))} after this delivery",
+        "stockout_risk_24h": f"{_pct(imp.get('stockout_prob_before'))} now, {_pct(imp.get('stockout_prob_after'))} after this delivery",
         "lost_sales_avoided": f"{imp.get('unmet_liters_avoided', 0):.0f} L",
         "confidence": _pct(rec.get("confidence")),
         "needs_human_review": bool(rec.get("requires_human_review")),
@@ -242,7 +242,7 @@ def _risk_table(s: Any, limit: int = 8) -> list[dict]:
         names = _names(snap)
         risks = sorted((r for r in assess_risk(snap, forecast(snap)) if r.level != "ok"), key=lambda r: -r.stockout_prob)
         return [{"station": names.get(r.station_id, r.station_id), "fuel": r.fuel_type, "level": r.level,
-                 "runs_dry_in": f"{r.stockout_hours} h", "stockout_risk_12h": _pct(r.stockout_prob),
+                 "runs_dry_in": f"{r.stockout_hours} h", "stockout_risk_24h": _pct(r.stockout_prob),
                  "stock": f"{r.current_inventory:.0f} L"} for r in risks[:limit]]
     except Exception:
         return []
@@ -311,7 +311,7 @@ def _service(s: Any) -> str | None:
 # ---------------- templates ----------------
 def _tpl_recommendation(f: dict) -> str:
     text = (f"Recommend: {f['action']}, arriving {f['arrives']}. The station holds {f['station_stock_now']} and runs dry in "
-            f"{f['runs_dry_in']}. Stockout risk (12 h): {f['stockout_risk_12h']}; about {f['lost_sales_avoided']} of lost sales "
+            f"{f['runs_dry_in']}. Stockout risk (24 h): {f['stockout_risk_24h']}; about {f['lost_sales_avoided']} of lost sales "
             f"avoided. Confidence {f['confidence']}.")
     if f["limits"]:
         text += " Limited by: " + "; ".join(f["limits"][:2]) + "."
@@ -355,14 +355,14 @@ def briefing(s: Any, risks: list, alerts: list) -> dict:
         "summary": f"Tick {tick}: {len(top)} station-fuel pairs at risk, {len(alerts)} open alerts ({len(crit)} critical)."
                    + (f" Network {service}." if service else ""),
         "top_risks": [f"{names.get(r['station_id'], r['station_id'])} {r['fuel_type']}: {r['level']}, "
-                      f"runs dry in {r.get('stockout_hours')} h (12 h risk {_pct(r.get('stockout_prob'))})" for r in top],
+                      f"runs dry in {r.get('stockout_hours')} h (24 h risk {_pct(r.get('stockout_prob'))})" for r in top],
         "recommended_actions": [f"Review resupply for {names.get(r['station_id'], r['station_id'])} {r['fuel_type']}" for r in top[:3]]
                                or ["No action needed; keep monitoring."],
         "source": "template",
     }
     facts = {"time": _clock(s, tick), "network": service,
              "top_risks": [{"station": names.get(r["station_id"], r["station_id"]), "fuel": r["fuel_type"], "level": r["level"],
-                            "runs_dry_in": f"{r.get('stockout_hours')} h", "risk_12h": _pct(r.get("stockout_prob"))} for r in top],
+                            "runs_dry_in": f"{r.get('stockout_hours')} h", "risk_24h": _pct(r.get("stockout_prob"))} for r in top],
              "alerts": [{k: a.get(k) for k in ("severity", "kind", "title", "detail")} for a in alerts[:15]],
              "active_events": _events(s)}
     text = _llm('Write a control-room situation briefing. Return JSON {"summary": str (2-4 sentences, lead with the most '

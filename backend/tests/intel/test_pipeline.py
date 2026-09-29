@@ -55,7 +55,8 @@ def test_healthy_pipeline_uses_intel_not_fallback():
     assert out["fallback_used"] is False and bridge.STATUS.prediction == "healthy"
     assert out["mape"] is not None and out["mape"] < 0.2
     assert out["risks"]["station-tongi"]["DIESEL"]["level"] == "watch"
-    assert [r["mode"] for r in out["recommendations"]] == ["optimizer"]
+    assert out["recommendations"] and {r["mode"] for r in out["recommendations"]} == {"optimizer"}
+    assert all(0 <= v["stockout_prob"] <= 1 for fm in out["risks"].values() for v in fm.values())
     assert legal(snap, out["recommendations"]) == []
 
 

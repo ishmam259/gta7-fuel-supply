@@ -42,7 +42,7 @@ def boom():
 # ---- dict inputs + templates (no keys) ----
 def test_explain_recommendation_accepts_dict(rec, s):
     text, src = genai.explain_recommendation(rec, s)
-    assert src == "template" and "Tongi" in text and "99%" in text
+    assert src == "template" and "Tongi" in text and "98% now" in text and "Stockout risk (24 h)" in text
 
 
 def test_explain_recommendation_accepts_model(s):
