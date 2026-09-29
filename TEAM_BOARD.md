@@ -49,14 +49,20 @@ Push small commits often. **Hard stop 13:20** for code; after that only demo-bre
 - [ ] Test everything on **http://localhost** (the gateway, same-origin URLs), not :3000.
 
 ### Farhan Tahsin Khan: reinforcement learning (+ intel)
-- [ ] **RL, timeboxed to 13:20** (brief §8: optional, but must show why it helps vs the heuristic). Suggested:
+- [x] **RL, timeboxed to 13:20** (brief §8: optional, but must show why it helps vs the heuristic). Suggested:
       an **RL-tuned hybrid**: tabular Q-learning / bandit that picks the planner's **target cover level** (e.g. 12/18/24/30 h)
       per station × fuel from a small state (cover-hours bucket, depot-stock ratio, active event, route status);
       reward = −unmet L − small transport cost − overflow penalty. Train **offline** on the documented dynamics your
       forecast already encodes (not on the live simulator; too slow). Expose `intel/rl.py → rl_plan(...)` returning
       `RecommendationDraft(mode="rl")`, keep LP as default.
-- [ ] Deliver numbers: **no-action vs LP vs RL** on the same scenario (Ishmam adds `policy` to the benchmark).
+      → `68ae291`: `intel/rl.py` (tabular Q-learning, 4-signal state, actions 12/18/24/30 h, reward = −(lost L + truck cost)
+      per hour), `intel/rl_env.py` (offline world), `intel/rl_policy.json` (trained, 37 states). `from app.intel import rl_plan`
+      → LP with RL-chosen cover, `mode="rl"`, signal explains the choice; no policy → plain LP. `PlanMode` now includes `"rl"`.
+- [x] Deliver numbers: **no-action vs LP vs RL** on the same scenario (Ishmam adds `policy` to the benchmark).
       If RL doesn't beat LP by 13:20, stop and say so honestly in Q&A: "evaluated; LP is used because …".
+      → `68ae291`, offline, 100 held-out runs × 4 days, same seeds. Crisis: no action 21.0% · LP 99.98% (97 trucks) ·
+      **RL 99.97% (83 trucks, −15%)**. Calm: LP 100% (88) · RL 100% (70, −20%). **RL doesn't beat LP on service**; its win is
+      the same service with 15–20% fewer trucks. LP stays default. Live check: run your benchmark with `policy=rl` → `intel.rl_plan`.
 - [ ] Read Q&A answers Q5–Q19 (Ishmam sends the PDF) and correct anything about your code.
 
 ### Ishmam Tahmid: backend, DevOps, merges
@@ -93,3 +99,6 @@ Badrul: load test and resilience docs (with Ishmam).
   http://localhost. Sakib: all frontend items. Farhan: RL timeboxed to 13:20. Badrul: slides + demo script first.
 - **12:40 · Ishmam → Farhan:** thanks. Merged; departure correction accepted (fixing my fallback ETA + docs); Groq vars
   going into `.env.example`; Q&A PDF coming via chat (kept out of the repo).
+- **12:53 · Farhan → Ishmam:** RL done on `intel` (`68ae291`), 113 tests green, please merge. For your benchmark switch:
+  `policy=rl` → `intel.rl_plan(s, fc, risks)` (same signature as `plan`, returns `mode="rl"`). Note `mode` can now be
+  `"rl"` (API contract/UI badge). Honest result: same service as LP, 15–20% fewer trucks. Still waiting for the Q&A PDF.

@@ -11,6 +11,7 @@ Agreed signatures (see docs/INTEL_INTERFACE.md):
     explain_incident(alert, s) -> (text, source)
     briefing(s, risks, alerts) -> dict
     answer(question, s, alerts, recs) -> dict
+    rl_plan(s, fc, risks) -> list[RecommendationDraft]   # optional: RL-chosen cover + LP, mode="rl"
 """
 from .detect import detect
 from .forecast import forecast
@@ -20,9 +21,10 @@ from .models import (
 )
 from .planner import fallback_plan, plan, simulate
 from .risk import assess_risk
+from .rl import rl_plan
 
 __all__ = [
     "Snapshot", "Forecast", "Risk", "AlertDraft", "RecommendationDraft", "WhatIf",
-    "forecast", "assess_risk", "detect", "plan", "fallback_plan", "simulate",
+    "forecast", "assess_risk", "detect", "plan", "fallback_plan", "simulate", "rl_plan",
     "explain_recommendation", "explain_incident", "briefing", "answer",
 ]

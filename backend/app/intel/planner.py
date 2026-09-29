@@ -116,7 +116,8 @@ def violations(s: Snapshot, recs: list[RecommendationDraft]) -> list[str]:
 
 # ---------------- candidates ----------------
 class Candidate:
-    def __init__(self, s: Snapshot, risk: Risk, fc: Forecast, st: dict):
+    def __init__(self, s: Snapshot, risk: Risk, fc: Forecast, st: dict, cover_ticks: int = COVER_TICKS):
+        self.cover_ticks = cover_ticks  # target cover after arrival (RL may change it per station/fuel)
         self.risk, self.fc, self.st = risk, fc, st
         self.station_id, self.fuel = risk.station_id, risk.fuel_type
         self.routes = usable_routes(s, self.station_id)
@@ -125,7 +126,8 @@ class Candidate:
         self.weight = (0.2 + risk.stockout_prob + 1.0 / (1.0 + risk.stockout_hours)
                        + (1.0 if risk.level in ("critical", "outage") else 0.0))
 
-    def need(self, s: Snapshot, route: dict | None = None, cover: int = COVER_TICKS) -> float:
+    def need(self, s: Snapshot, route: dict | None = None, cover: int | None = None) -> float:
+        cover = self.cover_ticks if cover is None else cover
         route = route or (self.routes[0] if self.routes else {"transit_ticks": 2})
         horizon = min(len(self.fc.per_tick), int(route["transit_ticks"]) + cover)
         have = self.risk.current_inventory + sum(incoming(s, self.station_id, self.fuel).values())
@@ -137,7 +139,7 @@ class Candidate:
         return 1.0 if late <= 0 else max(0.3, 1.0 - late / 16)
 
 
-def _candidates(s: Snapshot, fc: list[Forecast], risks: list[Risk], long_fc: dict) -> list[Candidate]:
+def _candidates(s: Snapshot, fc: list[Forecast], risks: list[Risk], long_fc: dict, cover_for=None) -> list[Candidate]:
     by_key = {(f.station_id, f.fuel_type): f for f in fc}
     stations = {st["id"]: st for st in s.stations}
     out = []
@@ -148,7 +150,7 @@ def _candidates(s: Snapshot, fc: list[Forecast], risks: list[Risk], long_fc: dic
         f = long_fc.get((r.station_id, r.fuel_type)) or by_key.get((r.station_id, r.fuel_type))
         if f is None:
             continue
-        c = Candidate(s, r, f, st)
+        c = Candidate(s, r, f, st, cover_for(r.station_id, r.fuel_type) if cover_for else COVER_TICKS)
         if c.routes and c.need(s) >= MIN_QTY:
             out.append(c)
     return sorted(out, key=lambda c: -c.weight)
@@ -313,8 +315,8 @@ def _build(s: Snapshot, cands: list[Candidate], alloc: dict[tuple[int, str], flo
     return recs
 
 
-def _plan(s: Snapshot, fc: list[Forecast], risks: list[Risk], long_fc: dict, use_lp: bool) -> list[RecommendationDraft]:
-    cands = _candidates(s, fc, risks, long_fc)
+def _plan(s: Snapshot, fc: list[Forecast], risks: list[Risk], long_fc: dict, use_lp: bool, cover_for=None) -> list[RecommendationDraft]:
+    cands = _candidates(s, fc, risks, long_fc, cover_for)
     if not cands:
         return []
     lim = Limits(s)
