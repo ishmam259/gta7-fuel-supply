@@ -12,6 +12,7 @@ INSTANCE = {"id": 1, "tick": 5, "sim_time": "2026-01-01T01:15:00", "tick_minutes
 def make_client(handler) -> SimClient:
     c = SimClient()
     c.http = httpx.AsyncClient(base_url="http://sim", transport=httpx.MockTransport(handler))
+    c._priority_http = httpx.AsyncClient(base_url="http://sim", transport=httpx.MockTransport(handler))
     c.breaker = CircuitBreaker(threshold=2, cooldown_s=0.05)
     return c
 

@@ -78,15 +78,19 @@ class SimClient:
         self.http = httpx.AsyncClient(base_url=s.simulator_url, timeout=s.sim_timeout_s,
                                       limits=httpx.Limits(max_connections=4, max_keepalive_connections=4))
         self._slots = asyncio.Semaphore(4)
+        # separate small pool for operator/admin commands (pause, step, faults) so they are never delayed
+        self._priority_http = httpx.AsyncClient(base_url=s.simulator_url, timeout=s.sim_timeout_s,
+                                                limits=httpx.Limits(max_connections=2, max_keepalive_connections=2))
         self.breaker = CircuitBreaker(s.breaker_threshold, s.breaker_cooldown_s)
         self.stale = False
         self.last_error: str | None = None
 
     async def close(self) -> None:
         await self.http.aclose()
+        await self._priority_http.aclose()
 
     async def _request(self, method: str, path: str, *, retry: bool = True, use_breaker: bool = True,
-                       **kwargs) -> httpx.Response:
+                       priority: bool = False, **kwargs) -> httpx.Response:
         label = _endpoint_label(path)
         if use_breaker and not self.breaker.allow():
             SIM_REQUESTS.labels(method, label, "circuit_open").inc()
@@ -96,8 +100,11 @@ class SimClient:
         for attempt in range(1, attempts + 1):
             start = time.perf_counter()
             try:
-                async with self._slots:
-                    resp = await self.http.request(method, path, **kwargs)
+                if priority:  # operator commands must not queue behind background sync reads
+                    resp = await self._priority_http.request(method, path, **kwargs)
+                else:
+                    async with self._slots:
+                        resp = await self.http.request(method, path, **kwargs)
                 SIM_LATENCY.labels(label).observe(time.perf_counter() - start)
                 if resp.status_code == 503:
                     SIM_REQUESTS.labels(method, label, "503").inc()
@@ -155,7 +162,7 @@ class SimClient:
     async def health(self) -> bool:
         """Liveness probe; bypasses faults and the breaker."""
         try:
-            resp = await self._request("GET", "/v1/health", retry=False, use_breaker=False)
+            resp = await self._request("GET", "/v1/health", retry=False, use_breaker=False, priority=True)
             return resp.status_code == 200
         except SimulatorUnavailable:
             return False
@@ -170,7 +177,7 @@ class SimClient:
 
     async def admin(self, method: str, path: str, json: dict | None = None) -> tuple[int, Any]:
         """Organizer/admin endpoints (bypass fault injection). Not behind the breaker."""
-        resp = await self._request(method, path, json=json, retry=False, use_breaker=False)
+        resp = await self._request(method, path, json=json, retry=False, use_breaker=False, priority=True)
         try:
             return resp.status_code, resp.json()
         except ValueError:

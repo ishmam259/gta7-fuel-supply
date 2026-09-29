@@ -226,6 +226,10 @@ class Engine:
             for r in s.exec(select(Recommendation).where(Recommendation.status == "pending")).all():
                 r.status, r.updated_at = "superseded", utcnow()
                 s.add(r)
+            # a reset starts a new run: the tick axis restarts, so start a fresh metrics history
+            # (the decision audit trail is kept on purpose)
+            for m in s.exec(select(MetricPoint)).all():
+                s.delete(m)
             s.commit()
         self._resolve(kinds=AUTO_RESOLVE_KINDS)
 
