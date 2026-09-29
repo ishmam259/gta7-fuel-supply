@@ -18,13 +18,15 @@ from typing import Any
 log = logging.getLogger("gta7.intel.genai")
 
 LLM_BUDGET_S = 3.0         # hard cap for the whole provider chain; after that the template answers instantly
+BRIEFING_BUDGET_S = 8.0    # the briefing is ~200 tokens of JSON (2-4 s on gpt-4.1-nano) and refreshes in the background
 TIMEOUT_S = 3.0            # per-call HTTP timeout (OpenAI / Groq)
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
 SLOW_COOLDOWN_S = 15.0     # after it was merely too slow
 CACHE_MAX = 256
 MAX_CHARS = 900
-MAX_OUT_TOKENS = 300       # explanations need ~90 tokens, briefings ~200
+MAX_OUT_TOKENS = 300       # explanations need ~90 tokens
+JSON_OUT_TOKENS = 800      # JSON answers (briefing) run 250-400 tokens; 300 cut them mid-string
 # fastest first (measured: gpt-4.1-nano ~1.1 s steady, gpt-4o-mini ~1.4 s with spikes); OPENAI_MODEL may be a list
 OPENAI_DEFAULT_MODELS = "gpt-4.1-nano,gpt-4o-mini"
 # used when GROQ_MODEL_PRIMARY/FALLBACK are not set; all verified available on Groq (Llama left the free tier: 404)
@@ -144,7 +146,8 @@ def _client(kind: str, key: str, insecure: bool = False):
 def _openai(cfg, model, system, user, want_json):
     client = _client("openai", cfg["openai_api_key"])
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
-    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=MAX_OUT_TOKENS,
+    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
+                                       timeout=BRIEFING_BUDGET_S if want_json else TIMEOUT_S,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -152,7 +155,7 @@ def _openai(cfg, model, system, user, want_json):
 def _gemini(cfg, model, system, user, want_json):
     from google.genai import types
     client = _client("gemini", cfg["gemini_api_key"])
-    conf = types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=MAX_OUT_TOKENS,
+    conf = types.GenerateContentConfig(system_instruction=system, temperature=0.2, max_output_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
                                        response_mime_type="application/json" if want_json else None)
     return client.models.generate_content(model=model, contents=user, config=conf).text
 
@@ -160,7 +163,8 @@ def _gemini(cfg, model, system, user, want_json):
 def _groq(cfg, model, system, user, want_json):
     client = _client("groq", cfg["groq_api_key"], cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"))
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
-    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=MAX_OUT_TOKENS,
+    r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
+                                       timeout=BRIEFING_BUDGET_S if want_json else TIMEOUT_S,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -177,15 +181,16 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     return steps
 
 
-def _llm(user: str, want_json: bool = False) -> str | None:
+def _llm(user: str, want_json: bool = False, budget: float | None = None) -> str | None:
     """First provider that answers wins; None means use the template."""
+    budget = LLM_BUDGET_S if budget is None else budget
     stats["calls"] += 1
     key = hashlib.sha256(f"{want_json}|{user}".encode()).hexdigest()
     if key in _cache:
         stats["cache_hits"] += 1
         return _cache[key]
     cfg = _cfg()
-    deadline = time.monotonic() + LLM_BUDGET_S
+    deadline = time.monotonic() + budget
     for name, fn in _chain(cfg):
         if _down_until.get(name, 0) > time.monotonic():
             continue
@@ -209,9 +214,9 @@ def _llm(user: str, want_json: bool = False) -> str | None:
                 stats["llm_ok"] += 1
                 return text
         except FutureTimeout:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
-            log.warning("llm %s exceeded the %.1f s budget", name, LLM_BUDGET_S)
+            log.warning("llm %s exceeded the %.1f s budget", name, budget)
             stats["failures"] += 1
-            stats["last_error"] = f"{name}: slower than {LLM_BUDGET_S:.0f} s"
+            stats["last_error"] = f"{name}: slower than {budget:.0f} s"
             _down_until[name] = time.monotonic() + SLOW_COOLDOWN_S
         except Exception as exc:
             log.warning("llm %s failed: %s", name, str(exc)[:200])
@@ -422,7 +427,7 @@ def briefing(s: Any, risks: list, alerts: list) -> dict:
              "active_events": _events(s)}
     text = _llm('Write a control-room situation briefing. Return JSON {"summary": str (2-4 sentences, lead with the most '
                 'urgent issue), "top_risks": [str] (max 5, one line each), "recommended_actions": [str] (max 4, concrete)}.\n'
-                + json.dumps(facts, default=str), want_json=True)
+                + json.dumps(facts, default=str), want_json=True, budget=BRIEFING_BUDGET_S)
     if text:
         try:
             out = json.loads(text)
@@ -458,7 +463,7 @@ def answer(question: str, s: Any, alerts: list, recs: list) -> dict:
     text = _llm("Answer the operator's question using only this network state. Be direct and specific (2-5 sentences). "
                 "If the question is not about this fuel network, say you can only answer questions about the current operations. "
                 'Return JSON {"answer": str, "evidence": [ids like "alert:9" or "recommendation:21" that support it]}.\n'
-                f"Question: {question}\nState: {json.dumps(context, default=str)}", want_json=True)
+                f"Question: {question}\nState: {json.dumps(context, default=str)}", want_json=True, budget=BRIEFING_BUDGET_S)
     if text:
         try:
             out = json.loads(text)
