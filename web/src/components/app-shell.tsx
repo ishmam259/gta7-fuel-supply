@@ -35,7 +35,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              active ? "bg-sidebar-primary font-medium text-sidebar-primary-foreground" : "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground",
             )}
           >
             <Icon className="size-4" />
@@ -77,7 +77,7 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
   const { state, status, stream } = useLive();
   const inst = state.data?.instance;
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-3 backdrop-blur md:px-5">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/85 px-3 shadow-[inset_0_-2px_0_var(--primary)] backdrop-blur md:px-5">
       <button className="rounded-md p-1.5 hover:bg-muted md:hidden" onClick={onMenu} aria-label="Open menu">
         <Menu className="size-5" />
       </button>
@@ -111,7 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar md:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
         <Brand />
         <Nav />
         <Footer />
@@ -119,10 +119,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       {open && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-sidebar shadow-xl">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-sidebar text-sidebar-foreground shadow-xl">
             <div className="flex items-center justify-between pr-2">
               <Brand />
-              <button onClick={() => setOpen(false)} className="rounded-md p-1.5 hover:bg-muted" aria-label="Close menu">
+              <button onClick={() => setOpen(false)} className="rounded-md p-1.5 hover:bg-sidebar-accent" aria-label="Close menu">
                 <X className="size-5" />
               </button>
             </div>
@@ -142,12 +142,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 function Brand() {
   return (
     <div className="flex items-center gap-2 px-4 py-4">
-      <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+      <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
         <Fuel className="size-4" />
       </div>
       <div className="leading-tight">
-        <div className="text-sm font-semibold">GTA 7 Fuel Ops</div>
-        <div className="text-[11px] text-muted-foreground">Intelligence & Resilience</div>
+        <div className="font-heading text-sm font-bold tracking-tight">GTA 7 Fuel Ops</div>
+        <div className="text-[11px] text-sidebar-foreground/55">Intelligence & Resilience</div>
       </div>
     </div>
   );
@@ -155,7 +155,7 @@ function Brand() {
 
 function Footer() {
   return (
-    <div className="mt-auto space-y-1 border-t p-3 text-[11px] text-muted-foreground">
+    <div className="mt-auto space-y-1 border-t border-sidebar-border p-3 text-[11px] text-sidebar-foreground/55">
       <div className="flex items-center gap-1.5">
         <ClipboardList className="size-3" /> Decision support — humans approve consequential actions
       </div>
