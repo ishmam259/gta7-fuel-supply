@@ -36,11 +36,11 @@ jobs:
       - uses: actions/setup-node@v4
         if: steps.has_web.outputs.present == 'yes'
         with:
-          node-version: "20"
+          node-version: "24"
       - name: Install & build
         if: steps.has_web.outputs.present == 'yes'
         working-directory: web
-        run: npm ci && npm run build
+        run: (npm ci || npm install --no-audit --no-fund) && npm run build
 
   deploy-smoke:
     name: Package, deploy (compose) & health check
