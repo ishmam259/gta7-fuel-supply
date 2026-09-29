@@ -172,9 +172,10 @@ def decisions(limit: int = Query(100, ge=1, le=1000)):
 
 # ---------------------------------------------------------------- decision mode
 class ModeBody(BaseModel):
-    mode: Literal["manual", "assisted"]
+    mode: Literal["manual", "assisted", "auto"]
     auto_confidence_threshold: float = Field(default=0.8, ge=0, le=1)
     auto_max_quantity: float = Field(default=5000, gt=0, le=20000)
+    auto_min_risk_drop: float = Field(default=0.20, ge=0.01, le=1)
 
 
 @router.get("/mode")

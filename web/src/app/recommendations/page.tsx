@@ -2,14 +2,13 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowRight, Check, FlaskConical, Info, ShieldCheck, TriangleAlert, X } from "lucide-react";
+import { ArrowRight, Check, FlaskConical, Hand, Info, ShieldCheck, TriangleAlert, X, Zap } from "lucide-react";
 import { useLive } from "@/components/live-provider";
 import { Empty, Loading, PageHeader, Pill, Seg, StaleNote, StatusPill } from "@/components/bits";
 import { WhatIfChart } from "@/components/whatif-chart";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { api, ApiError } from "@/lib/api";
 import { usePoll, useOperatorKey } from "@/lib/hooks";
@@ -310,9 +309,15 @@ function Inspect({ rec, state, onChanged }: { rec: Recommendation; state: Networ
   );
 }
 
+const MODES: { id: Mode["mode"]; label: string; icon: typeof Hand }[] = [
+  { id: "manual", label: "Manual", icon: Hand },
+  { id: "assisted", label: "Assisted", icon: ShieldCheck },
+  { id: "auto", label: "Auto", icon: Zap },
+];
+
 function ModeCard() {
   const opKey = useOperatorKey();
-  const mode = usePoll(api.mode, 10000);
+  const mode = usePoll(api.mode, 5000);
   const [busy, setBusy] = useState(false);
   const m = mode.data;
   const save = async (next: Mode) => {
@@ -328,18 +333,40 @@ function ModeCard() {
     }
   };
   if (!m) return null;
+  const drop = m.auto_min_risk_drop ?? 0.2;
+  const desc =
+    m.mode === "auto"
+      ? `Auto-approves immediately when a recommendation cuts stockout risk by ≥ ${pct(drop)} points (e.g. 74% → 54%). At 15 min per tick the simulator runs faster than any human can review. Low-confidence cards flagged "human review" still wait for you; paused in degraded mode; every approval is logged as autopilot in History.`
+      : m.mode === "assisted"
+        ? `Auto-executes only when confidence ≥ ${pct(m.auto_confidence_threshold)} and quantity ≤ ${liters(m.auto_max_quantity)}; everything else waits for review. Paused in degraded mode.`
+        : "No allocation reaches the simulator without an operator approval.";
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-sm">
-      <div className="flex items-center gap-3">
-        <Switch checked={m.mode === "assisted"} disabled={busy || !opKey} onCheckedChange={(v: boolean) => void save({ ...m, mode: v ? "assisted" : "manual" })} aria-label="Assisted mode" />
-        <div>
-          <div className="font-medium">{m.mode === "assisted" ? "Assisted mode (autopilot for safe cases)" : "Manual mode (operator approves everything)"}</div>
-          <div className="text-xs text-muted-foreground">
-            {m.mode === "assisted"
-              ? `Auto-executes only when confidence ≥ ${pct(m.auto_confidence_threshold)} and quantity ≤ ${liters(m.auto_max_quantity)}; everything else waits for review. Paused in degraded mode.`
-              : "No allocation reaches the simulator without an operator approval."}
+    <div className={cn("flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-4 py-3 text-sm", m.mode === "auto" && "border-sky-500/50 bg-sky-500/5")}>
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-medium">Decision mode</span>
+          <div className="inline-flex rounded-lg border p-0.5" role="radiogroup" aria-label="Decision mode">
+            {MODES.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                role="radio"
+                aria-checked={m.mode === id}
+                disabled={busy || !opKey || m.mode === id}
+                onClick={() => void save({ ...m, mode: id, auto_min_risk_drop: drop })}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-default",
+                  m.mode === id
+                    ? id === "auto" ? "bg-sky-600 text-white" : "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground disabled:opacity-60",
+                )}
+              >
+                <Icon className="size-3.5" /> {label}
+              </button>
+            ))}
           </div>
+          {m.mode === "auto" && <Pill tone="good">autopilot on · risk drop ≥ {pct(drop)}</Pill>}
         </div>
+        <div className="text-xs text-muted-foreground">{desc}</div>
       </div>
       {!opKey && <span className="text-xs text-muted-foreground">Operator key required to change</span>}
     </div>

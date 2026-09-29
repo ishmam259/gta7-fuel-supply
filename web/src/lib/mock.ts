@@ -120,7 +120,7 @@ export const mockDecisions: Decision[] = [
   { id: 3, tick: 30, actor: "operator", action: "reject", recommendation_id: 15, result: "OK", note: "route closing soon", created_at: "2026-09-29T09:55:00Z" },
 ];
 
-export const mockMode: Mode = { mode: "manual", auto_confidence_threshold: 0.8, auto_max_quantity: 5000 };
+export const mockMode: Mode = { mode: "manual", auto_confidence_threshold: 0.8, auto_max_quantity: 5000, auto_min_risk_drop: 0.2 };
 
 export const mockBriefing: Briefing = {
   tick: 42,

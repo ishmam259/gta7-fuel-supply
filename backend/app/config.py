@@ -27,9 +27,10 @@ class Settings(BaseSettings):
     breaker_cooldown_s: float = 10.0
 
     # decision mode defaults
-    decision_mode: str = "manual"  # manual | assisted
+    decision_mode: str = "manual"  # manual | assisted | auto
     auto_confidence_threshold: float = 0.8
     auto_max_quantity: float = 5000.0
+    auto_min_risk_drop: float = 0.20  # auto mode: approve when stockout risk falls by >= 20 points
 
     # LLM (used by app.intel.genai): OpenAI first, then Gemini, then Groq, then templates
     openai_api_key: str = ""

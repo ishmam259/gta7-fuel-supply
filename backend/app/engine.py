@@ -3,7 +3,8 @@
 - Poll loop + SSE listener keep a validated snapshot of the simulator (REST is truth, SSE only wakes us up).
 - On simulator failure: degraded mode (serve cached state, pause auto-execution), recovery when it comes back.
 - Each new tick runs the intelligence pipeline, persists alerts/recommendations, and auto-executes only
-  when mode == "assisted" and the recommendation is high-confidence and small (human review otherwise).
+  when mode == "assisted" and the recommendation is high-confidence and small (human review otherwise), or
+  when mode == "auto" and the recommendation cuts stockout risk by >= auto_min_risk_drop (default 20 points).
 """
 import asyncio
 import json
@@ -63,7 +64,8 @@ class Engine:
         self.started_at = time.time()
         self.mode = {"mode": self.settings.decision_mode,
                      "auto_confidence_threshold": self.settings.auto_confidence_threshold,
-                     "auto_max_quantity": self.settings.auto_max_quantity}
+                     "auto_max_quantity": self.settings.auto_max_quantity,
+                     "auto_min_risk_drop": self.settings.auto_min_risk_drop}
         self._wake = asyncio.Event()
         self._tasks: list[asyncio.Task] = []
         self._subscribers: set[asyncio.Queue] = set()
@@ -376,13 +378,30 @@ class Engine:
         return created
 
     async def _auto_execute(self, recs: list[Recommendation]) -> None:
-        if self.mode["mode"] != "assisted" or self.degraded:
+        if self.degraded or self.mode["mode"] not in ("assisted", "auto"):
+            return
+        if self.mode["mode"] == "auto":
+            await self._auto_mode()
             return
         for r in recs:
             qty = r.body.get("allocation", {}).get("quantity", 0)
             if (r.confidence >= self.mode["auto_confidence_threshold"] and qty <= self.mode["auto_max_quantity"]
                     and not r.requires_human_review):
                 await self.execute(r.id, actor="autopilot")
+
+    async def _auto_mode(self) -> None:
+        """Auto mode: at 15 min per tick a human cannot keep up, so approve every pending recommendation whose
+        expected stockout risk drop (before - after) is at least auto_min_risk_drop. Recommendations flagged for
+        human review (low confidence / fallback) still wait for an operator; every approval is audited as autopilot."""
+        min_drop = float(self.mode.get("auto_min_risk_drop", self.settings.auto_min_risk_drop))
+        with session() as s:
+            pending = s.exec(select(Recommendation).where(Recommendation.status == "pending")
+                             .order_by(Recommendation.id)).all()
+        for r in pending:
+            imp = r.body.get("expected_impact", {}) or {}
+            drop = float(imp.get("stockout_prob_before", 0) or 0) - float(imp.get("stockout_prob_after", 0) or 0)
+            if drop >= min_drop - 1e-9 and not r.requires_human_review:
+                await self.execute(r.id, actor="autopilot", note=f"auto mode: risk -{drop:.0%}")
 
     def _record_metrics(self, snap: dict) -> None:
         with session() as s:
