@@ -27,7 +27,9 @@ class Settings(BaseSettings):
     auto_confidence_threshold: float = 0.8
     auto_max_quantity: float = 5000.0
 
-    # LLM (used by app.intel.genai)
+    # LLM (used by app.intel.genai): OpenAI first, then Gemini, then Groq, then templates
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.5-flash-lite"
     groq_api_key: str = ""
