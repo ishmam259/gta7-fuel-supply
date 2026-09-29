@@ -211,10 +211,21 @@ def _counter_total(counter) -> float:
     return sum(s.value for m in counter.collect() for s in m.samples if s.name.endswith("_total"))
 
 
+_HEALTH_CACHE = {"at": 0.0, "ok": True}
+
+
+async def _cached_sim_health(eng) -> bool:
+    """Probe the simulator at most every 2 s, so heavy traffic on this endpoint doesn't hit the simulator."""
+    now = time.monotonic()
+    if now - _HEALTH_CACHE["at"] > 2.0:
+        _HEALTH_CACHE.update(at=now, ok=await eng.sim.health())
+    return _HEALTH_CACHE["ok"]
+
+
 @router.get("/system/status")
 async def system_status():
     eng = get_engine()
-    sim_ok = await eng.sim.health()
+    sim_ok = await _cached_sim_health(eng)
     llm = intel_bridge.llm_status()
     if not sim_ok:
         simulator = "down"
