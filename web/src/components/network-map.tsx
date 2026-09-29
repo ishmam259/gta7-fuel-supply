@@ -70,7 +70,7 @@ export function NetworkMap({ state, onSelect }: { state: NetworkState; onSelect?
                 stroke={bad ? "#ef4444" : undefined} />
               <text x={dX - 128} y={y - 7} className="fill-foreground text-[12px] font-semibold">{d.name}</text>
               <text x={dX - 128} y={y + 9} className="fill-muted-foreground text-[10px]">
-                {d.status} · {Math.round((tot / (cap || 1)) * 100)}% full · dispatch {Math.round(d.dispatch_used_this_tick)}/{Math.round(d.dispatch_capacity_per_tick)}
+                {d.status} · {Math.round((tot / (cap || 1)) * 100)}% full · dispatch {Math.round(d.dispatch_used_this_tick ?? 0)}/{Math.round(d.dispatch_capacity_per_tick ?? 0)}
               </text>
               <rect x={dX - 128} y={y + 14} width={176} height={4} rx={2} className="fill-muted" />
               <rect x={dX - 128} y={y + 14} width={176 * Math.min(1, tot / (cap || 1))} height={4} rx={2} fill="#0ea5e9" />

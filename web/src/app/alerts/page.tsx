@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Bell, Sparkles } from "lucide-react";
 import { useLive } from "@/components/live-provider";
 import { Empty, Loading, PageHeader, Pill, Seg, SourceTag, StaleNote, StatusPill } from "@/components/bits";
@@ -14,8 +15,17 @@ const SEV_TONE: Record<Severity, "bad" | "warn" | "neutral"> = { critical: "bad"
 const SEV_BORDER: Record<Severity, string> = { critical: "border-l-red-500", warning: "border-l-amber-500", info: "border-l-sky-500" };
 
 export default function AlertsPage() {
+  return (
+    <Suspense>
+      <AlertsInner />
+    </Suspense>
+  );
+}
+
+function AlertsInner() {
   const { state, bump } = useLive();
-  const [status, setStatus] = useState<"open" | "all">("open");
+  const focus = Number(useSearchParams().get("focus")) || null;
+  const [status, setStatus] = useState<"open" | "all">(focus ? "all" : "open");
   const [sev, setSev] = useState<"" | Severity>("");
   const [kind, setKind] = useState("");
   const alerts = usePoll(() => api.alerts(status, 200), 5000, [status, bump]);
@@ -52,14 +62,17 @@ export default function AlertsPage() {
       )}
       <div className="space-y-2">
         {rows.map((a) => (
-          <AlertRow key={a.id} a={a} entityName={nameOf(state.data, a.entity?.id)} />
+          <AlertRow key={a.id} a={a} entityName={nameOf(state.data, a.entity?.id)} focused={a.id === focus} />
         ))}
       </div>
     </>
   );
 }
 
-function AlertRow({ a, entityName }: { a: Alert; entityName: string }) {
+function AlertRow({ a, entityName, focused }: { a: Alert; entityName: string; focused: boolean }) {
+  useEffect(() => {
+    if (focused) document.getElementById(`alert-${a.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focused, a.id]);
   const [exp, setExp] = useState<IncidentExplanation | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -75,7 +88,7 @@ function AlertRow({ a, entityName }: { a: Alert; entityName: string }) {
     }
   };
   return (
-    <Card className={`border-l-4 ${SEV_BORDER[a.severity] ?? ""} ${a.status === "resolved" ? "opacity-70" : ""}`}>
+    <Card id={`alert-${a.id}`} className={`border-l-4 ${SEV_BORDER[a.severity] ?? ""} ${a.status === "resolved" && !focused ? "opacity-70" : ""} ${focused ? "ring-2 ring-primary" : ""}`}>
       <CardContent className="space-y-2 py-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">

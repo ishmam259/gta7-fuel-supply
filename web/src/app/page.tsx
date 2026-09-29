@@ -82,7 +82,7 @@ export default function Overview() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs tabular-nums text-muted-foreground">p={pct(r.stockout_prob)}</span>
+                  <span className="text-xs tabular-nums text-muted-foreground" title="24 h stockout risk if no action">24 h risk {pct(r.stockout_prob)}</span>
                   <RiskBadge level={r.level} />
                 </div>
               </div>

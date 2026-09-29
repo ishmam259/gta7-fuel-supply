@@ -1,7 +1,9 @@
 import type { NetworkState, RiskLevel } from "./types";
 
-export const liters = (v: number | null | undefined) =>
-  v === null || v === undefined || Number.isNaN(v) ? "—" : `${Math.round(v).toLocaleString("en-US")} L`;
+export const liters = (v: number | string | null | undefined) => {
+  const n = typeof v === "string" ? Number(v) : v;
+  return n === null || n === undefined || !Number.isFinite(n) ? "—" : `${Math.round(n).toLocaleString("en-US")} L`;
+};
 export const pct = (v: number | null | undefined, digits = 0) =>
   v === null || v === undefined || Number.isNaN(v) ? "—" : `${(v * 100).toFixed(digits)}%`;
 export const hours = (v: number | null | undefined) =>
