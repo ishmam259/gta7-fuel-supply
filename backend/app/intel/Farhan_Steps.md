@@ -269,6 +269,8 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 | LLM output showed raw decimals ("0.9934 to 0.0") and IDs. | It got raw JSON. | Readable facts (names, %, clock times) are prepared in code. |
 | **Incident explanation invented a cause**: "route disrupted, likely due to the demand spike", although a `route_disruption` event named that exact route. | Asking the LLM to pick the cause from a list of events wasn't enough; it still guessed. | Code matches events to the entity (`_known_cause`), and the LLM must state that cause exactly. Live re-check: "disrupted due to a route disruption event (ticks 22-34)". |
 | **LLM too slow for the demo** (team: "judges won't accept a slow AI"). | Measured: a new HTTPS connection per call (+0.5–1.5 s), `gpt-4o-mini` ~1.4 s with spikes, first call ~3 s, and an 8 s timeout per provider (a stuck provider could hold a request for 8+ s). Gemini won't accept timeouts under 10 s. | **Hard 3 s budget for the whole chain** (each call runs under the remaining time; a slow call is abandoned and the template answers instantly). Connections reused per provider. Default OpenAI order `gpt-4.1-nano` (~1.1 s steady) → `gpt-4o-mini`. Output cap 300 tokens. Background warm-up at startup. Live: explanations 1.0–1.5 s, briefing 2.6 s, answer 1.4 s, repeats 0.02 s (cache), first call 3.0 → 1.6 s. Test: a provider that hangs for 3 s is cut off by the budget. |
+| **Extensive 3 s test found a starvation bug.** | Abandoned slow calls kept all 4 threads of a shared worker pool busy, so a later call with a *healthy* provider queued, hit the budget and fell back to the template. | Each call now runs in its own short-lived thread: an abandoned call can never block a new one. |
+| **Gemini useless inside 3 s; Groq starved.** | Live: Gemini never answered under 3 s (≥ 2.3 s at best, slower models time out) but sat second in the chain, eating the budget before Groq (0.3–1.2 s). | Chain order now **OpenAI → Groq → Gemini → template**. |
 | Slow field access. | `_g()` converted the whole snapshot (2,000 history rows) to a dict for every single field read. | Read fields directly from the model. |
 
 ---
@@ -276,7 +278,7 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 ### Step 7: Tests (`backend/tests/intel/`)
 
 **What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
-the exact path production uses. **91 intel tests** (114 with Ishmam's backend tests), all passing, no network needed.
+the exact path production uses. **116 intel tests** (139 with Ishmam's backend tests, + 5 live LLM tests on demand), all passing, no network needed.
 
 | File | Tests | Covers |
 |---|---|---|
@@ -350,6 +352,23 @@ needs Ishmam's benchmark `policy` switch.
 | Training too slow (0.7 s per episode). | The demand model was recomputed every tick. | Cached per profile/fuel/hour: ~50× faster. |
 | Agent never saw a route disruption. | "Primary route open" looked at the fastest **available** route, which is always open. | Look at the station's normal (fastest) route regardless of status; 37 situations learned instead of 24. |
 
+**3-second guarantee, extensive test (`test_llm_budget.py`, 25 offline + 5 live).** Offline with the real 3.0 s budget:
+all 4 genai functions × 5 failure shapes (hangs forever; hang then a fast provider; three 2 s providers; slow failure
+then hang; slow invalid JSON then hang); budget is a **total** (three providers failing after 1.5 s each finish ≤ 3 s,
+not 4.5 s); 20 simultaneous calls against a hanging provider; no starvation after a burst of hung calls; cooldown skips
+a slow provider next time. Live (`LIVE_LLM=1`), after the fixes:
+
+| Setup | Calls | Median | 95th pct | Slowest | LLM / template |
+|---|---|---|---|---|---|
+| Full chain | 24 | 1.11 s | 1.40 s | 2.41 s | 24 / 0 |
+| OpenAI only | 24 | 1.18 s | 1.51 s | 2.08 s | 24 / 0 |
+| Groq only | 24 | 0.02 s | 0.62 s | 1.27 s | 14 / 10 |
+| Gemini only | 24 | 0.02 s | 3.01 s | 3.03 s | 0 / 24 (never answers in time) |
+| 16 in parallel | 16 | — | — | 1.93 s | 16 / 0 |
+
+Worst case observed anywhere: **3.03 s** (Gemini-only run, 30 ms thread hand-off). Run:
+`cd backend; python -m pytest tests/intel/test_llm_budget.py` (add `LIVE_LLM=1` and `-s` for the live table).
+
 **Tests (`test_rl.py`, 7):** policy file ships and every entry is a valid action; `rl_plan` gives legal plans marked
 `rl` with an explanation on 3 real snapshots; no policy → identical to LP; training world is deterministic; on
 held-out seeds RL matches LP service with fewer trucks, and no action collapses.
@@ -401,7 +420,7 @@ Retrain: `cd backend; python -m app.intel.rl 1500`
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
 Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
-Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (114 now).
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All tests pass together (139 now).
 
 **Correction for `round1_solution_approach.pdf` (the round-1 document):** it says "1-tick departure plus transit delay" and "lead time 3–5 ticks (45–75 min)". Tested on the simulator: a truck **departs on the tick it is ordered** and arrives after the transit time, so lead time is **2–4 ticks (30–60 min)**.
 
@@ -436,7 +455,7 @@ consequential actions.
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
 - **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
   simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
-- **91 intel tests** (114 with the backend's)
+- **116 intel tests** (139 with the backend's)
 - **RL option:** Q-learning picks the cover target; same service as LP with 15–20% fewer trucks., including full crisis runs through the backend bridge.
 - **Fast**: ~136 ms per tick for the whole pipeline.
 

@@ -1,7 +1,7 @@
 """Operator-facing text: explanations, briefing, investigation assistant.
 
 The LLM only explains facts computed by deterministic code; it never decides quantities.
-Provider chain: OpenAI -> Gemini -> Groq -> template. Every function returns source "llm" or "template".
+Provider chain: OpenAI -> Groq -> Gemini -> template, all inside a 3 s budget. Every function returns source "llm" or "template".
 Inputs may be Pydantic models or plain dicts (the backend passes dicts).
 Prompts get pre-formatted, human-readable facts (names, percentages, clock times) so the text is operator-ready.
 """
@@ -11,14 +11,13 @@ import logging
 import os
 import re
 import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+import threading
 from datetime import datetime, timedelta
 from typing import Any
 
 log = logging.getLogger("gta7.intel.genai")
 
 LLM_BUDGET_S = 3.0         # hard cap for the whole provider chain; after that the template answers instantly
-BRIEFING_BUDGET_S = 8.0    # the briefing is ~200 tokens of JSON (2-4 s on gpt-4.1-nano) and refreshes in the background
 TIMEOUT_S = 3.0            # per-call HTTP timeout (OpenAI / Groq)
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
@@ -119,7 +118,30 @@ def _clean(text: str, limit: int = MAX_CHARS) -> str:
 
 # ---------------- providers ----------------
 _clients: dict[tuple, Any] = {}   # one client per provider/key: reuses the HTTPS connection (saves ~0.5-1.5 s per call)
-_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="llm")
+
+
+class _Slow(Exception):
+    """A provider did not answer within the remaining budget."""
+
+
+def _within(seconds: float, fn, *args):
+    """Run fn in its own daemon thread and wait at most `seconds`. An abandoned call keeps running in the background
+    (bounded by the HTTP timeout) but never blocks a later call: no shared worker pool to exhaust."""
+    box: dict = {}
+
+    def run():
+        try:
+            box["value"] = fn(*args)
+        except BaseException as exc:  # noqa: BLE001 - re-raised in the caller
+            box["error"] = exc
+    th = threading.Thread(target=run, daemon=True, name="llm-call")
+    th.start()
+    th.join(timeout=seconds)
+    if th.is_alive():
+        raise _Slow()
+    if "error" in box:
+        raise box["error"]
+    return box.get("value")
 
 
 def _client(kind: str, key: str, insecure: bool = False):
@@ -147,7 +169,7 @@ def _openai(cfg, model, system, user, want_json):
     client = _client("openai", cfg["openai_api_key"])
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
     r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
-                                       timeout=BRIEFING_BUDGET_S if want_json else TIMEOUT_S,
+                                       timeout=TIMEOUT_S,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -164,7 +186,7 @@ def _groq(cfg, model, system, user, want_json):
     client = _client("groq", cfg["groq_api_key"], cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"))
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
     r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
-                                       timeout=BRIEFING_BUDGET_S if want_json else TIMEOUT_S,
+                                       timeout=TIMEOUT_S,
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -174,10 +196,11 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     steps = []
     if cfg.get("openai_api_key"):
         steps += [(f"openai:{m}", _openai) for m in _models(cfg.get("openai_model") or OPENAI_DEFAULT_MODELS)]
-    if cfg.get("gemini_api_key"):
-        steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
+    # Groq before Gemini: measured ~0.3-1.2 s vs Gemini >= 2.3 s, and the whole chain has a 3 s budget
     if cfg.get("groq_api_key"):
         steps += [(f"groq:{m}", _groq) for m in _models(cfg.get("groq_model_primary"), cfg.get("groq_model_fallback")) or list(GROQ_DEFAULT_MODELS)]
+    if cfg.get("gemini_api_key"):
+        steps += [(f"gemini:{m}", _gemini) for m in _models(cfg.get("gemini_model"), cfg.get("gemini_model_chain")) or ["gemini-2.5-flash-lite"]]
     return steps
 
 
@@ -200,8 +223,7 @@ def _llm(user: str, want_json: bool = False, budget: float | None = None) -> str
             break
         try:
             # run under the remaining budget; a slow call is abandoned (it finishes in the background, result ignored)
-            fut = _pool.submit(fn, cfg, name.split(":", 1)[1], SYSTEM, user, want_json)
-            text = (fut.result(timeout=remaining) or "").strip()
+            text = (_within(remaining, fn, cfg, name.split(":", 1)[1], SYSTEM, user, want_json) or "").strip()
             text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()  # reasoning models
             if want_json:
                 text = _json_block(text)
@@ -213,7 +235,7 @@ def _llm(user: str, want_json: bool = False, budget: float | None = None) -> str
                 last_provider["name"] = name
                 stats["llm_ok"] += 1
                 return text
-        except FutureTimeout:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
+        except _Slow:  # slow, not broken: short cooldown, and the budget is spent, so the template answers
             log.warning("llm %s exceeded the %.1f s budget", name, budget)
             stats["failures"] += 1
             stats["last_error"] = f"{name}: slower than {budget:.0f} s"
@@ -242,7 +264,7 @@ def warm_up() -> None:
                     c.chat.completions.create(model=name.split(":", 1)[1], max_tokens=1, messages=[{"role": "user", "content": "ok"}])
         except Exception as exc:
             log.info("llm warm-up skipped: %r", exc)
-    _pool.submit(_go)
+    threading.Thread(target=_go, daemon=True, name="llm-warmup").start()
 
 
 def llm_status() -> dict:
@@ -427,7 +449,7 @@ def briefing(s: Any, risks: list, alerts: list) -> dict:
              "active_events": _events(s)}
     text = _llm('Write a control-room situation briefing. Return JSON {"summary": str (2-4 sentences, lead with the most '
                 'urgent issue), "top_risks": [str] (max 5, one line each), "recommended_actions": [str] (max 4, concrete)}.\n'
-                + json.dumps(facts, default=str), want_json=True, budget=BRIEFING_BUDGET_S)
+                + json.dumps(facts, default=str), want_json=True)
     if text:
         try:
             out = json.loads(text)
@@ -463,7 +485,7 @@ def answer(question: str, s: Any, alerts: list, recs: list) -> dict:
     text = _llm("Answer the operator's question using only this network state. Be direct and specific (2-5 sentences). "
                 "If the question is not about this fuel network, say you can only answer questions about the current operations. "
                 'Return JSON {"answer": str, "evidence": [ids like "alert:9" or "recommendation:21" that support it]}.\n'
-                f"Question: {question}\nState: {json.dumps(context, default=str)}", want_json=True, budget=BRIEFING_BUDGET_S)
+                f"Question: {question}\nState: {json.dumps(context, default=str)}", want_json=True)
     if text:
         try:
             out = json.loads(text)

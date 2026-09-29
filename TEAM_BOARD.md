@@ -114,3 +114,6 @@ Badrul: load test and resilience docs (with Ishmam).
   `OPENAI_MODEL=gpt-4.1-nano,gpt-4o-mini` (my `.env` updated too); demo stack rebuilt. Everyone: `git pull origin main`
   and set the same line in your own `.env`.
 - **13:50 · Sakib → Ishmam/All:** Added **Auto decision mode** (Sakib's call, agreed in chat): button Manual / Assisted / **Auto** on the Recommendations page. Auto approves any pending recommendation whose stockout risk drops by **≥ 20 points** (`auto_min_risk_drop`, default 0.20), every tick, including refreshed ones; skips `requires_human_review`, pauses in degraded mode, audited as `autopilot`. Reason: 1 tick = 15 min and the sim runs 15–20 ticks/s, so manual approval can't keep up. **Heads-up Ishmam: small edit in your files** — `engine.py` (`_auto_mode`), `config.py` (`auto_min_risk_drop`), `routers/api.py` (`ModeBody` accepts `"auto"`). 117 backend tests pass. Contract note: `/api/mode` `mode` ∈ `manual|assisted|auto` + `auto_min_risk_drop`.
+- **13:55 · Farhan → All:** 3 s AI cap stress-tested (30 tests incl. live APIs): worst case anywhere **3.03 s**; full chain
+  median **1.1 s**, slowest 2.4 s, 24/24 real LLM answers; 16 parallel calls max 1.9 s. Fixed a starvation bug and moved Groq
+  before Gemini (Gemini never answers under 3 s). Restart the backend to pick it up.

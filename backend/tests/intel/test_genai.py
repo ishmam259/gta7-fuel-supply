@@ -119,9 +119,9 @@ def test_chain_order_and_models():
     cfg = {k: "" for k in genai.FIELDS} | {"openai_api_key": "a", "openai_model": "gpt-x", "gemini_api_key": "b",
                                           "gemini_model": "g1", "gemini_model_chain": "g2, g1,g3", "groq_api_key": "c",
                                           "groq_model_primary": "q1", "groq_model_fallback": "q2"}
-    assert [n for n, _ in genai._chain(cfg)] == ["openai:gpt-x", "gemini:g1", "gemini:g2", "gemini:g3", "groq:q1", "groq:q2"]
+    assert [n for n, _ in genai._chain(cfg)] == ["openai:gpt-x", "groq:q1", "groq:q2", "gemini:g1", "gemini:g2", "gemini:g3"]
     cfg["openai_api_key"] = ""
-    assert genai._chain(cfg)[0][0] == "gemini:g1"
+    assert genai._chain(cfg)[0][0] == "groq:q1"
 
 
 def test_slow_llm_never_blocks_longer_than_budget(monkeypatch, rec, s):
