@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: "fuel-platform-backend"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "simulator_api:8000"

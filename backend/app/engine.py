@@ -53,6 +53,7 @@ class Engine:
         self._subscribers: set[asyncio.Queue] = set()
         self._lock = asyncio.Lock()
         self._last_full = 0.0
+        self._consecutive_failures = 0
 
     # ------------------------------------------------------------ lifecycle
     async def start(self) -> None:
@@ -135,7 +136,9 @@ class Engine:
                     return
                 snap = await self._fetch_all(inst)
             except SimulatorUnavailable as exc:
-                self._enter_degraded(str(exc))
+                self._consecutive_failures += 1
+                if self._consecutive_failures >= 2:  # hysteresis: one failed sync is not an outage
+                    self._enter_degraded(str(exc))
                 return
             except InvalidSimulatorResponse as exc:
                 self._raise_alert("warning", "integration_failure", {"type": "simulator", "id": exc.endpoint},
@@ -143,6 +146,7 @@ class Engine:
                 log_event(log, "invalid simulator response rejected", logging.WARNING, endpoint=exc.endpoint)
                 return
             self._last_full = time.monotonic()
+            self._consecutive_failures = 0
             if self.degraded:
                 self._recover()
             if self.last_tick is not None and inst["tick"] < self.last_tick:
@@ -198,7 +202,7 @@ class Engine:
         self.degraded = False
         DEGRADED.set(0)
         RECOVERIES.inc()
-        self._resolve(kind="integration_failure")
+        self._resolve(kinds={"integration_failure", "recovery"})
         self._raise_alert("info", "recovery", {"type": "simulator", "id": "simulator"},
                           "Simulator connection recovered", "Live state restored; decisions resumed.", dedupe=False)
         log_event(log, "recovered from degraded mode", event="recovery")
