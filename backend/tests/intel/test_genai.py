@@ -128,3 +128,62 @@ def test_json_wrapped_in_fences_and_think(monkeypatch, s):
     reply = '<think>hmm</think>```json\n{"summary": "ok", "top_risks": [], "recommended_actions": []}\n```'
     use_providers(monkeypatch, lambda: reply)
     assert genai.briefing(s, [], [])["source"] == "llm"
+
+
+# ---- readable output + status ----
+def test_clean_strips_markdown_and_limits_length():
+    assert genai._clean("**Send** 500 L\n\n# now") == "Send 500 L now"
+    out = genai._clean("First sentence. " * 100, 60)
+    assert len(out) <= 60 and out.endswith(".")
+
+
+def test_clock_shows_arrival_time(s):
+    assert genai._clock(s, s.tick + 2) == "06:30 (in 30 min)"   # fixture sim_time is 06:00
+    assert genai._clock(s, s.tick) == "06:00 (now)"
+
+
+def test_recommendation_template_is_readable(rec, s):
+    text, _ = genai.explain_recommendation(rec, s)
+    assert "Tongi Industrial Station" in text and "06:30" in text and "lost sales" in text
+
+
+def test_briefing_template_mentions_service_level(s):
+    s.metrics = {"service_level": 0.943, "unmet_demand_liters": 1200}
+    assert "service level 94%" in genai.briefing(s, [], [])["summary"]
+
+
+def test_prompts_carry_risk_table_and_route_alternatives(monkeypatch, s):
+    seen = []
+    monkeypatch.setattr(genai, "_chain", lambda cfg: [("p:m", lambda c, m, sy, u, j: seen.append(u) or '{"answer": "x", "evidence": []}')])
+    genai.answer("which station is most at risk?", s, [], [])
+    assert "stations_at_risk" in seen[-1] and "Tongi Industrial Station" in seen[-1]
+    genai.explain_incident({"title": "Route down", "entity": {"type": "route", "id": "route-gazipur-mirpur"}}, s)
+    assert "route-patiya-mirpur" in seen[-1]          # the other route to Mirpur is offered
+
+
+def test_known_cause_is_matched_in_code(s):
+    s.events = [{"id": 3, "type": "demand_spike", "start_tick": 20, "end_tick": 40, "status": "ACTIVE",
+                 "parameters": {"region_ids": ["region-dhaka"]}},
+                {"id": 4, "type": "route_disruption", "start_tick": 22, "end_tick": 34, "status": "ACTIVE",
+                 "parameters": {"route_ids": ["route-gazipur-mirpur"]}}]
+    route = genai._known_cause(s, {"entity": {"type": "route", "id": "route-gazipur-mirpur"}})
+    assert len(route) == 1 and route[0].startswith("route_disruption")          # not the demand spike
+    station = genai._known_cause(s, {"entity": {"type": "station", "id": "station-mirpur"}})
+    assert any(c.startswith("demand_spike") for c in station)                   # via its region
+    assert genai._known_cause(s, {"entity": {"type": "station", "id": "station-coxsbazar"}}) == []
+
+
+def test_llm_output_is_cleaned(monkeypatch, rec, s):
+    use_providers(monkeypatch, lambda: "**Send it.**\n\nNow.")
+    assert genai.explain_recommendation(rec, s) == ("Send it. Now.", "llm")
+
+
+def test_llm_status_counts(monkeypatch, rec, s):
+    for k in ("calls", "llm_ok", "template", "failures", "cache_hits"):
+        genai.stats[k] = 0
+    genai.explain_recommendation(rec, s)                      # no keys -> template
+    st = genai.llm_status()
+    assert st["status"] == "unavailable" and st["template"] == 1 and st["calls"] == 1
+    use_providers(monkeypatch, boom, lambda: "ok")
+    genai.explain_incident({"title": "t"}, s)
+    assert genai.stats["llm_ok"] == 1 and genai.stats["failures"] == 1 and "p0" in genai.stats["last_error"]

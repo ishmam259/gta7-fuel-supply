@@ -74,7 +74,10 @@ class SimClient:
     def __init__(self) -> None:
         s = get_settings()
         self.settings = s
-        self.http = httpx.AsyncClient(base_url=s.simulator_url, timeout=s.sim_timeout_s)
+        # The simulator's DB pool is small (5 + 10 overflow): never hold more than a few connections at once.
+        self.http = httpx.AsyncClient(base_url=s.simulator_url, timeout=s.sim_timeout_s,
+                                      limits=httpx.Limits(max_connections=4, max_keepalive_connections=4))
+        self._slots = asyncio.Semaphore(4)
         self.breaker = CircuitBreaker(s.breaker_threshold, s.breaker_cooldown_s)
         self.stale = False
         self.last_error: str | None = None
@@ -93,7 +96,8 @@ class SimClient:
         for attempt in range(1, attempts + 1):
             start = time.perf_counter()
             try:
-                resp = await self.http.request(method, path, **kwargs)
+                async with self._slots:
+                    resp = await self.http.request(method, path, **kwargs)
                 SIM_LATENCY.labels(label).observe(time.perf_counter() - start)
                 if resp.status_code == 503:
                     SIM_REQUESTS.labels(method, label, "503").inc()

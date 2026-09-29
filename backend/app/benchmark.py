@@ -45,8 +45,12 @@ async def _with_retry(fn, attempts: int = 5):
 
 async def _run_policy(sim: SimClient, policy: str, scenario: str | None, ticks: int, run_id: str,
                       progress_base: float) -> dict:
-    await sim.admin("POST", "/admin/reset")
-    await asyncio.sleep(2)  # let the simulator finish reloading the scenario
+    # reset wipes and reloads the whole world; it can take a while under load
+    await sim.http.post("/admin/reset", timeout=300)
+    for _ in range(60):
+        if await sim.health():
+            break
+        await asyncio.sleep(1)
     await sim.admin("POST", "/admin/pause")
     if scenario:
         for ev in scenarios.events_for(scenario, 0):
@@ -116,13 +120,19 @@ async def run_benchmark(scenario: str | None = "combined_crisis", ticks: int = 9
 
 
 async def run_in_background(scenario: str | None, ticks: int) -> None:
+    from .engine import engine as live
     STATE.update(status="running", progress=0.0, error=None, started_at=time.time())
+    if live is not None:
+        live.paused_for_benchmark = True  # the benchmark owns the simulator while it runs
     try:
         STATE["result"] = await run_benchmark(scenario, ticks)
         STATE["status"] = "done"
     except Exception as exc:  # report, don't crash the API
         log.exception("benchmark failed")
         STATE.update(status="failed", error=repr(exc))
+    finally:
+        if live is not None:
+            live.paused_for_benchmark = False
 
 
 def latest() -> dict:

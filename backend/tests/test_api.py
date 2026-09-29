@@ -129,3 +129,15 @@ def test_system_status_and_metrics(client):
     s = c.get("/api/system/status").json()
     assert s["components"]["database"] == "healthy" and "p95_latency_ms" in s
     assert "gta7_" in c.get("/metrics").text
+
+
+def test_distinct_alert_codes_on_same_entity_stay_separate(client):
+    c, eng = client
+    ent = {"type": "depot", "id": "depot-gazipur"}
+    k1 = eng._raise_alert("warning", "bottleneck", ent, "Dispatch saturated", code="dispatch")
+    k2 = eng._raise_alert("warning", "bottleneck", ent, "Low diesel stock", code="low_stock")
+    k3 = eng._raise_alert("warning", "bottleneck", ent, "Dispatch saturated", code="dispatch")
+    assert k1 != k2 and k1 == k3
+    titles = [a["title"] for a in c.get("/api/alerts").json() if a["kind"] == "bottleneck"]
+    assert sorted(titles) == ["Dispatch saturated", "Low diesel stock"]
+    assert "llm_detail" in c.get("/api/system/status").json()

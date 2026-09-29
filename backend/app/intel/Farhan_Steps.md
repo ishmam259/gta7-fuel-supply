@@ -226,6 +226,20 @@ explains why.
 | `briefing` | Situation report: summary, top risks, recommended actions. |
 | `answer` | Investigation assistant: answers questions **only about the current network**, cites evidence (`alert:9`, `recommendation:21`), refuses off-topic questions ("capital of France?" gets "I can only answer questions about the current operations."). |
 
+**How the text stays accurate (finished in the final round of step 6):**
+- The code turns raw data into **readable facts** before the LLM sees them: station names instead of IDs,
+  "98%" instead of 0.9834, arrival as a clock time ("06:30 (in 30 min)"), lost sales in liters.
+  The LLM only has to phrase them, which leaves little room for mistakes.
+- **The cause of an incident is found by code, not guessed.** `_known_cause()` matches active events to the
+  alert's route, station (or its region) or depot and gives the LLM a `known_cause`. If nothing matches, the
+  text says "not known from current data".
+- The assistant also sees the **current risk table** (which stations/fuels are at risk and how badly), so
+  "which station is most at risk?" gets a real answer.
+- The briefing mentions the **service level** (from the simulator's metrics).
+- Every LLM reply is **cleaned**: markdown removed, one paragraph, cut at a sentence end (max 900 characters).
+- `llm_status()` reports the provider chain, which provider answered last, providers cooling down, and counters
+  (calls, LLM answers, template fallbacks, failures, cache hits, last error), for the backend's system-status page.
+
 **Provider chain:** **OpenAI → Gemini (model list) → Groq (primary, fallback) → template.**
 If a provider fails, it's skipped for 60 s. Answers are cached so the same question isn't paid for twice.
 The LLM only sees facts from our code and is told never to invent numbers. It can only cite evidence IDs that
@@ -243,21 +257,39 @@ actually exist. Every result says `source: "llm"` or `"template"`.
 | OpenAI call crashed with `Decompressor.decompress() got an unexpected keyword argument 'output_buffer_limit'`. | Old `brotlicffi` 1.1 package in my Python. | `python -m pip install -U "brotlicffi>=1.2"`. |
 | `pip install` "worked" but the import still failed. | `pip` pointed at a different Python (3.12) than `python` (Anaconda 3.13). | Always use `python -m pip`. |
 | Tests started making real LLM calls once keys were added. | Tests read `.env`. | Tests disable keys; no network in tests. |
+| LLM output showed raw decimals ("0.9934 to 0.0") and IDs. | It got raw JSON. | Readable facts (names, %, clock times) are prepared in code. |
+| **Incident explanation invented a cause**: "route disrupted, likely due to the demand spike", although a `route_disruption` event named that exact route. | Asking the LLM to pick the cause from a list of events wasn't enough; it still guessed. | Code matches events to the entity (`_known_cause`), and the LLM must state that cause exactly. Live re-check: "disrupted due to a route disruption event (ticks 22-34)". |
+| Slow field access. | `_g()` converted the whole snapshot (2,000 history rows) to a dict for every single field read. | Read fields directly from the model. |
 
 ---
 
 ### Step 7: Tests (`backend/tests/intel/`)
 
-**62 tests**, all on real simulator data:
+**What it does:** proves every part works on **real simulator data**, including through Ishmam's backend bridge,
+the exact path production uses. **76 intel tests** (94 with Ishmam's backend tests), all passing, no network needed.
 
-| File | Covers |
-|---|---|
-| `test_smoke.py` | Every function runs end to end. |
-| `test_forecast.py` | Backtest error < 10%, band, day/night shape, spike start/end, fallbacks. |
-| `test_risk.py` | Levels, probability goes down as stock goes up, outage, pending/in-transit trucks, DELAYED supply ETA. |
-| `test_detect.py` | No false alarms on real data, leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
-| `test_planner.py` | Every simulator rule, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
-| `test_genai.py` | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped. |
+| File | Tests | Covers |
+|---|---|---|
+| `test_smoke.py` | 4 | Every function runs end to end. |
+| `test_forecast.py` | 7 | Backtest error < 10%, band, day/night shape, spike start/end, fallbacks. |
+| `test_risk.py` | 7 | Levels, probability goes down as stock goes up, outage, pending/in-transit trucks, DELAYED supply ETA. |
+| `test_detect.py` | 15 | No false alarms on real data, leaks detected, z-score spike, bottlenecks, disruptions, bad input doesn't crash. |
+| `test_planner.py` | 16 | Every simulator rule, fairness, backup depot, closed vs constrained depot, low stock, both fallbacks, what-if. |
+| `test_genai.py` | 21 | Dict inputs, templates, provider order, failover + cooldown, cache, bad JSON, invented evidence dropped, text cleaning, clock times, service level, risk table in prompts, cause matched in code, status counters. |
+| `test_pipeline.py` | 6 | **Through `intel_bridge`** with dict snapshots: healthy tick uses intel (not fallback); **combined crisis** (demand spike + route down + delayed supply + constrained depot + near-empty station) raises every alert type, gives a legal plan that uses the backup depot, and all 4 genai functions work; real snapshot pair with no false alarms; what-if including the fallback on a bad route; same input gives the same output; messy data handled by intel itself. |
+
+Other checks done outside pytest:
+- Real simulator accepted **20/20** planner allocations (step 5).
+- Live LLM run on the combined crisis with OpenAI: explanation, incident, briefing and answer all grounded
+  and correct.
+- Speed: the full intel pipeline takes **~136 ms per tick**.
+
+**Bugs found by step 7 tests, and fixes:**
+
+| Bug | Why it happened | Fix |
+|---|---|---|
+| **One broken row crashed the whole tick** (a `None` demand value, a route with missing fields, half an allocation). The forecast failed, then everything else. | Functions trusted every row from the simulator. | `Snapshot` now cleans itself when it's built: rows missing required fields or with non-numbers are dropped and counted in `dropped_rows`. Intel keeps working on the good data. |
+| Ishmam's backup `fallback_policy.py` also crashes on a `None` demand value. | His file doesn't check for `None`. | Not my file. Reported to Ishmam (see section 4). |
 
 Run: `cd backend; python -m pytest tests/intel -q`
 
@@ -267,7 +299,8 @@ Run: `cd backend; python -m pytest tests/intel -q`
 
 | # | Bug | Why | Fix |
 |---|---|---|---|
-| G1 | Push to `intel` rejected (non-fast-forward). | I used `git pull --rebase origin main`. Ishmam had already merged my step 3/4 commits into `main`, and rebasing rewrote them, so my branch no longer matched GitHub. | Merged `origin/intel` into local `intel` (no force push, nothing lost). From now on: **merge** main into intel, never rebase. A local `intel-backup` branch holds the old state; it can be deleted. |
+| G1 | Push to `intel` rejected (non-fast-forward). | I used `git pull --rebase origin main`. Ishmam had already merged my step 3/4 commits into `main`, and rebasing rewrote them, so my branch no longer matched GitHub. | Merged `origin/intel` into local `intel` (no force push, nothing lost). A local `intel-backup` branch holds the old state; it can be deleted. |
+| G2 | `main` was merged into `intel` without Farhan's OK. | I started a merge of `main` to bring in team updates; Farhan rejected the command, but the merge had already run locally. | Farhan decided to keep it. **Rule since then: anything involving `main` (push, merge, rebase, pull) only happens when Farhan says so. Otherwise just commit and push to `intel`.** |
 
 ---
 
@@ -290,6 +323,17 @@ Run: `cd backend; python -m pytest tests/intel -q`
 | `stockout_prob_before` = 0 | Probability over 4 h (step 3 was "done"). | Step 3 reopened: 12 h window; planner and what-if changed to match. |
 | OpenAI first | Chain was Gemini → Groq → template. | OpenAI → Gemini → Groq → template, with model lists from `.env`. |
 
+Later changes from `main` (merged into `intel` in G2): Ishmam's backend tests (18), resilience improvements,
+Sakib's web scaffold, Badrul's crisis scenarios, and the participant brief. All 94 tests pass together.
+
+**Things for Ishmam to fix in his files (found while testing):**
+1. His engine de-duplicates alerts by `kind + entity` only. Two different alerts on the same depot (e.g. dispatch
+   saturated **and** constrained) collapse into one. Fix: include the alert's `code` field in his dedupe key
+   (`AlertDraft.key` already does this).
+2. `fallback_policy.demand_rate()` crashes on a `None` demand value. Intel no longer needs his fallback for this
+   case (it cleans the data), but his fallback should skip `None` rows too.
+3. Optional: show `genai.llm_status()` on the system-status page (provider chain, last provider, fallback counts).
+
 Other plan changes during the work:
 - Found by probing the real simulator: arrival timing, dispatch counting, full-depot overflow. Steps 3–5 were
   corrected to match the **real** simulator, not my assumptions.
@@ -311,12 +355,13 @@ consequential actions.
 - **Plans trucks** with an optimizer that shares fairly in a crisis, never breaks a simulator rule
   (the real simulator accepted 20/20), offers alternatives, and shows risk before → after (e.g. 99% → 0%).
 - **Explains** everything through OpenAI → Gemini → Groq → template, grounded in real data, never deciding quantities.
-- **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), and
-  every fallback is visible (`mode`, `source`).
-- **62 tests** on real simulator snapshots.
+- **Never falls over**: every layer has a fallback (heuristic planner, rule-based plan, template text), bad
+  simulator rows are cleaned out, and every fallback is visible (`mode`, `source`, `llm_status()`).
+- **76 intel tests** (94 with the backend's), including full crisis runs through the backend bridge.
+- **Fast**: ~136 ms per tick for the whole pipeline.
 
-**Status:** steps 1–7 done and pushed to `intel`. Ishmam has merged up to step 4. Team fixes and the planner are
-waiting for his merge.
+**Status: all 7 steps are complete** and pushed to `intel`. Ishmam has merged up to step 4. The team fixes,
+planner, and final step 6/7 work are waiting for his merge.
 
 **Possible next steps (optional):**
 - A/B evidence for Badrul: same crisis script with vs without our plans, compare service level.

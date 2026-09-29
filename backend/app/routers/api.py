@@ -215,6 +215,7 @@ def _counter_total(counter) -> float:
 async def system_status():
     eng = get_engine()
     sim_ok = await eng.sim.health()
+    llm = intel_bridge.llm_status()
     if not sim_ok:
         simulator = "down"
     elif eng.degraded or eng.sim.stale or eng.sim.breaker.state != "closed":
@@ -239,7 +240,7 @@ async def system_status():
     return {"overall": overall, "components": comps, "circuit_breaker": eng.sim.breaker.state,
             "sse": "connected" if eng.sse_connected else "reconnecting",
             **REQUEST_WINDOW.stats(), "fallback_activations": _counter_total(FALLBACK_ACTIVATIONS),
-            "last_error": eng.sim.last_error, "tick": eng.last_tick,
+            "llm_detail": llm, "last_error": eng.sim.last_error, "tick": eng.last_tick,
             "cpu_percent": proc.cpu_percent(interval=None), "memory_mb": round(proc.memory_info().rss / 1e6, 1),
             "uptime_s": int(time.time() - eng.started_at)}
 

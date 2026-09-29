@@ -161,6 +161,19 @@ def _call_llm(fn_name: str, *args) -> Any | None:
         return None
 
 
+def llm_status() -> dict:
+    g = _genai()
+    fn = getattr(g, "llm_status", None) if g else None
+    if fn is None:
+        return {"status": STATUS.llm}
+    try:
+        out = fn()
+        STATUS.llm = out.get("status", STATUS.llm)
+        return out
+    except Exception as exc:
+        return {"status": "unavailable", "error": repr(exc)}
+
+
 def briefing(snap: dict, risks: dict, alerts: list[dict]) -> dict:
     intel = _intel()
     out = _call_llm("briefing", _snapshot_obj(intel, snap) if intel else snap, _flat_risks(risks), alerts)

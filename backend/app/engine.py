@@ -69,6 +69,7 @@ class Engine:
         self._lock = asyncio.Lock()
         self._last_full = 0.0
         self._consecutive_failures = 0
+        self.paused_for_benchmark = False
 
     # ------------------------------------------------------------ lifecycle
     async def start(self) -> None:
@@ -103,6 +104,8 @@ class Engine:
             except asyncio.TimeoutError:
                 pass
             self._wake.clear()
+            if self.paused_for_benchmark:
+                continue
             try:
                 await self.sync()
             except Exception:  # never let the loop die
@@ -241,7 +244,8 @@ class Engine:
         # alerts: raise current, resolve the ones that disappeared
         current_keys = set()
         for a in result["alerts"]:
-            key = self._raise_alert(a["severity"], a["kind"], a.get("entity", {}), a["title"], a.get("detail", ""))
+            key = self._raise_alert(a["severity"], a["kind"], a.get("entity", {}), a["title"], a.get("detail", ""),
+                                    code=a.get("code", ""))
             current_keys.add(key)
         self._resolve(kinds={"shortage_risk", "disruption", "bottleneck", "anomalous_demand", "inventory_anomaly"},
                       keep=current_keys)
@@ -304,8 +308,10 @@ class Engine:
 
     # ------------------------------------------------------------ alerts
     def _raise_alert(self, severity: str, kind: str, entity: dict, title: str, detail: str = "",
-                     dedupe: bool = True) -> str:
-        key = f"{kind}|{json.dumps(entity, sort_keys=True)}"
+                     dedupe: bool = True, code: str = "") -> str:
+        # code = sub-type within kind (e.g. bottleneck "dispatch" vs "low_stock") so distinct problems
+        # on the same entity stay separate alerts
+        key = f"{kind}|{code}|{json.dumps(entity, sort_keys=True)}"
         with session() as s:
             existing = s.exec(select(Alert).where(Alert.dedupe_key == key, Alert.status == "open")).first() if dedupe else None
             if existing:

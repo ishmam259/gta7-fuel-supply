@@ -69,3 +69,12 @@ def test_detect_flags_disruptions():
     snap["depots"][0]["status"] = "CONSTRAINED"
     kinds = {a["kind"] for a in fb.detect(snap, fb.assess(snap))}
     assert {"disruption", "bottleneck"} <= kinds
+
+
+def test_missing_demand_values_do_not_crash():
+    snap = load()
+    snap["demand_history"] = [{"station_id": "station-mirpur", "fuel_type": "DIESEL", "tick": 1, "demand_liters": None},
+                              {"station_id": "station-mirpur", "fuel_type": "DIESEL", "tick": 2}] + snap["demand_history"][:5]
+    rates = fb.demand_rate(snap)
+    assert all(v >= 0 for v in rates.values())
+    assert fb.plan(snap, fb.assess(snap)) is not None
