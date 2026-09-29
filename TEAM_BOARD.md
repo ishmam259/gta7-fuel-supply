@@ -35,18 +35,18 @@ Shared place to talk through GitHub. **How to use it**
 Push small commits often. **Hard stop 13:20** for code; after that only demo-breaking fixes.
 
 ### Mahmudul Hasan Sakib: all frontend
-- [ ] **Notifications clickable:** alert toasts → `/alerts` (highlight that alert), recommendation toasts →
+- [x] (`c8c837b`) **Notifications clickable:** alert toasts → `/alerts` (highlight that alert), recommendation toasts →
       `/recommendations` with that card open (`components/live-provider.tsx` lines ~57/66; sonner `action`/`onClick`).
-- [ ] **Stations & Depots shows "0 L – L":** a value renders as empty/undefined; find the formatter and never print a
+- [x] (`c8c837b`) **Stations & Depots shows "0 L – L":** a value renders as empty/undefined; find the formatter and never print a
       bare "– L" (show "—" when a value is missing). Check against live `http://localhost/api/state`.
-- [ ] **Overview network map shows 0 for all stations:** compare with `/api/state` (real stock there). If the API has
+- [x] (checked live: map matches `/api/state`; zeros were real drained stock) **Overview network map shows 0 for all stations:** compare with `/api/state` (real stock there). If the API has
       values but the map shows 0, fix the fill-% mapping (inventory ÷ capacity per fuel).
-- [ ] **Situation briefing only shows "Top risks":** show summary + top risks + recommended actions, and link each action
+- [x] (`c8c837b`) **Situation briefing only shows "Top risks":** show summary + top risks + recommended actions, and link each action
       to the matching recommendation in the inbox. Badge must read "AI (LLM)" vs "template fallback" from `source`.
-- [ ] Carry-over: System Status wording ("If LLM fails → template fallback", badge = current state); empty fuel
+- [x] (`c8c837b`) Carry-over: System Status wording ("If LLM fails → template fallback", badge = current state); empty fuel
       "STOCKOUT" not "OUTAGE"; fallback text 35% → **50%**; duplicate "New recommendation" toast; label p as
       "24 h stockout risk if no action"; quick phone-width check.
-- [ ] Test everything on **http://localhost** (the gateway, same-origin URLs), not :3000.
+- [x] Test everything on **http://localhost** (the gateway, same-origin URLs), not :3000.
 
 ### Farhan Tahsin Khan: reinforcement learning (+ intel)
 - [x] **RL, timeboxed to 13:20** (brief §8: optional, but must show why it helps vs the heuristic). Suggested:
@@ -105,3 +105,4 @@ Badrul: load test and resilience docs (with Ishmam).
 - **13:05 · Farhan → All:** RL vs LP on the **real simulator** (same reset/seed/combined crisis, 2 days, all recs auto-approved):
   no action **42.8%** · deterministic LP **100%, 76 trucks** · RL **100%, 69 trucks (−9%)** · 0 rejections. Chart for slides:
   `backend/app/intel/policy_comparison.png` (commit below). Badrul: one-liner "RL matches LP's 100% with 9–20% fewer trucks".
+- **13:12 · Sakib → All:** All frontend items done in `c8c837b` (branch `web`), tested on http://localhost: alert toasts → `/alerts?focus=id` (highlighted), recommendation toasts → `/recommendations?id=id` (card open), each toast once; briefing actions link to their recommendation; STOCKOUT vs OUTAGE; "24 h stockout risk if no action"; 50% fallback; System Status wording; all pages fit 375 px. @Ishmam please merge `web`.
