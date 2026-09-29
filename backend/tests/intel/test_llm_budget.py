@@ -21,6 +21,9 @@ from app.intel.risk import assess_risk
 FIXTURE = Path(__file__).parent / "fixtures" / "snapshot_live_now.json"
 BUDGET = genai.LLM_BUDGET_S          # the real value (4.0)
 SLACK = 0.35                         # thread hand-off + template rendering + slow CI machines
+# the briefing refreshes in the background, so it has a longer budget than the interactive calls
+LIMIT = {"explain_recommendation": BUDGET, "explain_incident": BUDGET, "answer": BUDGET,
+         "briefing": genai.BRIEFING_BUDGET_S}
 
 
 @pytest.fixture
@@ -89,7 +92,7 @@ SCENARIOS = {
 def test_every_function_respects_budget(monkeypatch, s, rec, scenario, fn_name):
     chain(monkeypatch, *SCENARIOS[scenario])
     dt, out = timed(calls(s, rec)[fn_name])
-    assert dt <= BUDGET + SLACK, f"{fn_name} / {scenario}: {dt:.2f} s"
+    assert dt <= LIMIT[fn_name] + SLACK, f"{fn_name} / {scenario}: {dt:.2f} s"
     src = out[1] if isinstance(out, tuple) else out["source"]
     assert src in ("llm", "template")
 
@@ -115,8 +118,9 @@ def test_parallel_calls_each_within_budget(monkeypatch, s, rec):
     fns = calls(s, rec)
     jobs = [(name, f"q{i}") for i in range(5) for name in fns]      # distinct prompts: no cache help
     with ThreadPoolExecutor(max_workers=len(jobs)) as ex:
-        durations = list(ex.map(lambda j: timed(lambda: fns[j[0]](j[1]))[0], jobs))
-    assert max(durations) <= BUDGET + SLACK, f"max {max(durations):.2f} s"
+        durations = list(ex.map(lambda j: (j[0], timed(lambda: fns[j[0]](j[1]))[0]), jobs))
+    over = [(n, round(d, 2)) for n, d in durations if d > LIMIT[n] + SLACK]
+    assert not over, f"over budget: {over}"
 
 
 def test_abandoned_slow_calls_do_not_starve_later_calls(monkeypatch, s, rec):
@@ -159,11 +163,11 @@ def test_live_latency_stays_under_budget(monkeypatch, s, rec, only):
         for name, fn in fns.items():
             dt, out = timed(lambda: fn(f"live {only} {i}"))
             durations.append(dt)
+            assert dt <= LIMIT[name] + SLACK, f"{name}: {dt:.2f} s"
             sources.append(out[1] if isinstance(out, tuple) else out["source"])
     print(f"\n[{only or 'full chain'}] n={len(durations)} p50={statistics.median(durations):.2f}s "
           f"p95={sorted(durations)[int(0.95 * len(durations)) - 1]:.2f}s max={max(durations):.2f}s "
           f"llm={sources.count('llm')} template={sources.count('template')}")
-    assert max(durations) <= BUDGET + SLACK
 
 
 @live
@@ -173,6 +177,6 @@ def test_live_parallel_burst(s, rec):
     with ThreadPoolExecutor(max_workers=len(jobs)) as ex:
         res = list(ex.map(lambda j: timed(lambda: fns[j[0]](j[1])), jobs))
     durations = [d for d, _ in res]
+    assert all(d <= LIMIT[j[0]] + SLACK for j, (d, _) in zip(jobs, res))
     srcs = [o[1] if isinstance(o, tuple) else o["source"] for _, o in res]
     print(f"\n[parallel x{len(jobs)}] max={max(durations):.2f}s llm={srcs.count('llm')} template={srcs.count('template')}")
-    assert max(durations) <= BUDGET + SLACK

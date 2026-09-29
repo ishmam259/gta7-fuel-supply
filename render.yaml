@@ -1,0 +1,62 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> pick this repo. See docs/DEPLOY.md ("Deploy on Render").
+# Render runs one container per service (no docker compose), so the backend runs as ROLE=all (engine + API in one
+# process) and the console calls it directly. Values marked `sync: false` are asked for in the dashboard.
+databases:
+  - name: gta7-db
+    plan: free
+    databaseName: gta7
+    user: gta7
+
+services:
+  - type: web
+    name: gta7-simulator
+    runtime: image
+    image:
+      url: docker.io/asifmahmoud414/bup-fuel-supply-simulator:1.0.0
+    plan: free               # sleeps after 15 min idle (restarts the simulation); starter keeps it on
+    envVars:
+      - key: PORT
+        value: "8000"
+
+  - type: web
+    name: gta7-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free               # sleeps after 15 min idle (tick loop stops); starter keeps it on
+    healthCheckPath: /api/health
+    envVars:
+      - key: ROLE
+        value: all
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gta7-db
+          property: connectionString
+      - key: SIMULATOR_URL     # https://<gta7-simulator>.onrender.com
+        sync: false
+      - key: CORS_ORIGINS      # https://<gta7-web>.onrender.com
+        sync: false
+      - key: OPERATOR_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-nano,gpt-4o-mini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+  - type: web
+    name: gta7-web
+    runtime: docker
+    rootDir: web
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:                   # Render passes env vars as Docker build args (NEXT_PUBLIC_* are baked in at build)
+      - key: NEXT_PUBLIC_API_URL        # https://<gta7-backend>.onrender.com
+        sync: false
+      - key: NEXT_PUBLIC_GRAFANA_URL
+        value: ""
+      - key: NEXT_PUBLIC_PROMETHEUS_URL
+        value: ""

@@ -62,3 +62,19 @@ Load-test comparison (1 vs N replicas): see `docs/LOAD_TEST.md`.
 ## Rollback
 Every push to `main` is built and smoke-tested by CI (build → test → deploy → health check → scale check).
 Roll back with `git checkout <previous-tag> && docker compose up -d --build`.
+
+## Deploy on Render (Blueprint)
+Render runs one container per service (no compose), so the Blueprint (`render.yaml`) deploys a slimmer layout:
+simulator image + backend (`ROLE=all`: engine and API in one process) + console + Render Postgres. Grafana/Prometheus
+stay in the compose deployment.
+1. Render dashboard → **New → Blueprint** → select `ishmam259/gta7-fuel-supply` → it reads `render.yaml`.
+2. Fill the `sync: false` values (first pass: leave URLs blank, paste your LLM keys) → **Apply**.
+3. When the services have URLs, set them and redeploy:
+   - `gta7-backend` → `SIMULATOR_URL=https://<gta7-simulator>.onrender.com`, `CORS_ORIGINS=https://<gta7-web>.onrender.com`
+   - `gta7-web` → `NEXT_PUBLIC_API_URL=https://<gta7-backend>.onrender.com` → **Manual Deploy → Clear build cache & deploy**
+     (the value is baked in at build time).
+4. Check `https://<gta7-backend>.onrender.com/api/system/status`, then open the console URL. The operator key is the
+   generated `OPERATOR_KEY` on `gta7-backend` (Environment tab).
+Plans: simulator and backend on **Starter** (free instances sleep after 15 min idle, which stops the tick loop and resets
+the simulator); console can stay free. Scaling on Render: raise the backend's instance count only with `ROLE=api`
+replicas plus a separate `ROLE=engine` service (paid; the compose deployment shows scaling end to end).
