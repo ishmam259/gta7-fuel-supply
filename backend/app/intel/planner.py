@@ -4,7 +4,7 @@ from .models import (
     AllocationPlan, Alternative, ExpectedImpact, Forecast, ProjectionPoint, RecommendationDraft,
     Risk, Situation, Snapshot, WhatIf,
 )
-from .risk import assess_risk, incoming, project, stockout_hours, stockout_prob
+from .risk import SHIPPABLE_DEPOT, assess_risk, incoming, project, stockout_prob
 
 MIN_QTY = 500.0
 
@@ -16,7 +16,7 @@ def _candidates(s: Snapshot, station_id: str, fuel: str, depot_left: dict, depot
     out = []
     for r in s.routes:
         d = depots.get(r.get("source_depot_id"))
-        if r.get("destination_station_id") != station_id or r.get("status") != "AVAILABLE" or not d or d.get("status") != "OPEN":
+        if r.get("destination_station_id") != station_id or r.get("status") != "AVAILABLE" or not d or d.get("status") not in SHIPPABLE_DEPOT:
             continue
         limits = {
             f"route max {r['max_shipment']:.0f} L": float(r["max_shipment"]),
