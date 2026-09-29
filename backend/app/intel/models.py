@@ -49,7 +49,10 @@ class Risk(BaseModel):
     stockout_hours: float
     stockout_prob: float
     current_inventory: float = 0.0
-    next_supply_eta_tick: int | None = None
+    next_supply_eta_tick: int | None = None      # next shipment reaching the station
+    incoming_liters: float = 0.0                 # PENDING + IN_TRANSIT to the station
+    depot_supply_eta_tick: int | None = None     # next supply arrival at a depot that serves this station
+    depot_supply_delayed: bool = False           # that upstream supply is DELAYED
 
 
 class AlertEntity(BaseModel):
