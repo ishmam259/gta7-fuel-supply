@@ -124,6 +124,11 @@ def test_chain_order_and_models():
     assert genai._chain(cfg)[0][0] == "gemini:g1"
 
 
+def test_groq_defaults_are_real_models():
+    cfg = {k: "" for k in genai.FIELDS} | {"groq_api_key": "c"}
+    assert [n for n, _ in genai._chain(cfg)] == ["groq:qwen/qwen3.8-27b", "groq:openai/gpt-oss-120b", "groq:openai/gpt-oss-20b"]
+
+
 def test_json_wrapped_in_fences_and_think(monkeypatch, s):
     reply = '<think>hmm</think>```json\n{"summary": "ok", "top_risks": [], "recommended_actions": []}\n```'
     use_providers(monkeypatch, lambda: reply)

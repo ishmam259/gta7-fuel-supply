@@ -77,39 +77,45 @@ def _demand(s: Snapshot, fc: list[Forecast], names: dict) -> list[AlertDraft]:
 
 
 # ---------- inventory accounting ----------
+# The backend reads the tick number first and the lists in parallel, so while the simulator runs a snapshot's
+# contents can be newer than its tick label (several ticks after a fast `step n=4`). Events near a window edge
+# may therefore belong on either side: we try each boundary shift and keep the explanation with the smallest residual.
+MAX_LAG = 3                                  # ticks a snapshot's contents may run ahead of its label
+SHIFTS = tuple((a, b) for a in range(MAX_LAG + 1) for b in range(MAX_LAG + 1))  # (drop first a ticks, add b more)
+
+
+def _in_window(tick, p: int, n: int, shift: tuple[int, int]) -> bool:
+    return tick is not None and (p + shift[0]) <= tick < (n + shift[1])
+
+
 def _inventory(s: Snapshot, prev: Snapshot | None, names: dict) -> list[AlertDraft]:
     if not prev or s.tick <= prev.tick:
         return []
     out, p, n = [], prev.tick, s.tick
-    prev_st = {st["id"]: st for st in prev.stations}
-    served: dict[tuple, float] = {}
-    seen_ticks: dict[tuple, set] = {}
-    for h in s.demand_history:
-        if p <= h.get("tick", -1) < n:
-            k = (h["station_id"], h["fuel_type"])
-            served[k] = served.get(k, 0.0) + float(h.get("served_liters", 0.0))
-            seen_ticks.setdefault(k, set()).add(h["tick"])
-    arrived: dict[tuple, float] = {}
-    for a in s.allocations:
-        if a.get("status") == "ARRIVED" and a.get("actual_arrival_tick") is not None and p <= a["actual_arrival_tick"] < n:
-            k = (a.get("destination_station_id"), a.get("fuel_type"))
-            arrived[k] = arrived.get(k, 0.0) + float(a.get("quantity", 0.0))
+    hist_ticks = {h.get("tick") for h in s.demand_history}
+    if not all(t in hist_ticks for t in range(p, n)):  # history window does not cover the gap
+        return []
 
+    prev_st = {st["id"]: st for st in prev.stations}
     for st in s.stations:
         old = prev_st.get(st["id"])
         if not old:
             continue
         for fuel, inv in st.get("inventory", {}).items():
-            k = (st["id"], fuel)
-            if len(seen_ticks.get(k, ())) < n - p:  # history window does not cover the gap
-                continue
-            expected = float(old["inventory"].get(fuel, 0)) + arrived.get(k, 0.0) - served.get(k, 0.0)
-            resid = float(inv) - min(expected, float(st["capacity"].get(fuel, expected)))  # overflow is discarded
-            tol = max(INV_TOLERANCE_L, INV_TOLERANCE_FRAC * float(st["capacity"].get(fuel, 0)))
-            if abs(resid) > tol:
+            cap = float(st["capacity"].get(fuel, float("inf")))
+            def resid(shift):
+                sold = sum(float(h.get("served_liters", 0.0)) for h in s.demand_history
+                           if h.get("station_id") == st["id"] and h.get("fuel_type") == fuel and _in_window(h.get("tick"), p, n, shift))
+                got = sum(float(a.get("quantity", 0.0)) for a in s.allocations
+                          if a.get("status") == "ARRIVED" and a.get("destination_station_id") == st["id"]
+                          and a.get("fuel_type") == fuel and _in_window(a.get("actual_arrival_tick"), p, n, shift))
+                return float(inv) - min(float(old["inventory"].get(fuel, 0)) + got - sold, cap)  # overflow is discarded
+            r = min((resid(sh) for sh in SHIFTS), key=abs)
+            tol = max(INV_TOLERANCE_L, INV_TOLERANCE_FRAC * cap)
+            if abs(r) > tol:
                 out.append(_alert(s, "warning", "inventory_anomaly", "station", st["id"],
-                                  f"Unexplained {fuel.lower()} inventory {'drop' if resid < 0 else 'gain'} at {names[st['id']]}",
-                                  f"{resid:+.0f} L vs deliveries/sales (ticks {p}-{n})", fuel))
+                                  f"Unexplained {fuel.lower()} inventory {'drop' if r < 0 else 'gain'} at {names[st['id']]}",
+                                  f"{r:+.0f} L vs deliveries/sales (ticks {p}-{n})", fuel))
 
     prev_dp = {d["id"]: d for d in prev.depots}
     for d in s.depots:
@@ -117,23 +123,22 @@ def _inventory(s: Snapshot, prev: Snapshot | None, names: dict) -> list[AlertDra
         if not old:
             continue
         for fuel, inv in d.get("inventory", {}).items():
-            supplied = sum(float(a.get("quantity", 0)) for a in s.supply_arrivals
-                           if a.get("depot_id") == d["id"] and a.get("fuel_type") == fuel
-                           and a.get("status") == "ARRIVED" and a.get("actual_tick") is not None and p <= a["actual_tick"] < n)
-            def shipped(lo_incl: bool) -> float:
-                return sum(float(a.get("quantity", 0)) for a in s.allocations
-                           if a.get("source_depot_id") == d["id"] and a.get("fuel_type") == fuel
-                           and a.get("status") in ACTIVE_ALLOC and a.get("created_tick") is not None
-                           and (p <= a["created_tick"] if lo_incl else p < a["created_tick"]) and a["created_tick"] <= n)
-            base = float(old["inventory"].get(fuel, 0)) + supplied
-            # an allocation POSTed on tick p may or may not be in the previous snapshot: accept either
-            cap = float(d["capacity"].get(fuel, float("inf")))  # supply beyond capacity is discarded
-            resid = min((float(inv) - min(base - shipped(x), cap) for x in (True, False)), key=abs)
-            tol = max(INV_TOLERANCE_L, INV_TOLERANCE_FRAC * float(d["capacity"].get(fuel, 0)))
-            if abs(resid) > tol:
+            cap = float(d["capacity"].get(fuel, float("inf")))
+            def resid(shift):
+                supplied = sum(float(a.get("quantity", 0)) for a in s.supply_arrivals
+                               if a.get("depot_id") == d["id"] and a.get("fuel_type") == fuel and a.get("status") == "ARRIVED"
+                               and _in_window(a.get("actual_tick"), p, n, shift))
+                # depot stock drops when an allocation is POSTed, so it counts at its created tick
+                shipped = sum(float(a.get("quantity", 0)) for a in s.allocations
+                              if a.get("source_depot_id") == d["id"] and a.get("fuel_type") == fuel
+                              and a.get("status") in ACTIVE_ALLOC and _in_window(a.get("created_tick"), p, n + 1, shift))
+                return float(inv) - min(float(old["inventory"].get(fuel, 0)) + supplied - shipped, cap)  # overflow discarded
+            r = min((resid(sh) for sh in SHIFTS), key=abs)
+            tol = max(INV_TOLERANCE_L, INV_TOLERANCE_FRAC * cap)
+            if abs(r) > tol:
                 out.append(_alert(s, "warning", "inventory_anomaly", "depot", d["id"],
-                                  f"Unexplained {fuel.lower()} inventory {'drop' if resid < 0 else 'gain'} at {d.get('name', d['id'])}",
-                                  f"{resid:+.0f} L vs supply/dispatch (ticks {p}-{n})", fuel))
+                                  f"Unexplained {fuel.lower()} inventory {'drop' if r < 0 else 'gain'} at {d.get('name', d['id'])}",
+                                  f"{r:+.0f} L vs supply/dispatch (ticks {p}-{n})", fuel))
     return out
 
 

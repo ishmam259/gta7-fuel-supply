@@ -154,3 +154,28 @@ def test_same_recommendation_is_refreshed_not_duplicated(client):
     recs = c.get("/api/recommendations").json()
     assert len(recs) == 1
     assert recs[0]["signals"] == ["Gazipur Depot constrained"] and recs[0]["confidence"] == 0.7
+
+
+def test_approval_blocked_when_availability_changed(client):
+    c, eng = client
+    rid = c.get("/api/recommendations").json()[0]["id"]
+    for r in eng.snap["routes"]:
+        if r["id"] == "route-gazipur-mirpur":
+            r["status"] = "DISRUPTED"
+    r = c.post(f"/api/recommendations/{rid}/approve", headers={"X-Operator-Key": "test-key"}).json()
+    assert r["status"] == "failed" and r["failure_reason"].startswith("AVAILABILITY_CHANGED")
+    assert "DISRUPTED" in r["failure_reason"]
+    assert eng.sim.posted == []  # nothing doomed was sent to the simulator
+
+
+def test_concurrent_approvals_are_serialized(client):
+    import asyncio
+    c, eng = client
+    rid = c.get("/api/recommendations").json()[0]["id"]
+
+    async def both():
+        return await asyncio.gather(eng.execute(rid), eng.execute(rid))
+
+    a, b = asyncio.run(both())
+    assert len(eng.sim.posted) == 1  # second approval sees the first one's result
+    assert a.status == b.status == "executed"
