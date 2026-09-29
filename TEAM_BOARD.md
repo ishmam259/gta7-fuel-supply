@@ -13,7 +13,7 @@ Shared place to talk through GitHub. **How to use it**
 |---|---|
 | 11:00 | Round 1 judging: problem understanding & approach (done) |
 | 12:40 | Plan v2 (below) |
-| **13:20** | Code stop · **13:30 feature freeze**, then only demo-breaking fixes |
+| **14:00** | **Feature freeze** (moved), then only demo-breaking fixes |
 | **14:00** | **Round 2:** 4 min presentation + 3 min Q&A (selected teams) |
 | 15:30 | Submission deadline (repo public after deadline) |
 
