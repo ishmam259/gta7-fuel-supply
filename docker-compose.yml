@@ -1,3 +1,9 @@
+# GTA 7 platform: `docker compose up --build`
+#   simulator  http://localhost:8000   (organizer image)
+#   backend    http://localhost:8090   (API docs /docs, metrics /metrics)
+#   web        http://localhost:3000   (operator console; `--profile web` once web/Dockerfile exists)
+#   prometheus http://localhost:9090
+#   grafana    http://localhost:3001   (admin / admin)
 services:
   simulator-api:
     image: asifmahmoud414/bup-fuel-supply-simulator:1.0.0
@@ -7,3 +13,65 @@ services:
       SIMULATOR_START_MODE: ${SIMULATOR_START_MODE:-paused}
     ports:
       - "8000:8000"
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SIMULATOR_URL: http://simulator-api:8000
+      DATABASE_URL: sqlite:////app/data/gta7.db
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "8090:8090"
+    volumes:
+      - backend-data:/app/data
+    depends_on:
+      - simulator-api
+    restart: unless-stopped
+
+  web:
+    profiles: ["web"]
+    build: ./web
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8090
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=1d
+    volumes:
+      - ./ops/prometheus:/etc/prometheus:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  backend-data:

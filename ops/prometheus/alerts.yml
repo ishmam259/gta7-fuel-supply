@@ -1,0 +1,42 @@
+groups:
+  - name: gta7
+    rules:
+      - alert: BackendDown
+        expr: up{job="gta7-backend"} == 0
+        for: 15s
+        labels: {severity: critical}
+        annotations: {summary: "GTA7 backend is not responding to Prometheus scrapes"}
+      - alert: SimulatorCircuitOpen
+        expr: gta7_circuit_breaker_state == 2
+        for: 5s
+        labels: {severity: critical}
+        annotations: {summary: "Circuit breaker to the simulator is OPEN (degraded mode)"}
+      - alert: DegradedMode
+        expr: gta7_degraded_mode == 1
+        for: 5s
+        labels: {severity: warning}
+        annotations: {summary: "Backend is serving cached state (simulator unavailable)"}
+      - alert: HighApiErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[1m])) / clamp_min(sum(rate(http_requests_total[1m])), 0.001) > 0.05
+        for: 30s
+        labels: {severity: warning}
+        annotations: {summary: "API 5xx error rate above 5%"}
+      - alert: SlowApi
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le)) > 0.5
+        for: 1m
+        labels: {severity: warning}
+        annotations: {summary: "API p95 latency above 500 ms"}
+      - alert: FallbackPolicyActive
+        expr: increase(gta7_fallback_activations_total[2m]) > 0
+        labels: {severity: warning}
+        annotations: {summary: "Intelligence fallback policy activated"}
+      - alert: ServiceLevelDrop
+        expr: gta7_service_level < 0.95
+        for: 30s
+        labels: {severity: warning}
+        annotations: {summary: "Simulator service level below 95%"}
+      - alert: CriticalShortages
+        expr: gta7_open_alerts{severity="critical"} > 0
+        for: 10s
+        labels: {severity: warning}
+        annotations: {summary: "Critical fuel shortage alerts are open"}

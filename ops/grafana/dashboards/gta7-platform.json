@@ -1,0 +1,473 @@
+{
+ "uid": "gta7-ops",
+ "title": "GTA7 Fuel Ops - Platform Health",
+ "timezone": "browser",
+ "refresh": "5s",
+ "time": {
+  "from": "now-30m",
+  "to": "now"
+ },
+ "schemaVersion": 39,
+ "panels": [
+  {
+   "id": 1,
+   "type": "stat",
+   "title": "Service level",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_service_level",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 6,
+    "h": 5,
+    "x": 0,
+    "y": 0
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "Open alerts (critical)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_open_alerts{severity=\"critical\"}",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 6,
+    "h": 5,
+    "x": 6,
+    "y": 0
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "Pending recommendations",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_pending_recommendations",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 6,
+    "h": 5,
+    "x": 12,
+    "y": 0
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "Simulator tick",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_sim_tick",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 6,
+    "h": 5,
+    "x": 18,
+    "y": 0
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 5,
+   "type": "timeseries",
+   "title": "API request rate (req/s)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(http_requests_total[1m])) by (handler)",
+     "legendFormat": "{{handler}}"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 0,
+    "y": 5
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqps"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 6,
+   "type": "timeseries",
+   "title": "API latency p50 / p95",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))",
+     "legendFormat": "p50"
+    },
+    {
+     "refId": "B",
+     "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))",
+     "legendFormat": "p95"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 8,
+    "y": 5
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 7,
+   "type": "timeseries",
+   "title": "API error rate (5xx)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m])) / clamp_min(sum(rate(http_requests_total[1m])),0.001)",
+     "legendFormat": ""
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 16,
+    "y": 5
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 8,
+   "type": "timeseries",
+   "title": "Simulator calls by outcome",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(gta7_sim_requests_total[1m])) by (outcome)",
+     "legendFormat": "{{outcome}}"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 0,
+    "y": 12
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqps"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 9,
+   "type": "timeseries",
+   "title": "Circuit breaker (0 closed, 1 half-open, 2 open) / degraded / SSE",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_circuit_breaker_state",
+     "legendFormat": "breaker"
+    },
+    {
+     "refId": "B",
+     "expr": "gta7_degraded_mode",
+     "legendFormat": "degraded"
+    },
+    {
+     "refId": "C",
+     "expr": "gta7_sse_connected",
+     "legendFormat": "sse connected"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 8,
+    "y": 12
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 10,
+   "type": "timeseries",
+   "title": "Fallback activations & recoveries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(increase(gta7_fallback_activations_total[5m])) by (component)",
+     "legendFormat": "fallback {{component}}"
+    },
+    {
+     "refId": "B",
+     "expr": "increase(gta7_recoveries_total[5m])",
+     "legendFormat": "recoveries"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 16,
+    "y": 12
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 11,
+   "type": "timeseries",
+   "title": "Prediction error (MAPE) & model confidence",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_prediction_mape",
+     "legendFormat": "MAPE"
+    },
+    {
+     "refId": "B",
+     "expr": "gta7_model_confidence",
+     "legendFormat": "confidence"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 0,
+    "y": 19
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 12,
+   "type": "timeseries",
+   "title": "Decisions per minute",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "sum(rate(gta7_decisions_total[5m])*60) by (actor,result)",
+     "legendFormat": "decision {{actor}} {{result}}"
+    },
+    {
+     "refId": "B",
+     "expr": "sum(rate(gta7_recommendations_total[5m])*60) by (mode)",
+     "legendFormat": "recs {{mode}}"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 8,
+    "y": 19
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 13,
+   "type": "timeseries",
+   "title": "Shortage alert rate",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "rate(gta7_shortage_alerts_total[5m])*60",
+     "legendFormat": "shortage alerts/min"
+    },
+    {
+     "refId": "B",
+     "expr": "sum(gta7_open_alerts) by (severity)",
+     "legendFormat": "open {{severity}}"
+    }
+   ],
+   "gridPos": {
+    "w": 8,
+    "h": 7,
+    "x": 16,
+    "y": 19
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 14,
+   "type": "timeseries",
+   "title": "Station inventory (L)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "gta7_station_inventory_liters",
+     "legendFormat": "{{station}} {{fuel}}"
+    }
+   ],
+   "gridPos": {
+    "w": 12,
+    "h": 7,
+    "x": 0,
+    "y": 26
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  },
+  {
+   "id": 15,
+   "type": "timeseries",
+   "title": "Backend CPU & memory",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "expr": "rate(process_cpu_seconds_total{job=\"gta7-backend\"}[1m])",
+     "legendFormat": "cpu cores"
+    },
+    {
+     "refId": "B",
+     "expr": "process_resident_memory_bytes{job=\"gta7-backend\"}/1e6",
+     "legendFormat": "memory MB"
+    }
+   ],
+   "gridPos": {
+    "w": 12,
+    "h": 7,
+    "x": 12,
+    "y": 26
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   },
+   "options": {}
+  }
+ ],
+ "tags": [
+  "gta7"
+ ]
+}

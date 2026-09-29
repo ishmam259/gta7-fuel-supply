@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: gta7
+    folder: GTA7
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
