@@ -78,6 +78,10 @@ def engine():
     global _engine
     if _engine is None:
         url = get_settings().database_url
+        # hosted Postgres (Render, Heroku) hands out postgres:// or postgresql://; we ship psycopg 3, not psycopg2
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                url = "postgresql+psycopg://" + url.removeprefix(prefix)
         if url.startswith("sqlite:///"):
             path = url.removeprefix("sqlite:///")
             os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
