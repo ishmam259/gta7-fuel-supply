@@ -141,3 +141,16 @@ def test_distinct_alert_codes_on_same_entity_stay_separate(client):
     titles = [a["title"] for a in c.get("/api/alerts").json() if a["kind"] == "bottleneck"]
     assert sorted(titles) == ["Dispatch saturated", "Low diesel stock"]
     assert "llm_detail" in c.get("/api/system/status").json()
+
+
+def test_same_recommendation_is_refreshed_not_duplicated(client):
+    c, eng = client
+    snap = eng.snap
+    base = {"station_id": "station-mirpur", "fuel_type": "OCTANE", "mode": "heuristic", "confidence": 0.7,
+            "allocation": {"source_depot_id": "depot-gazipur", "route_id": "route-gazipur-mirpur",
+                           "quantity": 4000, "eta_tick": snap["tick"] + 3},
+            "signals": ["Gazipur Depot constrained"]}
+    eng._store_recommendations(snap, [base])
+    recs = c.get("/api/recommendations").json()
+    assert len(recs) == 1
+    assert recs[0]["signals"] == ["Gazipur Depot constrained"] and recs[0]["confidence"] == 0.7

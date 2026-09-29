@@ -260,7 +260,8 @@ class Engine:
         self.publish("tick", {"tick": snap["tick"], "service_level": snap["metrics"]["service_level"]})
 
     def _store_recommendations(self, snap: dict, drafts: list[dict]) -> list[Recommendation]:
-        created = []
+        created: list[Recommendation] = []
+        refreshed: list[Recommendation] = []
         with session() as s:
             for d in drafts:
                 alloc = d.get("allocation", {})
@@ -271,7 +272,17 @@ class Engine:
                         and abs(e.body.get("allocation", {}).get("quantity", 0) - alloc.get("quantity", 0))
                         <= 0.1 * max(alloc.get("quantity", 1), 1)]
                 if same:
-                    continue  # unchanged recommendation still pending
+                    # same shipment still proposed: refresh its reasoning (signals, constraints, impact,
+                    # confidence) so the card reflects the current situation, e.g. a depot now constrained
+                    keep = same[0]
+                    conf = float(d.get("confidence", keep.confidence))
+                    keep.body = {**d, "explanation": d.get("explanation") or keep.body.get("explanation", "")}
+                    keep.confidence = conf
+                    keep.requires_human_review = bool(d.get("requires_human_review", conf < 0.7))
+                    keep.tick, keep.updated_at = snap["tick"], utcnow()
+                    s.add(keep)
+                    refreshed.append(keep)
+                    continue
                 for e in existing:
                     e.status, e.updated_at = "superseded", utcnow()
                     s.add(e)
@@ -284,7 +295,7 @@ class Engine:
                 RECOMMENDATIONS.labels(rec.mode).inc()
                 created.append(rec)
             s.commit()
-            for r in created:
+            for r in created + refreshed:
                 s.refresh(r)
                 self.publish("recommendation", self.rec_view(r))
             PENDING_RECS.set(len(s.exec(select(Recommendation.id).where(Recommendation.status == "pending")).all()))
