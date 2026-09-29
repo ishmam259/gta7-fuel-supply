@@ -285,7 +285,12 @@ def _build(s: Snapshot, cands: list[Candidate], alloc: dict[tuple[int, str], flo
                 aeta = s.tick + int(other["transit_ticks"])
                 alts.append(Alternative(source_depot_id=other["source_depot_id"], route_id=other["id"], quantity=aq,
                                         eta_tick=aeta, stockout_prob_after=stockout_prob(s, c.fc, inv, {aeta: aq}, from_tick=aeta)))
-        partners = [f"together with {q2:.0f} L via {r2['id']}" for j, r2, q2, _ in shipments if j == i and r2["id"] != rid]
+        mates = [(q2, r2["id"]) for j, r2, q2, _ in shipments if j == i and r2["id"] != rid]
+        partners = []
+        if mates:  # the card's "after" counts every truck to this station; the what-if shows one truck only
+            alone = stockout_prob(s, c.fc, inv, {eta: qty}, from_tick=eta)
+            partners = [f"risk after counts this truck together with " + " and ".join(f"{q2:.0f} L via {r2}" for q2, r2 in mates)
+                        + f"; this truck alone: {alone:.0%} (what-if shows the single truck)"]
         unmet_avoided = max(0.0, expected_unmet(s, c.fc, inv) - expected_unmet(s, c.fc, inv, combined)) * qty / total
         conf = _confidence(s, c, route, total, need, mode)
         recs.append(RecommendationDraft(

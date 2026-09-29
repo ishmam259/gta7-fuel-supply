@@ -93,11 +93,15 @@ def test_risk_story_before_after_on_live_state():
 
 
 def test_two_trucks_share_one_combined_impact(healthy):
+    for st in healthy["stations"]:
+        if st["id"] == "station-mirpur":
+            st["inventory"]["PETROL"] = 400          # needs more than one route's max (7,000 L)
     _, recs = run(healthy)
-    pair = [r for r in recs if (r.station_id, r.fuel_type) == ("station-karnaphuli", "PETROL")]
+    pair = [r for r in recs if (r.station_id, r.fuel_type) == ("station-mirpur", "PETROL")]
     assert len(pair) == 2 and all(r.allocation.quantity >= 1500 for r in pair)
     assert pair[0].expected_impact.stockout_prob_after == pair[1].expected_impact.stockout_prob_after < 0.2
-    assert all(any(sig.startswith("together with") for sig in r.signals) for r in pair)
+    assert all(any(sig.startswith("risk after counts this truck together with") and "this truck alone" in sig
+                   for sig in r.signals) for r in pair)
 
 
 def test_scarcity_is_shared_fairly(scarce):
