@@ -1,7 +1,7 @@
 """Operator-facing text: explanations, briefing, investigation assistant.
 
 The LLM only explains facts computed by deterministic code; it never decides quantities.
-Provider chain: OpenAI -> Groq -> Gemini -> template, all inside a 3 s budget. Every function returns source "llm" or "template".
+Provider chain: OpenAI -> Groq -> Gemini -> template, all inside a 4 s budget. Every function returns source "llm" or "template".
 Inputs may be Pydantic models or plain dicts (the backend passes dicts).
 Prompts get pre-formatted, human-readable facts (names, percentages, clock times) so the text is operator-ready.
 """
@@ -17,8 +17,8 @@ from typing import Any
 
 log = logging.getLogger("gta7.intel.genai")
 
-LLM_BUDGET_S = 3.0         # hard cap for the whole provider chain; after that the template answers instantly
-TIMEOUT_S = 3.0            # per-call HTTP timeout (OpenAI / Groq)
+LLM_BUDGET_S = 4.0         # hard cap for the whole provider chain; after that the template answers instantly
+TIMEOUT_S = 4.0            # per-call HTTP timeout (OpenAI / Groq)
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
 SLOW_COOLDOWN_S = 15.0     # after it was merely too slow
@@ -196,7 +196,7 @@ def _chain(cfg: dict) -> list[tuple[str, callable]]:
     steps = []
     if cfg.get("openai_api_key"):
         steps += [(f"openai:{m}", _openai) for m in _models(cfg.get("openai_model") or OPENAI_DEFAULT_MODELS)]
-    # Groq before Gemini: measured ~0.3-1.2 s vs Gemini >= 2.3 s, and the whole chain has a 3 s budget
+    # Groq before Gemini: measured ~0.3-1.2 s vs Gemini >= 2.3 s, and the whole chain has a 4 s budget
     if cfg.get("groq_api_key"):
         steps += [(f"groq:{m}", _groq) for m in _models(cfg.get("groq_model_primary"), cfg.get("groq_model_fallback")) or list(GROQ_DEFAULT_MODELS)]
     if cfg.get("gemini_api_key"):

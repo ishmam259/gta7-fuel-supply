@@ -1,7 +1,7 @@
-"""The LLM chain must never keep the operator waiting longer than LLM_BUDGET_S (3 s), whatever the providers do.
+"""The LLM chain must never keep the operator waiting longer than LLM_BUDGET_S (4 s), whatever the providers do.
 
 Offline (fake providers, no network): hangs, slow failures, slow bad JSON, slow chains, parallel load,
-all four genai functions, the real 3.0 s budget. Live stress (real APIs) runs only with LIVE_LLM=1.
+all four genai functions, the real 4.0 s budget. Live stress (real APIs) runs only with LIVE_LLM=1.
 """
 import json
 import os
@@ -19,7 +19,7 @@ from app.intel.planner import plan
 from app.intel.risk import assess_risk
 
 FIXTURE = Path(__file__).parent / "fixtures" / "snapshot_live_now.json"
-BUDGET = genai.LLM_BUDGET_S          # the real value (3.0)
+BUDGET = genai.LLM_BUDGET_S          # the real value (4.0)
 SLACK = 0.35                         # thread hand-off + template rendering + slow CI machines
 
 
@@ -74,7 +74,7 @@ def timed(fn):
     return time.monotonic() - t, out
 
 
-# ---------------- every failure shape, every function, real 3.0 s budget ----------------
+# ---------------- every failure shape, every function, real 4.0 s budget ----------------
 SCENARIOS = {
     "hangs forever":                  [hang(30)],
     "hangs, then a fast one":         [hang(30), lambda: '{"summary": "ok", "answer": "ok", "evidence": []}'],
