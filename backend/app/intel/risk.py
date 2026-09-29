@@ -14,6 +14,7 @@ MAX_HOURS = 168.0  # cap for "no stockout in sight"
 LONG_HORIZON_TICKS = 192  # 48 h at 15 min/tick
 PROB_HORIZON_TICKS = 96   # 24 h
 WATCH_HOURS = 16.0        # under this, plan a delivery (well inside the 24 h window)
+WATCH_PROB = 0.9          # or: 24 h stockout risk this high (never show 'ok' next to p=98%)
 DEMAND_SHOCK = 0.10       # extra relative uncertainty: demand spikes / events the forecast cannot see
 
 
@@ -131,7 +132,7 @@ def level(inventory: float, station_open: bool, hours: float, prob: float) -> st
         return "outage"
     if hours < 4:
         return "critical"
-    if hours < WATCH_HOURS:
+    if hours < WATCH_HOURS or prob >= WATCH_PROB:
         return "watch"
     return "ok"
 

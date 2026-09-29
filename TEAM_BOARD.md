@@ -29,15 +29,21 @@ Shared place to talk through GitHub. **How to use it**
 ## Open items
 
 ### Farhan Tahsin Khan (intelligence)
-- [ ] **False positive alert:** "Unexplained petrol inventory drop −8000 L at Patiya Depot (ticks 80–82)". The simulator
+- [x] **False positive alert:** "Unexplained petrol inventory drop −8000 L at Patiya Depot (ticks 80–82)". The simulator
       audit shows `supply-105` **ARRIVED +8000 L** at tick 80 (`GET /admin/audit`). The inventory-accounting detector
       seems to invert or double-count supply arrivals when snapshots are several ticks apart (e.g. after `step n=4`).
-- [ ] **Groq fallback model** `llama-3.1-8b-instant`: Llama left Groq's free tier in August; use `openai/gpt-oss-20b`
+      → `2dcb5e9`, `60a2e8a`: cause = snapshot race (tick read first, lists fetched in parallel, so contents can be
+      ahead of the label and the supply was counted twice). Now tolerates up to 3 ticks of lag; real leaks still caught.
+- [x] **Groq fallback model** `llama-3.1-8b-instant`: Llama left Groq's free tier in August; use `openai/gpt-oss-20b`
       (or another current free model) so the fallback really works.
-- [ ] (Label) A station can show level "ok" next to p=98%: consider labelling the probability
+      → `2dcb5e9`: confirmed 404; defaults now `qwen/qwen3.8-27b` → `openai/gpt-oss-120b` → `openai/gpt-oss-20b` (all tested live).
+- [x] (Label) A station can show level "ok" next to p=98%: consider labelling the probability
       "24 h stockout risk if no action" or folding probability into the level.
-- [ ] Confirm for Q&A: why a single card's impact (e.g. 99% → 9%) can differ from its what-if (99% → 71%): the card
+      → `60a2e8a`: folded in, level is `watch` when 24 h risk ≥ 90% (or < 16 h left). Sakib: label p as "24 h stockout risk if no action".
+- [x] Confirm for Q&A: why a single card's impact (e.g. 99% → 9%) can differ from its what-if (99% → 71%): the card
       counts the paired shipment on the other route; say so on the card.
+      → `60a2e8a`: confirmed. Card signal now reads "risk after counts this truck together with 5000 L via route-…;
+      this truck alone: 97% (what-if shows the single truck)".
 - [ ] Read `docs/`/Q&A answers Q5–Q19 (Ishmam has the PDF) and correct anything wrong about your code.
 
 ### Mahmudul Hasan Sakib (console)
@@ -67,3 +73,7 @@ Shared place to talk through GitHub. **How to use it**
 ## Messages
 - **11:55 · Ishmam → All:** Board created. Please pull, tick your items as you finish (with commit hash), and push small
   commits often. Anything that blocks you → write it here and ping in the group chat.
+- **12:00 · Farhan → Ishmam:** 4 of my 5 items fixed on `intel` (`2dcb5e9`, `60a2e8a`), 106 tests green; please merge.
+  (1) Please add `GROQ_MODEL_PRIMARY` / `GROQ_MODEL_FALLBACK` to `.env.example`. (2) Please send me the Q&A PDF (Q5–Q19),
+  it's not in the repo. (3) Correction for the round-1 doc: trucks **depart on the tick they're ordered**
+  (tested on the simulator), so lead time is **2–4 ticks (30–60 min)**, not "1-tick departure" / 3–5 ticks.

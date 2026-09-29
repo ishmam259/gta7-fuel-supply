@@ -78,9 +78,10 @@ def _demand(s: Snapshot, fc: list[Forecast], names: dict) -> list[AlertDraft]:
 
 # ---------- inventory accounting ----------
 # The backend reads the tick number first and the lists in parallel, so while the simulator runs a snapshot's
-# contents can be one tick newer than its tick label. Every event at a window edge (tick p or n) may therefore
-# belong on either side: we try each boundary shift and keep the explanation with the smallest residual.
-SHIFTS = ((0, 0), (1, 0), (0, 1), (1, 1))   # (drop events at tick p, add events at tick n)
+# contents can be newer than its tick label (several ticks after a fast `step n=4`). Events near a window edge
+# may therefore belong on either side: we try each boundary shift and keep the explanation with the smallest residual.
+MAX_LAG = 3                                  # ticks a snapshot's contents may run ahead of its label
+SHIFTS = tuple((a, b) for a in range(MAX_LAG + 1) for b in range(MAX_LAG + 1))  # (drop first a ticks, add b more)
 
 
 def _in_window(tick, p: int, n: int, shift: tuple[int, int]) -> bool:
