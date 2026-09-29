@@ -1,7 +1,7 @@
 """Allocation planning: which depot sends how much fuel over which route to which station.
 
 1. Candidates: every OPEN station/fuel at watch/critical/outage risk.
-2. Need: liters to cover demand until arrival + COVER_TICKS, minus stock and inbound, capped by free tank space.
+2. Need: liters to cover demand until arrival + COVER_TICKS (+20% safety), minus stock and inbound, capped by free tank space.
 3. Optimizer (scipy linprog / HiGHS): split scarce depot stock and dispatch capacity across stations, weighted by
    risk and by whether the route arrives before the stockout. The first FIRST_TICKS of cover is worth
    FIRST_BONUS x more, so when fuel is short every station gets a share before anyone is topped up.
@@ -27,6 +27,8 @@ ROUND_TO = 50.0        # liters
 COVER_TICKS = 96       # stock to cover after arrival (24 h)
 FIRST_TICKS = 24       # "keep it running" cover after arrival (6 h), valued FIRST_BONUS x more
 FIRST_BONUS = 3.0
+SECONDARY_MIN = 1500.0  # a second truck to the same station only if it carries at least this
+SAFETY = 1.2           # order 20% above forecast demand (buffer against spikes)
 AT_RISK = ("watch", "critical", "outage")
 REVIEW_BELOW = 0.6     # confidence under this needs a human
 
@@ -127,7 +129,7 @@ class Candidate:
         route = route or (self.routes[0] if self.routes else {"transit_ticks": 2})
         horizon = min(len(self.fc.per_tick), int(route["transit_ticks"]) + cover)
         have = self.risk.current_inventory + sum(incoming(s, self.station_id, self.fuel).values())
-        return max(0.0, min(sum(self.fc.per_tick[:horizon]) - have, _room(s, self.st, self.fuel)))
+        return max(0.0, min(SAFETY * sum(self.fc.per_tick[:horizon]) - have, _room(s, self.st, self.fuel)))
 
     def timeliness(self, s: Snapshot, route: dict) -> float:
         """1.0 if the truck arrives before the station runs dry, less the later it is."""
@@ -209,7 +211,7 @@ def _solve_greedy(s: Snapshot, cands: list[Candidate], lim: Limits) -> dict[tupl
 # ---------------- recommendation building ----------------
 def _signals(s: Snapshot, c: Candidate, route: dict) -> list[str]:
     r = c.risk
-    sig = [f"risk {r.level}: stockout in {r.stockout_hours} h, p(12h)={r.stockout_prob:.0%}"]
+    sig = [f"risk {r.level}: stockout in {r.stockout_hours} h, p(24h)={r.stockout_prob:.0%}"]
     m = float(c.st.get("demand_multiplier", 1.0))
     if m >= 1.2:
         sig.append(f"demand {m:.1f}x normal (demand spike)")
@@ -248,19 +250,32 @@ def _confidence(s: Snapshot, c: Candidate, route: dict, qty: float, need: float,
 
 
 def _build(s: Snapshot, cands: list[Candidate], alloc: dict[tuple[int, str], float], lim: Limits, mode: str) -> list[RecommendationDraft]:
-    recs = []
     routes = {r["id"]: r for r in s.routes}
     base = lim.copy()                                # limits before this plan, used to show alternatives
-    for (i, rid), q in sorted(alloc.items(), key=lambda kv: -cands[kv[0][0]].weight):
+    # pass 1: final legal quantities (a second truck to the same station must be worth it)
+    shipments: list[tuple[int, dict, float, list[str]]] = []
+    for (i, rid), q in sorted(alloc.items(), key=lambda kv: (-cands[kv[0][0]].weight, -kv[1])):
         c, route = cands[i], routes[rid]
         cap, cons = route_cap(s, c.st, c.fuel, route, lim)
         qty = _floor(min(q, cap))
-        if qty < MIN_QTY:
+        extra_truck = any(j == i for j, *_ in shipments)
+        if qty < (SECONDARY_MIN if extra_truck else MIN_QTY):
             continue
         lim.take(route["source_depot_id"], c.fuel, qty)
+        shipments.append((i, route, qty, cons))
+    # pass 2: impact of ALL trucks planned for the same station/fuel, shown on each of its cards
+    plan_by_cand: dict[int, dict[int, float]] = {}
+    for i, route, qty, _ in shipments:
         eta = s.tick + int(route["transit_ticks"])
-        inv = c.risk.current_inventory
-        need = c.need(s, route)
+        plan_by_cand.setdefault(i, {})[eta] = plan_by_cand.get(i, {}).get(eta, 0.0) + qty
+    recs = []
+    for i, route, qty, cons in shipments:
+        c, rid = cands[i], route["id"]
+        eta = s.tick + int(route["transit_ticks"])
+        inv, need = c.risk.current_inventory, c.need(s, route)
+        combined = plan_by_cand[i]
+        total = sum(combined.values())
+        first_eta = min(combined)
         alts = []
         for other in c.routes:
             if other["id"] == rid:
@@ -270,7 +285,9 @@ def _build(s: Snapshot, cands: list[Candidate], alloc: dict[tuple[int, str], flo
                 aeta = s.tick + int(other["transit_ticks"])
                 alts.append(Alternative(source_depot_id=other["source_depot_id"], route_id=other["id"], quantity=aq,
                                         eta_tick=aeta, stockout_prob_after=stockout_prob(s, c.fc, inv, {aeta: aq}, from_tick=aeta)))
-        conf = _confidence(s, c, route, qty, need, mode)
+        partners = [f"together with {q2:.0f} L via {r2['id']}" for j, r2, q2, _ in shipments if j == i and r2["id"] != rid]
+        unmet_avoided = max(0.0, expected_unmet(s, c.fc, inv) - expected_unmet(s, c.fc, inv, combined)) * qty / total
+        conf = _confidence(s, c, route, total, need, mode)
         recs.append(RecommendationDraft(
             tick=s.tick, mode=mode, station_id=c.station_id, fuel_type=c.fuel,
             allocation=AllocationPlan(source_depot_id=route["source_depot_id"], route_id=rid, quantity=qty, eta_tick=eta),
@@ -279,13 +296,13 @@ def _build(s: Snapshot, cands: list[Candidate], alloc: dict[tuple[int, str], flo
                                 projected_stockout_hours=c.risk.stockout_hours),
             expected_impact=ExpectedImpact(
                 stockout_prob_before=c.risk.stockout_prob,
-                stockout_prob_after=stockout_prob(s, c.fc, inv, {eta: qty}, from_tick=eta),
-                unmet_liters_avoided=round(max(0.0, expected_unmet(s, c.fc, inv) - expected_unmet(s, c.fc, inv, {eta: qty})), 1)),
+                stockout_prob_after=stockout_prob(s, c.fc, inv, combined, from_tick=first_eta),
+                unmet_liters_avoided=round(unmet_avoided, 1)),
             confidence=conf,
             requires_human_review=conf < REVIEW_BELOW or mode == "fallback" or c.timeliness(s, route) < 1.0,
-            signals=_signals(s, c, route) + ([f"runs dry before the truck arrives (tick {eta}); gap cannot be avoided"]
-                                             if c.stockout_tick < eta else []),
-            constraints=cons + ([f"need {need:.0f} L, only {qty:.0f} L possible this tick"] if qty < need - ROUND_TO else []),
+            signals=_signals(s, c, route) + partners + ([f"runs dry before the truck arrives (tick {eta}); gap cannot be avoided"]
+                                                        if c.stockout_tick < eta else []),
+            constraints=cons + ([f"need {need:.0f} L, only {total:.0f} L possible this tick"] if total < need - ROUND_TO else []),
             alternatives=alts,
         ))
     return recs
