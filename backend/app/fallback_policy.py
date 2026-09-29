@@ -19,10 +19,13 @@ ACTIVE = ("PENDING", "IN_TRANSIT")
 
 def demand_rate(snap: dict) -> dict[tuple[str, str], float]:
     """Litres per tick for each (station, fuel): mean of the last 8 observed ticks, else profile."""
-    ticks_per_day = 24 * 60 / snap["tick_minutes"]
+    ticks_per_day = 24 * 60 / (snap.get("tick_minutes") or 15)
     by_pair: dict[tuple[str, str], list[tuple[int, float]]] = defaultdict(list)
-    for row in snap.get("demand_history", []):
-        by_pair[(row["station_id"], row["fuel_type"])].append((row["tick"], row["demand_liters"]))
+    for row in snap.get("demand_history") or []:
+        demand = row.get("demand_liters")
+        if demand is None or row.get("station_id") is None or row.get("fuel_type") is None:
+            continue  # skip incomplete observations instead of crashing
+        by_pair[(row["station_id"], row["fuel_type"])].append((row.get("tick", 0), float(demand)))
     rates = {}
     for st in snap["stations"]:
         for f in FUELS:
@@ -31,7 +34,7 @@ def demand_rate(snap: dict) -> dict[tuple[str, str], float]:
                 rates[(st["id"], f)] = sum(v for _, v in rows) / len(rows)
             else:
                 base = PROFILE_DAILY.get(st["demand_profile"], PROFILE_DAILY["regional"])[f]
-                rates[(st["id"], f)] = base / ticks_per_day * st.get("demand_multiplier", 1.0)
+                rates[(st["id"], f)] = base / ticks_per_day * (st.get("demand_multiplier") or 1.0)
     return rates
 
 

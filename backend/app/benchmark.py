@@ -45,8 +45,12 @@ async def _with_retry(fn, attempts: int = 5):
 
 async def _run_policy(sim: SimClient, policy: str, scenario: str | None, ticks: int, run_id: str,
                       progress_base: float) -> dict:
-    await sim.admin("POST", "/admin/reset")
-    await asyncio.sleep(2)  # let the simulator finish reloading the scenario
+    # reset wipes and reloads the whole world; it can take a while under load
+    await sim.http.post("/admin/reset", timeout=300)
+    for _ in range(60):
+        if await sim.health():
+            break
+        await asyncio.sleep(1)
     await sim.admin("POST", "/admin/pause")
     if scenario:
         for ev in scenarios.events_for(scenario, 0):
