@@ -19,6 +19,8 @@ log = logging.getLogger("gta7.intel.genai")
 
 LLM_BUDGET_S = 4.0         # hard cap for the whole provider chain; after that the template answers instantly
 TIMEOUT_S = 4.0            # per-call HTTP timeout (OpenAI / Groq)
+BRIEFING_BUDGET_S = 8.0    # the briefing is ~200-400 tokens of JSON (2-4 s on gpt-4.1-nano) and refreshes in the
+                           # background (nobody waits on it), so it gets a longer budget than interactive answers
 GEMINI_TIMEOUT_MS = 12_000  # Gemini rejects deadlines under 10 s
 COOLDOWN_S = 60.0          # skip a provider for this long after it fails
 SLOW_COOLDOWN_S = 15.0     # after it was merely too slow
@@ -169,7 +171,7 @@ def _openai(cfg, model, system, user, want_json):
     client = _client("openai", cfg["openai_api_key"])
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
     r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
-                                       timeout=TIMEOUT_S,
+                                       timeout=cfg.get("_timeout", TIMEOUT_S),
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -186,7 +188,7 @@ def _groq(cfg, model, system, user, want_json):
     client = _client("groq", cfg["groq_api_key"], cfg.get("groq_tls_insecure", "").lower() in ("1", "true", "yes"))
     kw = {"response_format": {"type": "json_object"}} if want_json else {}
     r = client.chat.completions.create(model=model, temperature=0.2, max_tokens=JSON_OUT_TOKENS if want_json else MAX_OUT_TOKENS,
-                                       timeout=TIMEOUT_S,
+                                       timeout=cfg.get("_timeout", TIMEOUT_S),
                                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], **kw)
     return r.choices[0].message.content
 
@@ -212,7 +214,7 @@ def _llm(user: str, want_json: bool = False, budget: float | None = None) -> str
     if key in _cache:
         stats["cache_hits"] += 1
         return _cache[key]
-    cfg = _cfg()
+    cfg = {**_cfg(), "_timeout": max(TIMEOUT_S, budget)}  # HTTP timeout follows the budget (8 s briefing)
     deadline = time.monotonic() + budget
     for name, fn in _chain(cfg):
         if _down_until.get(name, 0) > time.monotonic():
@@ -449,7 +451,7 @@ def briefing(s: Any, risks: list, alerts: list) -> dict:
              "active_events": _events(s)}
     text = _llm('Write a control-room situation briefing. Return JSON {"summary": str (2-4 sentences, lead with the most '
                 'urgent issue), "top_risks": [str] (max 5, one line each), "recommended_actions": [str] (max 4, concrete)}.\n'
-                + json.dumps(facts, default=str), want_json=True)
+                + json.dumps(facts, default=str), want_json=True, budget=BRIEFING_BUDGET_S)
     if text:
         try:
             out = json.loads(text)
