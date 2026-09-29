@@ -32,6 +32,21 @@ LIST_ENDPOINTS = {
 AUTO_RESOLVE_KINDS = {"shortage_risk", "disruption", "bottleneck", "integration_failure", "stale_data"}
 
 
+async def fetch_snapshot(sim: SimClient, inst: dict, history_limit: int = 2000) -> dict:
+    """Read the whole world via REST (validated). Shared by the engine and the benchmark."""
+    names = list(LIST_ENDPOINTS)
+    results = await asyncio.gather(
+        *[sim.get(LIST_ENDPOINTS[n]) for n in names],
+        sim.get("/v1/metrics"),
+        sim.get("/v1/demand-history", params={"limit": history_limit}),
+    )
+    snap = {n: results[i] for i, n in enumerate(names)}
+    snap["metrics"] = results[len(names)]
+    snap["demand_history"] = results[len(names) + 1]
+    snap.update(tick=inst["tick"], sim_time=inst["sim_time"], tick_minutes=inst["tick_minutes"], status=inst["status"])
+    return snap
+
+
 class Engine:
     def __init__(self) -> None:
         self.settings = get_settings()
@@ -164,17 +179,7 @@ class Engine:
                 await self._run_tick(snap)
 
     async def _fetch_all(self, inst: dict) -> dict:
-        names = list(LIST_ENDPOINTS)
-        results = await asyncio.gather(
-            *[self.sim.get(LIST_ENDPOINTS[n]) for n in names],
-            self.sim.get("/v1/metrics"),
-            self.sim.get("/v1/demand-history", params={"limit": self.settings.demand_history_limit}),
-        )
-        snap = {n: results[i] for i, n in enumerate(names)}
-        snap["metrics"] = results[len(names)]
-        snap["demand_history"] = results[len(names) + 1]
-        snap.update(tick=inst["tick"], sim_time=inst["sim_time"], tick_minutes=inst["tick_minutes"], status=inst["status"])
-        return snap
+        return await fetch_snapshot(self.sim, inst, self.settings.demand_history_limit)
 
     def _update_gauges(self, snap: dict) -> None:
         SIM_TICK.set(snap["tick"])
