@@ -356,6 +356,19 @@ class Engine:
                 RECOMMENDATIONS.labels(rec.mode).inc()
                 created.append(rec)
             s.commit()
+            # retire pending cards that the latest plan no longer proposes or that are no longer feasible
+            # (e.g. their route became DISRUPTED): the inbox always reflects the current plan
+            proposed = {(d["station_id"], d["fuel_type"]) for d in drafts}
+            keep_ids = {r.id for r in created + refreshed}
+            for old in s.exec(select(Recommendation).where(Recommendation.status == "pending")).all():
+                if old.id in keep_ids:
+                    continue
+                problem = self.availability_problem(old.station_id, old.fuel_type, old.body.get("allocation", {}))
+                if (old.station_id, old.fuel_type) not in proposed or problem:
+                    old.status, old.updated_at = "superseded", utcnow()
+                    old.failure_reason = f"superseded at tick {snap['tick']}: " + (problem or "no longer needed in the latest plan")
+                    s.add(old)
+            s.commit()
             for r in created + refreshed:
                 s.refresh(r)
                 self.publish("recommendation", self.rec_view(r))
@@ -434,6 +447,19 @@ class Engine:
         async with self._exec_lock:
             return await self._execute(rec_id, actor, quantity, note)
 
+    def _apply_local(self, body: dict, resp: dict) -> None:
+        """Mirror what the simulator just did (pending shipment created, depot stock deducted) in our snapshot, so
+        back-to-back approvals within one tick are checked against dispatch capacity and stock correctly."""
+        snap = self.snap
+        if snap is None:
+            return
+        if not any(a.get("id") == resp.get("id") for a in snap["allocations"]):
+            snap["allocations"].append({**body, "id": resp.get("id"), "status": resp.get("status", "PENDING"),
+                                        "created_tick": resp.get("created_tick", self.last_tick)})
+        for d in snap["depots"]:
+            if d["id"] == body["source_depot_id"]:
+                d["inventory"][body["fuel_type"]] = max(0.0, d["inventory"].get(body["fuel_type"], 0) - body["quantity"])
+
     def availability_problem(self, station_id: str, fuel: str, alloc: dict) -> str | None:
         """Re-check a shipment against the LATEST snapshot (availability may have changed since the card was made)."""
         snap = self.snap
@@ -499,6 +525,7 @@ class Engine:
             if code in (200, 201):
                 rec.status, rec.sim_allocation_id, rec.failure_reason = "executed", resp.get("id"), None
                 result = "OK"
+                self._apply_local(body, resp)  # next approval's availability check must see this shipment
             else:
                 detail = resp.get("detail") or resp.get("error") or {}
                 result = detail.get("code", f"HTTP_{code}") if isinstance(detail, dict) else f"HTTP_{code}"

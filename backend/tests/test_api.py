@@ -179,3 +179,37 @@ def test_concurrent_approvals_are_serialized(client):
     a, b = asyncio.run(both())
     assert len(eng.sim.posted) == 1  # second approval sees the first one's result
     assert a.status == b.status == "executed"
+
+
+def test_back_to_back_approvals_respect_dispatch_capacity(client):
+    c, eng = client
+    snap = eng.snap
+    gaz = next(d for d in snap["depots"] if d["id"] == "depot-gazipur")
+    gaz["dispatch_capacity_per_tick"] = 5000
+    for a in snap["allocations"]:
+        a["status"] = "ARRIVED"
+    drafts = [{"station_id": st, "fuel_type": "DIESEL", "mode": "heuristic", "confidence": 0.9,
+               "allocation": {"source_depot_id": "depot-gazipur", "route_id": rt, "quantity": 3000, "eta_tick": snap["tick"] + 2}}
+              for st, rt in (("station-mirpur", "route-gazipur-mirpur"), ("station-tongi", "route-gazipur-tongi"))]
+    for st in snap["stations"]:
+        st["inventory"]["DIESEL"] = 0
+    eng._store_recommendations(snap, drafts)
+    ids = [r["id"] for r in c.get("/api/recommendations").json() if r["fuel_type"] == "DIESEL"]
+    res = [c.post(f"/api/recommendations/{i}/approve", headers={"X-Operator-Key": "test-key"}).json() for i in ids]
+    assert sorted(r["status"] for r in res) == ["executed", "failed"]
+    blocked = next(r for r in res if r["status"] == "failed")
+    assert "dispatch capacity" in blocked["failure_reason"]
+    assert len(eng.sim.posted) == 1  # the second one was stopped before reaching the simulator
+
+
+def test_stale_pending_recommendation_is_retired(client):
+    c, eng = client
+    snap = eng.snap
+    rid = c.get("/api/recommendations").json()[0]["id"]
+    for r in snap["routes"]:
+        if r["id"] == "route-gazipur-mirpur":
+            r["status"] = "DISRUPTED"
+    eng._store_recommendations(snap, [])  # next tick: planner proposes nothing for that card
+    assert all(r["id"] != rid for r in c.get("/api/recommendations").json())
+    old = next(r for r in c.get("/api/recommendations?status=superseded").json() if r["id"] == rid)
+    assert "DISRUPTED" in old["failure_reason"]
