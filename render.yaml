@@ -13,7 +13,7 @@ services:
     runtime: image
     image:
       url: docker.io/asifmahmoud414/bup-fuel-supply-simulator:1.0.0
-    plan: starter            # free instances sleep after 15 min idle and restart the simulation
+    plan: free               # sleeps after 15 min idle (restarts the simulation); starter keeps it on
     envVars:
       - key: PORT
         value: "8000"
@@ -23,7 +23,7 @@ services:
     runtime: docker
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    plan: starter            # the tick loop must keep running; free instances sleep
+    plan: free               # sleeps after 15 min idle (tick loop stops); starter keeps it on
     healthCheckPath: /api/health
     envVars:
       - key: ROLE
