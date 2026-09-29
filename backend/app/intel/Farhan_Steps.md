@@ -353,6 +353,19 @@ needs Ishmam's benchmark `policy` switch.
 `rl` with an explanation on 3 real snapshots; no policy → identical to LP; training world is deterministic; on
 held-out seeds RL matches LP service with fewer trucks, and no action collapses.
 
+**Real-simulator comparison (`compare_policies.py`, 13:04).** Same reset, same seed, same combined crisis (Dhaka demand
+spike ×1.6 for 12 h, Gazipur→Mirpur route down 8 h, Gazipur supply delayed 12 ticks, Patiya constrained), 192 ticks
+(2 days), every recommendation auto-approved and POSTed:
+
+| Policy | Service level | Liters lost | Trucks | Liters shipped | Rejected by simulator |
+|---|---|---|---|---|---|
+| No action | 42.8% | 114,614 | 0 | 0 | 0 |
+| Deterministic LP | **100%** | **0** | 76 | 215,600 | 0 |
+| **RL-tuned LP** | **100%** | **0** | **69 (−9%)** | 220,750 | 0 |
+
+Same answer as offline: identical service, fewer trucks (bigger loads). Chart: `policy_comparison.png`, data:
+`policy_comparison.json`. Rerun: `cd backend; python -m app.intel.compare_policies 192` (resets the local simulator).
+
 Retrain: `cd backend; python -m app.intel.rl 1500`
 
 ---

@@ -1,0 +1,2970 @@
+{
+ "crisis": [
+  {
+   "type": "demand_spike",
+   "offset": 8,
+   "duration_ticks": 48,
+   "parameters": {
+    "region_ids": [
+     "region-dhaka"
+    ],
+    "multiplier": 1.6
+   }
+  },
+  {
+   "type": "route_disruption",
+   "offset": 16,
+   "duration_ticks": 32,
+   "parameters": {
+    "route_ids": [
+     "route-gazipur-mirpur"
+    ]
+   }
+  },
+  {
+   "type": "shipment_delay",
+   "offset": 4,
+   "duration_ticks": 1,
+   "parameters": {
+    "depot_ids": [
+     "depot-gazipur"
+    ],
+    "delay_ticks": 12
+   }
+  },
+  {
+   "type": "depot_constraint",
+   "offset": 20,
+   "duration_ticks": 24,
+   "parameters": {
+    "depot_ids": [
+     "depot-patiya"
+    ]
+   }
+  }
+ ],
+ "results": [
+  {
+   "policy": "no_action",
+   "ticks": 192,
+   "service_level": 0.4284,
+   "unmet_liters": 114613.6,
+   "served_liters": 85900.0,
+   "trucks_sent": 0,
+   "liters_shipped": 0,
+   "rejected": 0,
+   "reject_reasons": {},
+   "seconds": 42.2,
+   "curve": [
+    {
+     "tick": 0,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 1,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 2,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 3,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 4,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 5,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 6,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 7,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 8,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 9,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 10,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 11,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 12,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 13,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 14,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 15,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 16,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 17,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 18,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 19,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 20,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 21,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 22,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 23,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 24,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 25,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 26,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 27,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 28,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 29,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 30,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 31,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 32,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 33,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 34,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 35,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 36,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 37,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 38,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 39,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 40,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 41,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 42,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 43,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 44,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 45,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 46,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 47,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 48,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 49,
+     "service_level": 0.995556,
+     "unmet": 253.597
+    },
+    {
+     "tick": 50,
+     "service_level": 0.989455,
+     "unmet": 615.541
+    },
+    {
+     "tick": 51,
+     "service_level": 0.983699,
+     "unmet": 972.742
+    },
+    {
+     "tick": 52,
+     "service_level": 0.978263,
+     "unmet": 1325.502
+    },
+    {
+     "tick": 53,
+     "service_level": 0.973262,
+     "unmet": 1664.972
+    },
+    {
+     "tick": 54,
+     "service_level": 0.968172,
+     "unmet": 2023.268
+    },
+    {
+     "tick": 55,
+     "service_level": 0.963552,
+     "unmet": 2364.395
+    },
+    {
+     "tick": 56,
+     "service_level": 0.958555,
+     "unmet": 2742.315
+    },
+    {
+     "tick": 57,
+     "service_level": 0.954295,
+     "unmet": 3082.992
+    },
+    {
+     "tick": 58,
+     "service_level": 0.95182,
+     "unmet": 3297.455
+    },
+    {
+     "tick": 59,
+     "service_level": 0.949411,
+     "unmet": 3512.668
+    },
+    {
+     "tick": 60,
+     "service_level": 0.946989,
+     "unmet": 3734.009
+    },
+    {
+     "tick": 61,
+     "service_level": 0.944404,
+     "unmet": 3973.616
+    },
+    {
+     "tick": 62,
+     "service_level": 0.942113,
+     "unmet": 4197.296
+    },
+    {
+     "tick": 63,
+     "service_level": 0.939782,
+     "unmet": 4428.895
+    },
+    {
+     "tick": 64,
+     "service_level": 0.937792,
+     "unmet": 4638.195
+    },
+    {
+     "tick": 65,
+     "service_level": 0.935867,
+     "unmet": 4869.172
+    },
+    {
+     "tick": 66,
+     "service_level": 0.933259,
+     "unmet": 5160.221
+    },
+    {
+     "tick": 67,
+     "service_level": 0.929437,
+     "unmet": 5553.905
+    },
+    {
+     "tick": 68,
+     "service_level": 0.925753,
+     "unmet": 5944.43
+    },
+    {
+     "tick": 69,
+     "service_level": 0.921787,
+     "unmet": 6371.546
+    },
+    {
+     "tick": 70,
+     "service_level": 0.917444,
+     "unmet": 6840.181
+    },
+    {
+     "tick": 71,
+     "service_level": 0.913346,
+     "unmet": 7298.83
+    },
+    {
+     "tick": 72,
+     "service_level": 0.909152,
+     "unmet": 7778.564
+    },
+    {
+     "tick": 73,
+     "service_level": 0.906801,
+     "unmet": 8085.84
+    },
+    {
+     "tick": 74,
+     "service_level": 0.90451,
+     "unmet": 8395.141
+    },
+    {
+     "tick": 75,
+     "service_level": 0.901433,
+     "unmet": 8777.241
+    },
+    {
+     "tick": 76,
+     "service_level": 0.897094,
+     "unmet": 9288.14
+    },
+    {
+     "tick": 77,
+     "service_level": 0.892906,
+     "unmet": 9790.167
+    },
+    {
+     "tick": 78,
+     "service_level": 0.887987,
+     "unmet": 10371.265
+    },
+    {
+     "tick": 79,
+     "service_level": 0.883383,
+     "unmet": 10930.068
+    },
+    {
+     "tick": 80,
+     "service_level": 0.876147,
+     "unmet": 11752.233
+    },
+    {
+     "tick": 81,
+     "service_level": 0.868626,
+     "unmet": 12618.291
+    },
+    {
+     "tick": 82,
+     "service_level": 0.861589,
+     "unmet": 13450.465
+    },
+    {
+     "tick": 83,
+     "service_level": 0.854046,
+     "unmet": 14354.876
+    },
+    {
+     "tick": 84,
+     "service_level": 0.845792,
+     "unmet": 15346.985
+    },
+    {
+     "tick": 85,
+     "service_level": 0.84153,
+     "unmet": 15871.421
+    },
+    {
+     "tick": 86,
+     "service_level": 0.837247,
+     "unmet": 16405.887
+    },
+    {
+     "tick": 87,
+     "service_level": 0.832959,
+     "unmet": 16947.447
+    },
+    {
+     "tick": 88,
+     "service_level": 0.828797,
+     "unmet": 17478.66
+    },
+    {
+     "tick": 89,
+     "service_level": 0.824741,
+     "unmet": 18003.287
+    },
+    {
+     "tick": 90,
+     "service_level": 0.820648,
+     "unmet": 18536.007
+    },
+    {
+     "tick": 91,
+     "service_level": 0.816456,
+     "unmet": 19085.504
+    },
+    {
+     "tick": 92,
+     "service_level": 0.811775,
+     "unmet": 19695.198
+    },
+    {
+     "tick": 93,
+     "service_level": 0.807246,
+     "unmet": 20290.876
+    },
+    {
+     "tick": 94,
+     "service_level": 0.802706,
+     "unmet": 20895.648
+    },
+    {
+     "tick": 95,
+     "service_level": 0.798215,
+     "unmet": 21500.631
+    },
+    {
+     "tick": 96,
+     "service_level": 0.793625,
+     "unmet": 22126.553
+    },
+    {
+     "tick": 97,
+     "service_level": 0.789263,
+     "unmet": 22729.322
+    },
+    {
+     "tick": 98,
+     "service_level": 0.784947,
+     "unmet": 23332.821
+    },
+    {
+     "tick": 99,
+     "service_level": 0.78058,
+     "unmet": 23950.093
+    },
+    {
+     "tick": 100,
+     "service_level": 0.77628,
+     "unmet": 24565.727
+    },
+    {
+     "tick": 101,
+     "service_level": 0.772067,
+     "unmet": 25175.591
+    },
+    {
+     "tick": 102,
+     "service_level": 0.767912,
+     "unmet": 25784.002
+    },
+    {
+     "tick": 103,
+     "service_level": 0.763816,
+     "unmet": 26390.989
+    },
+    {
+     "tick": 104,
+     "service_level": 0.759765,
+     "unmet": 26998.647
+    },
+    {
+     "tick": 105,
+     "service_level": 0.755748,
+     "unmet": 27608.051
+    },
+    {
+     "tick": 106,
+     "service_level": 0.751784,
+     "unmet": 28216.523
+    },
+    {
+     "tick": 107,
+     "service_level": 0.747972,
+     "unmet": 28808.14
+    },
+    {
+     "tick": 108,
+     "service_level": 0.744042,
+     "unmet": 29424.473
+    },
+    {
+     "tick": 109,
+     "service_level": 0.739915,
+     "unmet": 30070.052
+    },
+    {
+     "tick": 110,
+     "service_level": 0.736029,
+     "unmet": 30683.878
+    },
+    {
+     "tick": 111,
+     "service_level": 0.73195,
+     "unmet": 31335.379
+    },
+    {
+     "tick": 112,
+     "service_level": 0.728147,
+     "unmet": 31950.114
+    },
+    {
+     "tick": 113,
+     "service_level": 0.724307,
+     "unmet": 32576.905
+    },
+    {
+     "tick": 114,
+     "service_level": 0.720498,
+     "unmet": 33205.807
+    },
+    {
+     "tick": 115,
+     "service_level": 0.716744,
+     "unmet": 33832.312
+    },
+    {
+     "tick": 116,
+     "service_level": 0.713037,
+     "unmet": 34457.532
+    },
+    {
+     "tick": 117,
+     "service_level": 0.709323,
+     "unmet": 35090.519
+    },
+    {
+     "tick": 118,
+     "service_level": 0.705775,
+     "unmet": 35701.899
+    },
+    {
+     "tick": 119,
+     "service_level": 0.702157,
+     "unmet": 36331.652
+    },
+    {
+     "tick": 120,
+     "service_level": 0.698608,
+     "unmet": 36955.786
+    },
+    {
+     "tick": 121,
+     "service_level": 0.692927,
+     "unmet": 37977.413
+    },
+    {
+     "tick": 122,
+     "service_level": 0.687323,
+     "unmet": 39002.003
+    },
+    {
+     "tick": 123,
+     "service_level": 0.681731,
+     "unmet": 40041.341
+    },
+    {
+     "tick": 124,
+     "service_level": 0.676212,
+     "unmet": 41086.104
+    },
+    {
+     "tick": 125,
+     "service_level": 0.669149,
+     "unmet": 42443.449
+    },
+    {
+     "tick": 126,
+     "service_level": 0.662202,
+     "unmet": 43808.628
+    },
+    {
+     "tick": 127,
+     "service_level": 0.655116,
+     "unmet": 45221.904
+    },
+    {
+     "tick": 128,
+     "service_level": 0.648053,
+     "unmet": 46650.912
+    },
+    {
+     "tick": 129,
+     "service_level": 0.641363,
+     "unmet": 48033.539
+    },
+    {
+     "tick": 130,
+     "service_level": 0.634783,
+     "unmet": 49421.838
+    },
+    {
+     "tick": 131,
+     "service_level": 0.628344,
+     "unmet": 50808.547
+    },
+    {
+     "tick": 132,
+     "service_level": 0.621913,
+     "unmet": 52222.111
+    },
+    {
+     "tick": 133,
+     "service_level": 0.615721,
+     "unmet": 53611.35
+    },
+    {
+     "tick": 134,
+     "service_level": 0.609708,
+     "unmet": 54987.059
+    },
+    {
+     "tick": 135,
+     "service_level": 0.603875,
+     "unmet": 56347.929
+    },
+    {
+     "tick": 136,
+     "service_level": 0.597934,
+     "unmet": 57761.388
+    },
+    {
+     "tick": 137,
+     "service_level": 0.593793,
+     "unmet": 58763.199
+    },
+    {
+     "tick": 138,
+     "service_level": 0.589679,
+     "unmet": 59772.532
+    },
+    {
+     "tick": 139,
+     "service_level": 0.585604,
+     "unmet": 60786.124
+    },
+    {
+     "tick": 140,
+     "service_level": 0.581647,
+     "unmet": 61784.083
+    },
+    {
+     "tick": 141,
+     "service_level": 0.577751,
+     "unmet": 62779.901
+    },
+    {
+     "tick": 142,
+     "service_level": 0.573789,
+     "unmet": 63806.517
+    },
+    {
+     "tick": 143,
+     "service_level": 0.569899,
+     "unmet": 64828.403
+    },
+    {
+     "tick": 144,
+     "service_level": 0.566194,
+     "unmet": 65814.661
+    },
+    {
+     "tick": 145,
+     "service_level": 0.562449,
+     "unmet": 66824.994
+    },
+    {
+     "tick": 146,
+     "service_level": 0.558719,
+     "unmet": 67844.458
+    },
+    {
+     "tick": 147,
+     "service_level": 0.555026,
+     "unmet": 68867.495
+    },
+    {
+     "tick": 148,
+     "service_level": 0.551447,
+     "unmet": 69871.901
+    },
+    {
+     "tick": 149,
+     "service_level": 0.547845,
+     "unmet": 70896.049
+    },
+    {
+     "tick": 150,
+     "service_level": 0.544373,
+     "unmet": 71896.201
+    },
+    {
+     "tick": 151,
+     "service_level": 0.540744,
+     "unmet": 72955.344
+    },
+    {
+     "tick": 152,
+     "service_level": 0.537346,
+     "unmet": 73959.661
+    },
+    {
+     "tick": 153,
+     "service_level": 0.534053,
+     "unmet": 74945.566
+    },
+    {
+     "tick": 154,
+     "service_level": 0.53087,
+     "unmet": 75909.825
+    },
+    {
+     "tick": 155,
+     "service_level": 0.52745,
+     "unmet": 76959.13
+    },
+    {
+     "tick": 156,
+     "service_level": 0.524301,
+     "unmet": 77937.153
+    },
+    {
+     "tick": 157,
+     "service_level": 0.521174,
+     "unmet": 78920.294
+    },
+    {
+     "tick": 158,
+     "service_level": 0.517937,
+     "unmet": 79950.206
+    },
+    {
+     "tick": 159,
+     "service_level": 0.514828,
+     "unmet": 80951.823
+    },
+    {
+     "tick": 160,
+     "service_level": 0.511592,
+     "unmet": 82007.254
+    },
+    {
+     "tick": 161,
+     "service_level": 0.507259,
+     "unmet": 83441.616
+    },
+    {
+     "tick": 162,
+     "service_level": 0.50307,
+     "unmet": 84851.459
+    },
+    {
+     "tick": 163,
+     "service_level": 0.498963,
+     "unmet": 86256.948
+    },
+    {
+     "tick": 164,
+     "service_level": 0.494981,
+     "unmet": 87642.089
+    },
+    {
+     "tick": 165,
+     "service_level": 0.491036,
+     "unmet": 89036.139
+    },
+    {
+     "tick": 166,
+     "service_level": 0.487238,
+     "unmet": 90399.845
+    },
+    {
+     "tick": 167,
+     "service_level": 0.483412,
+     "unmet": 91795.248
+    },
+    {
+     "tick": 168,
+     "service_level": 0.479804,
+     "unmet": 93131.592
+    },
+    {
+     "tick": 169,
+     "service_level": 0.476722,
+     "unmet": 94288.75
+    },
+    {
+     "tick": 170,
+     "service_level": 0.473705,
+     "unmet": 95436.546
+    },
+    {
+     "tick": 171,
+     "service_level": 0.47079,
+     "unmet": 96559.146
+    },
+    {
+     "tick": 172,
+     "service_level": 0.467873,
+     "unmet": 97696.866
+    },
+    {
+     "tick": 173,
+     "service_level": 0.465035,
+     "unmet": 98817.421
+    },
+    {
+     "tick": 174,
+     "service_level": 0.462135,
+     "unmet": 99976.416
+    },
+    {
+     "tick": 175,
+     "service_level": 0.459273,
+     "unmet": 101134.61
+    },
+    {
+     "tick": 176,
+     "service_level": 0.45653,
+     "unmet": 102258.521
+    },
+    {
+     "tick": 177,
+     "service_level": 0.453778,
+     "unmet": 103399.7
+    },
+    {
+     "tick": 178,
+     "service_level": 0.450923,
+     "unmet": 104598.182
+    },
+    {
+     "tick": 179,
+     "service_level": 0.448188,
+     "unmet": 105760.644
+    },
+    {
+     "tick": 180,
+     "service_level": 0.445612,
+     "unmet": 106868.618
+    },
+    {
+     "tick": 181,
+     "service_level": 0.444152,
+     "unmet": 107502.218
+    },
+    {
+     "tick": 182,
+     "service_level": 0.442687,
+     "unmet": 108142.142
+    },
+    {
+     "tick": 183,
+     "service_level": 0.441213,
+     "unmet": 108790.6
+    },
+    {
+     "tick": 184,
+     "service_level": 0.439749,
+     "unmet": 109438.835
+    },
+    {
+     "tick": 185,
+     "service_level": 0.438286,
+     "unmet": 110090.909
+    },
+    {
+     "tick": 186,
+     "service_level": 0.436839,
+     "unmet": 110739.761
+    },
+    {
+     "tick": 187,
+     "service_level": 0.435399,
+     "unmet": 111390.298
+    },
+    {
+     "tick": 188,
+     "service_level": 0.434011,
+     "unmet": 112021.221
+    },
+    {
+     "tick": 189,
+     "service_level": 0.432542,
+     "unmet": 112693.509
+    },
+    {
+     "tick": 190,
+     "service_level": 0.431178,
+     "unmet": 113321.778
+    },
+    {
+     "tick": 191,
+     "service_level": 0.429802,
+     "unmet": 113959.54
+    }
+   ]
+  },
+  {
+   "policy": "deterministic_lp",
+   "ticks": 192,
+   "service_level": 1.0,
+   "unmet_liters": 0.0,
+   "served_liters": 200513.6,
+   "trucks_sent": 76,
+   "liters_shipped": 215600.0,
+   "rejected": 0,
+   "reject_reasons": {},
+   "seconds": 51.0,
+   "curve": [
+    {
+     "tick": 0,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 1,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 2,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 3,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 4,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 5,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 6,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 7,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 8,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 9,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 10,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 11,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 12,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 13,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 14,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 15,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 16,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 17,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 18,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 19,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 20,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 21,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 22,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 23,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 24,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 25,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 26,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 27,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 28,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 29,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 30,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 31,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 32,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 33,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 34,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 35,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 36,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 37,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 38,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 39,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 40,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 41,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 42,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 43,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 44,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 45,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 46,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 47,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 48,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 49,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 50,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 51,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 52,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 53,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 54,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 55,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 56,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 57,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 58,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 59,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 60,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 61,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 62,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 63,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 64,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 65,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 66,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 67,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 68,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 69,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 70,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 71,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 72,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 73,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 74,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 75,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 76,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 77,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 78,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 79,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 80,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 81,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 82,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 83,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 84,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 85,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 86,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 87,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 88,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 89,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 90,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 91,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 92,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 93,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 94,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 95,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 96,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 97,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 98,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 99,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 100,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 101,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 102,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 103,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 104,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 105,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 106,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 107,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 108,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 109,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 110,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 111,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 112,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 113,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 114,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 115,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 116,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 117,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 118,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 119,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 120,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 121,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 122,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 123,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 124,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 125,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 126,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 127,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 128,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 129,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 130,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 131,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 132,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 133,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 134,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 135,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 136,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 137,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 138,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 139,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 140,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 141,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 142,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 143,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 144,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 145,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 146,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 147,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 148,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 149,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 150,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 151,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 152,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 153,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 154,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 155,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 156,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 157,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 158,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 159,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 160,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 161,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 162,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 163,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 164,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 165,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 166,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 167,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 168,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 169,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 170,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 171,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 172,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 173,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 174,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 175,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 176,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 177,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 178,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 179,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 180,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 181,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 182,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 183,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 184,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 185,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 186,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 187,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 188,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 189,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 190,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 191,
+     "service_level": 1.0,
+     "unmet": 0.0
+    }
+   ]
+  },
+  {
+   "policy": "rl",
+   "ticks": 192,
+   "service_level": 1.0,
+   "unmet_liters": 0.0,
+   "served_liters": 200513.6,
+   "trucks_sent": 69,
+   "liters_shipped": 220750.0,
+   "rejected": 0,
+   "reject_reasons": {},
+   "seconds": 50.6,
+   "curve": [
+    {
+     "tick": 0,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 1,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 2,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 3,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 4,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 5,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 6,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 7,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 8,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 9,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 10,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 11,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 12,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 13,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 14,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 15,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 16,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 17,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 18,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 19,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 20,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 21,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 22,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 23,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 24,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 25,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 26,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 27,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 28,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 29,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 30,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 31,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 32,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 33,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 34,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 35,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 36,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 37,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 38,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 39,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 40,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 41,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 42,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 43,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 44,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 45,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 46,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 47,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 48,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 49,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 50,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 51,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 52,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 53,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 54,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 55,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 56,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 57,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 58,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 59,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 60,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 61,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 62,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 63,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 64,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 65,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 66,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 67,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 68,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 69,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 70,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 71,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 72,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 73,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 74,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 75,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 76,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 77,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 78,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 79,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 80,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 81,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 82,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 83,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 84,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 85,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 86,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 87,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 88,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 89,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 90,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 91,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 92,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 93,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 94,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 95,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 96,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 97,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 98,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 99,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 100,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 101,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 102,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 103,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 104,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 105,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 106,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 107,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 108,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 109,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 110,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 111,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 112,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 113,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 114,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 115,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 116,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 117,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 118,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 119,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 120,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 121,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 122,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 123,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 124,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 125,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 126,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 127,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 128,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 129,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 130,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 131,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 132,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 133,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 134,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 135,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 136,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 137,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 138,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 139,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 140,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 141,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 142,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 143,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 144,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 145,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 146,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 147,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 148,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 149,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 150,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 151,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 152,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 153,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 154,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 155,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 156,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 157,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 158,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 159,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 160,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 161,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 162,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 163,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 164,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 165,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 166,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 167,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 168,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 169,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 170,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 171,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 172,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 173,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 174,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 175,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 176,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 177,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 178,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 179,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 180,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 181,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 182,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 183,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 184,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 185,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 186,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 187,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 188,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 189,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 190,
+     "service_level": 1.0,
+     "unmet": 0.0
+    },
+    {
+     "tick": 191,
+     "service_level": 1.0,
+     "unmet": 0.0
+    }
+   ]
+  }
+ ]
+}

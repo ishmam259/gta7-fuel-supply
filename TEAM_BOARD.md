@@ -102,3 +102,6 @@ Badrul: load test and resilience docs (with Ishmam).
 - **12:53 · Farhan → Ishmam:** RL done on `intel` (`68ae291`), 113 tests green, please merge. For your benchmark switch:
   `policy=rl` → `intel.rl_plan(s, fc, risks)` (same signature as `plan`, returns `mode="rl"`). Note `mode` can now be
   `"rl"` (API contract/UI badge). Honest result: same service as LP, 15–20% fewer trucks. Still waiting for the Q&A PDF.
+- **13:05 · Farhan → All:** RL vs LP on the **real simulator** (same reset/seed/combined crisis, 2 days, all recs auto-approved):
+  no action **42.8%** · deterministic LP **100%, 76 trucks** · RL **100%, 69 trucks (−9%)** · 0 rejections. Chart for slides:
+  `backend/app/intel/policy_comparison.png` (commit below). Badrul: one-liner "RL matches LP's 100% with 9–20% fewer trucks".
