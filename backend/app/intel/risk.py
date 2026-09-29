@@ -20,8 +20,8 @@ def _norm_cdf(z: float) -> float:
 def _arrival_tick(s: Snapshot, a: dict, transit: dict[str, int]) -> int:
     if a.get("expected_arrival_tick") is not None:
         return int(a["expected_arrival_tick"])
-    # PENDING: departs next tick, then transit_ticks on the road
-    return int(a.get("created_tick", s.tick)) + 1 + transit.get(a.get("route_id"), 2)
+    # PENDING: departs on its created tick, arrives transit_ticks later (verified against the simulator)
+    return int(a.get("created_tick", s.tick)) + transit.get(a.get("route_id"), 2)
 
 
 def incoming(s: Snapshot, station_id: str, fuel: str) -> dict[int, float]:
@@ -35,7 +35,7 @@ def incoming(s: Snapshot, station_id: str, fuel: str) -> dict[int, float]:
         dest = a.get("destination_station_id") or routes.get(a.get("route_id"), {}).get("destination_station_id")
         if dest != station_id:
             continue
-        t = max(_arrival_tick(s, a, transit), s.tick + 1)
+        t = max(_arrival_tick(s, a, transit), s.tick)
         out[t] = out.get(t, 0.0) + float(a.get("quantity", 0.0))
     return out
 
@@ -46,9 +46,17 @@ def depot_supply(s: Snapshot, depot_id: str, fuel: str) -> list[dict]:
     for a in s.supply_arrivals:
         if a.get("depot_id") != depot_id or a.get("fuel_type") != fuel or a.get("status") == "ARRIVED":
             continue
-        eta = max(int(a.get("planned_tick", s.tick)), s.tick + 1)
+        eta = max(int(a.get("planned_tick", s.tick)), s.tick)
         out.append({**a, "eta_tick": eta})
     return sorted(out, key=lambda a: a["eta_tick"])
+
+
+def dispatch_used(s: Snapshot, depot: dict) -> float:
+    """Liters already committed from this depot this tick (simulator counts PENDING + in-flight created this tick)."""
+    counted = sum(float(a.get("quantity", 0.0)) for a in s.allocations
+                  if a.get("source_depot_id") == depot["id"] and a.get("created_tick") == s.tick
+                  and a.get("status") in ("PENDING", "IN_TRANSIT"))
+    return max(counted, float(depot.get("dispatch_used_this_tick") or 0.0))
 
 
 def serving_depots(s: Snapshot, station_id: str) -> list[str]:
@@ -61,7 +69,7 @@ def project(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, float]
     for t, q in (extra or {}).items():
         arrivals[t] = arrivals.get(t, 0.0) + q
     inv, path = inventory, []
-    for i, d in enumerate(fc.per_tick, start=1):
+    for i, d in enumerate(fc.per_tick):  # per_tick[0] is the tick being processed next (= s.tick)
         t = s.tick + i
         inv = max(0.0, inv + arrivals.get(t, 0.0) - d)
         path.append((t, inv))
@@ -75,7 +83,7 @@ def stockout_prob(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int, 
     sys_err = min(fc.mape_recent if fc.mape_recent is not None else 0.1, 0.5)
     cum_d = var = worst = 0.0
     for i, (mu, lo, hi) in enumerate(zip(fc.per_tick, fc.lower, fc.upper), start=1):
-        supply_k = inventory + sum(q for t, q in arrivals.items() if t <= s.tick + i)
+        supply_k = inventory + sum(q for t, q in arrivals.items() if t <= s.tick + i - 1)
         cum_d += mu
         var += ((hi - lo) / (2 * Z80)) ** 2
         sd = max(math.sqrt(var) + sys_err * cum_d, 1e-6)
@@ -89,7 +97,7 @@ def stockout_hours(s: Snapshot, fc: Forecast, inventory: float, extra: dict[int,
     path = project(s, fc, inventory, extra)
     for t, inv in path:
         if inv <= 0:
-            return round((t - s.tick) * s.tick_minutes / 60, 2)
+            return round((t - s.tick + 1) * s.tick_minutes / 60, 2)
     rate = (sum(fc.per_tick) / len(fc.per_tick)) or 1e-6
     hours = (len(fc.per_tick) + path[-1][1] / rate) * s.tick_minutes / 60
     return round(min(hours, MAX_HOURS), 2)

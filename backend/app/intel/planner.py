@@ -4,7 +4,7 @@ from .models import (
     AllocationPlan, Alternative, ExpectedImpact, Forecast, ProjectionPoint, RecommendationDraft,
     Risk, Situation, Snapshot, WhatIf,
 )
-from .risk import SHIPPABLE_DEPOT, assess_risk, incoming, project, stockout_prob
+from .risk import SHIPPABLE_DEPOT, assess_risk, dispatch_used, incoming, project, stockout_prob
 
 MIN_QTY = 500.0
 
@@ -33,7 +33,7 @@ def _candidates(s: Snapshot, station_id: str, fuel: str, depot_left: dict, depot
 
 def _plan(s: Snapshot, fc: list[Forecast], risks: list[Risk], mode: str) -> list[RecommendationDraft]:
     by_key = {(f.station_id, f.fuel_type): f for f in fc}
-    depot_left = {d["id"]: float(d.get("dispatch_capacity_per_tick", 0)) - float(d.get("dispatch_used_this_tick", 0)) for d in s.depots}
+    depot_left = {d["id"]: float(d.get("dispatch_capacity_per_tick", 0)) - dispatch_used(s, d) for d in s.depots}
     depot_inv = {(d["id"], f): float(q) for d in s.depots for f, q in d.get("inventory", {}).items()}
     recs = []
     for r in sorted((x for x in risks if x.level in ("watch", "critical")), key=lambda x: -x.stockout_prob):

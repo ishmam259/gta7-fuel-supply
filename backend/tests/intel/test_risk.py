@@ -60,7 +60,7 @@ def test_incoming_shipment_lowers_risk(raw, status, eta):
         "created_tick": 200, "expected_arrival_tick": eta, "status": status,
     }]
     after = _risk(raw)
-    assert after.next_supply_eta_tick == (eta or 203)  # pending: created 200 + depart 1 + transit 2
+    assert after.next_supply_eta_tick == (eta or 202)  # pending: created 200 + transit 2
     assert after.incoming_liters == 5000
     assert after.stockout_prob < before.stockout_prob
     assert after.stockout_hours > before.stockout_hours
@@ -81,6 +81,6 @@ def test_depot_supply_eta_includes_delayed(raw):
                                    "quantity": 12000, "planned_tick": 206, "status": "DELAYED"})
     r = _risk(raw)
     assert r.depot_supply_eta_tick == 206 and r.depot_supply_delayed
-    # overdue delayed supply is expected next tick, never in the past
+    # overdue delayed supply is expected now, never in the past
     raw["supply_arrivals"][-1]["planned_tick"] = 190
-    assert _risk(raw).depot_supply_eta_tick == 201
+    assert _risk(raw).depot_supply_eta_tick == 200
