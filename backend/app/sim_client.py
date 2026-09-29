@@ -108,7 +108,7 @@ class SimClient:
                 SIM_REQUESTS.labels(method, label, str(resp.status_code)).inc()
                 if use_breaker:
                     self.breaker.success()
-                if method == "GET" and path.startswith("/v1/"):
+                if method == "GET" and path.startswith("/v1/") and not path.startswith("/v1/health"):
                     self.stale = resp.headers.get("X-Simulator-Stale", "").lower() == "true"
                     STALE_DATA.set(1 if self.stale else 0)
                 return resp
