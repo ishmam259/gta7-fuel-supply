@@ -68,6 +68,12 @@ class AlertDraft(BaseModel):
     entity: AlertEntity
     title: str
     detail: str = ""
+    code: str = ""  # sub-type within kind, e.g. "dispatch" / "low_stock" for bottleneck
+
+    @property
+    def key(self) -> str:
+        """Stable identity for de-duplicating / resolving the same condition across ticks."""
+        return f"{self.kind}:{self.entity.type}:{self.entity.id}:{self.entity.fuel_type or ''}:{self.code}"
 
 
 class AllocationPlan(BaseModel):
