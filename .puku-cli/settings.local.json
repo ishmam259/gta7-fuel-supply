@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh --version)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(git -C \"D:/VSCODE/gta7-fuel-supply/FuelSupply-master/FuelSupply-master\" log --pretty=format:'%h | %an | %ae | %ad | %s' --date=short)",
+      "Bash(python -c \":*)",
+      "Bash(python:*)",
+      "Bash(for br:*)",
+      "Bash(wc -l D:/VSCODE/gta7-fuel-supply/backend/app/intel/*.py D:/VSCODE/gta7-fuel-supply/FuelSupply-master/FuelSupply-master/intelligence/*.py)",
+      "Bash(mkdir:*)",
+      "Bash(wc -l D:/VSCODE/gta7-fuel-supply/POST_MORTEM/*.md)"
+    ]
+  }
+}
